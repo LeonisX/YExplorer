@@ -1,0 +1,6 @@
+/input
+/output*
+/test
+/other
+/src/dcu*
+/src/*.~*
