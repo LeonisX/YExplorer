@@ -2,7 +2,7 @@ object MainForm: TMainForm
   Left = 192
   Top = 114
   Width = 667
-  Height = 510
+  Height = 671
   Caption = 'Yoda Stories Explorer'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,9 +17,9 @@ object MainForm: TMainForm
   TextHeight = 13
   object Image1: TImage
     Left = 336
-    Top = 24
-    Width = 305
-    Height = 321
+    Top = 8
+    Width = 313
+    Height = 297
   end
   object Button1: TButton
     Left = 16
@@ -75,18 +75,16 @@ object MainForm: TMainForm
     Left = 8
     Top = 280
     Width = 321
-    Height = 193
+    Height = 353
     Caption = ' LOG '
     TabOrder = 4
-    object LOG: TMemo
+    object LogMemo: TRichEdit
       Left = 2
       Top = 15
       Width = 317
-      Height = 176
+      Height = 336
       Align = alClient
-      ScrollBars = ssVertical
       TabOrder = 0
-      WordWrap = False
     end
   end
   object GroupBox4: TGroupBox
@@ -281,6 +279,32 @@ object MainForm: TMainForm
     Caption = 'Open DTA'
     TabOrder = 13
     OnClick = OpenDTAButtonClick
+  end
+  object SaveSTUPButton: TButton
+    Left = 288
+    Top = 72
+    Width = 75
+    Height = 25
+    Caption = 'Save STUP'
+    TabOrder = 14
+    OnClick = SaveSTUPButtonClick
+  end
+  object ListSNDSButton: TButton
+    Left = 288
+    Top = 104
+    Width = 75
+    Height = 25
+    Caption = 'List SNDS'
+    TabOrder = 15
+    OnClick = ListSNDSButtonClick
+  end
+  object SaveTextMemo: TMemo
+    Left = 368
+    Top = 464
+    Width = 185
+    Height = 89
+    TabOrder = 16
+    Visible = False
   end
   object OpenDTADialog: TOpenDialog
     DefaultExt = '*.dta'

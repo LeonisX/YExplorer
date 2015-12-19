@@ -5,7 +5,8 @@ uses
   MainUnit in 'MainUnit.pas' {MainForm},
   BMPUnit in 'BMPUnit.pas',
   DataStructureUnit in 'DataStructureUnit.pas',
-  CRCUnit in 'CRCUnit.pas';
+  CRCUnit in 'CRCUnit.pas',
+  LoggerUnit in 'LoggerUnit.pas';
 
 {$R *.res}
 

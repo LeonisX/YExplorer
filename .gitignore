@@ -4,3 +4,6 @@
 /other
 /src/dcu*
 /src/*.~*
+/*.map
+/*.rsm
+/*.exe

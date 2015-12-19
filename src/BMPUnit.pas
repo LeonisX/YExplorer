@@ -2,7 +2,7 @@ unit BMPUnit;
 
 interface
 
-uses Windows, Classes, ExtCtrls, SysUtils, Graphics, Dialogs;
+uses Windows, Classes, ExtCtrls, SysUtils, Graphics, Dialogs, DataStructureUnit;
 
 const
 GamePalette: array[0..1023] of byte = (	$FF, $00, $FF, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00,
@@ -35,7 +35,7 @@ GamePalette: array[0..1023] of byte = (	$FF, $00, $FF, $00, $00, $00, $00, $00, 
 	$07, $27, $57, $00, $00, $1B, $47, $00, $00, $13, $37, $00, $00, $0F, $2B, $00,
 	$FB, $FB, $E7, $00, $F3, $F3, $D3, $00, $EB, $E7, $C7, $00, $E3, $DF, $B7, $00,
 	$DB, $D7, $A7, $00, $D3, $CF, $97, $00, $CB, $C7, $8B, $00, $C3, $BB, $7F, $00, 
-	$BB, $B3, $73, $00, $AF, $A7, $63, $00, $9B, $93, $47, $00, $87, $7B, $33, $00, 
+	$BB, $B3, $73, $00, $AF, $A7, $63, $00, $9B, $93, $47, $00, $87, $7B, $33, $00,
 	$6F, $67, $1F, $00, $5B, $53, $0F, $00, $47, $43, $00, $00, $37, $33, $00, $00,
 	$FF, $F7, $F7, $00, $EF, $DF, $DF, $00, $DF, $C7, $C7, $00, $CF, $B3, $B3, $00,
 	$BF, $9F, $9F, $00, $B3, $8B, $8B, $00, $A3, $7B, $7B, $00, $93, $6B, $6B, $00, 
@@ -100,20 +100,11 @@ type
   Palette : packed array[0..255,0..3]of byte; {таблица палитры}
   end;
 
-    procedure FillInternalPalette(BM:TBitMap); //заполняет палитру нужного БитМапа. СТрого 256 цветов. Палитра прошита в программе
+    procedure FillInternalPalette(BM:TBitMap; r, g, b: Byte); //заполняет палитру нужного БитМапа. СТрого 256 цветов. Палитра прошита в программе
     procedure FillPalette(BM:TBitMap); //заполняет палитру нужного БитМапа. СТрого 256 цветов
-    procedure ReadPicture(Offset:Cardinal); //читает картинку из DTA файла согласно её смещению
+    procedure ReadPicture(section: TSection; offset: Cardinal); //читает картинку из DTA файла согласно её смещению
     procedure CopyPicture(Image:TImage;x,y:word); //берёт прочитанную картинку и кидает куда нам нужно
     procedure CopyFrame(Image:TImage;x,y:word); //копирует блочок на большой холст
-
-    function ReadString(size:cardinal):string;
-    function ReadByte:byte;
-    //так как следующие данные по 2-4 байта, надо по необходимости преобразовывать их
-    //в читабельный вариант
-    function ReadWord:word;
-    function ReadLongWord:Longword;
-    function ReadRWord:word;  //читает обратный порядок, little-endian, преобразует в нормальное число
-    function ReadRLongWord:Longword; //читает обратный порядок, little-endian, преобразует в нормальное число
     procedure LoadBMP(s:string;bmp:tbitmap);
     procedure SaveBMP(s:string;bmp:tbitmap);
     procedure InitBMP;
@@ -129,45 +120,7 @@ var
 
 implementation
 
-
-function ReadByte:byte;
-begin
-  BlockRead(SrcFile, Buf, 1, NumRead);
-  result:=buf[1];
-end;
-
-function ReadWord:word;
-begin
-  BlockRead(SrcFile, Buf, 2, NumRead);
-  result:=buf[1]+buf[2]*256;
-end;
-
-function ReadLongWord:longword;
-begin
-  BlockRead(SrcFile, Buf, 4, NumRead);
-  result:=buf[1]+buf[2]*256+buf[3]*65536+buf[4]*16777216;
-end;
-
-function ReadRWord:word;
-begin
-  BlockRead(SrcFile, Buf, 2, NumRead);
-  result:=buf[2]+buf[1]*256;
-end;
-
-function ReadRLongWord:longword;
-begin
-  BlockRead(SrcFile, Buf, 4, NumRead);
-  result:=buf[4]+buf[3]*256+buf[2]*65536+buf[1]*16777216;
-end;
-
-function ReadString(size:cardinal):string;
-var i:cardinal;
-begin
-  BlockRead(SrcFile, Buf, size, NumRead);
-  result:='';
-  for i:=1 to size do result:=result+chr(buf[i]);
-end;
-
+uses MainUnit;
 
 procedure LoadBMP(s:string;bmp:tbitmap);
 var i,j:cardinal;
@@ -202,7 +155,7 @@ end;
 
 procedure SaveBMP(s:string;bmp:tbitmap);
 var i,j:cardinal;
-P : PByteArray;
+P: PByteArray;
 begin
   InitBMP;
   assignfile(DestFile, s);
@@ -285,22 +238,22 @@ begin
   Image.Canvas.BrushCopy(rect(0+x,0+y,BMP.Width+x,BMP.Height+y), BMP, rect(0,0,BMP.Width,BMP.Height),clFuchsia);
 end;
 
-procedure ReadPicture(Offset:Cardinal);
+procedure ReadPicture(section: TSection; offset: Cardinal);
 var i:cardinal;
 x,y:word;
 P: PByteArray;
 begin
-  if Offset>0 then seek(SrcFile,Offset);
-  for i:=0 to BMP.Width*BMP.Height-1 do
+  if Offset > 0 then section.setIndex(offset);
+  for i := 0 to BMP.Width * BMP.Height - 1 do
    begin
-    y:=i div BMP.Width;
-    x:=i-y*BMP.Width;
-    P:=BMP.ScanLine[y];
-    P[x]:=ReadByte;
+    y := i div BMP.Width;
+    x := i - y * BMP.Width;
+    P := BMP.ScanLine[y];
+    P[x] := section.ReadByte;
    end;
 end;
 
-procedure FillInternalPalette(BM:TBitMap);
+procedure FillInternalPalette(BM:TBitMap; r, g, b: Byte);
 var
   pal: PLogPalette;
   hpal: HPALETTE;
@@ -311,7 +264,10 @@ begin
     GetMem(pal, sizeof(TLogPalette) + sizeof(TPaletteEntry) * 255);
     pal.palVersion := $300;
     pal.palNumEntries := 256;
-    for i := 0 to 255 do
+    pal.palPalEntry[i].peRed := r;
+    pal.palPalEntry[i].peGreen := g;
+    pal.palPalEntry[i].peBlue := b;
+    for i := 1 to 255 do
     begin
       pal.palPalEntry[i].peRed := GamePalette[i * 4 + 2];
       pal.palPalEntry[i].peGreen := GamePalette[i * 4 + 1];
