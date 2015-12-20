@@ -2,7 +2,7 @@ unit DataStructureUnit;
 
 interface
 
-uses classes, dialogs, sysutils, CRCUnit, Forms;
+uses classes, dialogs, sysutils, CRCUnit, LoggerUnit, Forms;
 
 const
   knownSections: Array[1..12] of string[4]=('VERS','STUP','SNDS','TILE','ZONE','PUZ2','CHAR','CHWP','CAUX','TNAM','TGEN','ENDF');
@@ -23,6 +23,8 @@ type
     index: integer;
     crcs: TStringList;
   public
+    crc32: String;
+    dtaRevision: String;
     procedure Clear;
     procedure Add(section: String; size, offset: integer);
     function GetOffset(section: String): integer;
@@ -64,9 +66,9 @@ type
     function inBound(section: String): boolean;
   end;
 
-implementation
+  var DTA: TSection;
 
-uses MainUnit;
+implementation
 
 constructor TSectionMetricks.Create(size, offset: integer);
 begin
@@ -147,7 +149,6 @@ i: byte;
 begin
   loadFileToArray(fileName);
 
-  log.Clear;
   keepReading:=true;
   while (keepReading) do
     begin
@@ -314,16 +315,13 @@ end;
 
 procedure TSection.loadFileToArray(fileName: String);
 var FS: TFileStream;
-  crc: String;
 begin
-  crc := IntToHex(GetFileCRC(fileName), 8);
-  if crcs.IndexOfName(crc) = -1
-    then log.debug('Unrecognized DTA file with CRC32: ' + crc)
-    else
-      begin
-        log.info('Recognized DTA file with CRC32: ' + crc);
-        log.info(crcs.Values[crc]);
-      end;
+  crc32 := IntToHex(GetFileCRC(fileName), 8);
+  if crcs.IndexOfName(crc32) = -1
+    then dtaRevision := 'Unknown'
+    else dtaRevision := crcs.Values[crc32];
+  Log.debug('CRC-32: ' + crc32);
+  Log.debug('DTA revision: ' + dtaRevision);
   dta := nil;
   Clear;
   FS := TFileStream.Create(fileName, fmOpenRead);
@@ -392,5 +390,13 @@ begin
   for i := 0 to size - 1 do result := result + chr(dta[index + i]);
   MoveIndex(size);
 end;
+
+initialization
+
+  DTA := TSection.Create;
+
+finalization
+
+  DTA.Free;
 
 end.

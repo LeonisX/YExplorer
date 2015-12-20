@@ -8,96 +8,99 @@
   resources were bound to the produced executable.
 */
 
-#define Consts_SDockTreeRemoveError 65312
-#define Consts_SDockZoneNotFound 65313
-#define Consts_SDockZoneHasNoCtl 65314
-#define HelpIntfs_hNoTableOfContents 65315
-#define HelpIntfs_hNothingFound 65316
-#define HelpIntfs_hNoContext 65317
-#define HelpIntfs_hNoTopics 65318
-#define ComStrs_sRichEditInsertError 65319
-#define ComStrs_sRichEditLoadFail 65320
-#define ComStrs_sRichEditSaveFail 65321
-#define Consts_SmkcHome 65328
-#define Consts_SmkcLeft 65329
-#define Consts_SmkcUp 65330
-#define Consts_SmkcRight 65331
-#define Consts_SmkcDown 65332
-#define Consts_SmkcIns 65333
-#define Consts_SmkcDel 65334
-#define Consts_SmkcShift 65335
-#define Consts_SmkcCtrl 65336
-#define Consts_SmkcAlt 65337
-#define Consts_SIconToClipboard 65338
-#define Consts_SCannotOpenClipboard 65339
-#define Consts_SInvalidMemoSize 65340
-#define Consts_SNoDefaultPrinter 65341
-#define Consts_SDuplicateMenus 65342
-#define Consts_SDockedCtlNeedsName 65343
-#define Consts_SMsgDlgCancel 65344
-#define Consts_SMsgDlgHelp 65345
-#define Consts_SMsgDlgAbort 65346
-#define Consts_SMsgDlgRetry 65347
-#define Consts_SMsgDlgIgnore 65348
-#define Consts_SMsgDlgAll 65349
-#define Consts_SMsgDlgNoToAll 65350
-#define Consts_SMsgDlgYesToAll 65351
-#define Consts_SmkcBkSp 65352
-#define Consts_SmkcTab 65353
-#define Consts_SmkcEsc 65354
-#define Consts_SmkcEnter 65355
-#define Consts_SmkcSpace 65356
-#define Consts_SmkcPgUp 65357
-#define Consts_SmkcPgDn 65358
-#define Consts_SmkcEnd 65359
-#define Consts_SIgnoreButton 65360
-#define Consts_SRetryButton 65361
-#define Consts_SAbortButton 65362
-#define Consts_SAllButton 65363
-#define Consts_SCannotDragForm 65364
-#define Consts_SVMetafiles 65365
-#define Consts_SVEnhMetafiles 65366
-#define Consts_SVIcons 65367
-#define Consts_SVBitmaps 65368
-#define Consts_SMsgDlgWarning 65369
-#define Consts_SMsgDlgError 65370
-#define Consts_SMsgDlgInformation 65371
-#define Consts_SMsgDlgConfirm 65372
-#define Consts_SMsgDlgYes 65373
-#define Consts_SMsgDlgNo 65374
-#define Consts_SMsgDlgOK 65375
-#define Consts_SMenuNotFound 65376
-#define Consts_SNoTimers 65377
-#define Consts_SNotPrinting 65378
-#define Consts_SPrinting 65379
-#define Consts_SInvalidPrinter 65380
-#define Consts_SDeviceOnPort 65381
-#define Consts_SGroupIndexTooLow 65382
-#define Consts_SNoMDIForm 65383
-#define Consts_SImageCanvasNeedsBitmap 65384
-#define Consts_SControlParentSetToSelf 65385
-#define Consts_SOKButton 65386
-#define Consts_SCancelButton 65387
-#define Consts_SYesButton 65388
-#define Consts_SNoButton 65389
-#define Consts_SHelpButton 65390
-#define Consts_SCloseButton 65391
-#define Consts_SOutOfResources 65392
-#define Consts_SNoCanvasHandle 65393
-#define Consts_SInvalidImageSize 65394
-#define Consts_SInvalidImageList 65395
-#define Consts_SImageIndexError 65396
-#define Consts_SImageReadFail 65397
-#define Consts_SImageWriteFail 65398
-#define Consts_SWindowDCError 65399
-#define Consts_SWindowClass 65400
-#define Consts_SCannotFocus 65401
-#define Consts_SParentRequired 65402
-#define Consts_SMDIChildNotVisible 65403
-#define Consts_SVisibleChanged 65404
-#define Consts_SCannotShowModal 65405
-#define Consts_SMenuIndexError 65406
-#define Consts_SMenuReinserted 65407
+#define Consts_SDockZoneHasNoCtl 65312
+#define HelpIntfs_hNoTableOfContents 65313
+#define HelpIntfs_hNothingFound 65314
+#define HelpIntfs_hNoContext 65315
+#define HelpIntfs_hNoTopics 65316
+#define ComStrs_sTabFailClear 65317
+#define ComStrs_sTabFailDelete 65318
+#define ComStrs_sTabFailRetrieve 65319
+#define ComStrs_sTabFailGetObject 65320
+#define ComStrs_sTabFailSet 65321
+#define ComStrs_sTabFailSetObject 65322
+#define ComStrs_sTabMustBeMultiLine 65323
+#define ComStrs_sPageIndexError 65324
+#define Consts_SmkcLeft 65328
+#define Consts_SmkcUp 65329
+#define Consts_SmkcRight 65330
+#define Consts_SmkcDown 65331
+#define Consts_SmkcIns 65332
+#define Consts_SmkcDel 65333
+#define Consts_SmkcShift 65334
+#define Consts_SmkcCtrl 65335
+#define Consts_SmkcAlt 65336
+#define Consts_SIconToClipboard 65337
+#define Consts_SCannotOpenClipboard 65338
+#define Consts_SInvalidMemoSize 65339
+#define Consts_SDuplicateMenus 65340
+#define Consts_SDockedCtlNeedsName 65341
+#define Consts_SDockTreeRemoveError 65342
+#define Consts_SDockZoneNotFound 65343
+#define Consts_SMsgDlgHelp 65344
+#define Consts_SMsgDlgAbort 65345
+#define Consts_SMsgDlgRetry 65346
+#define Consts_SMsgDlgIgnore 65347
+#define Consts_SMsgDlgAll 65348
+#define Consts_SMsgDlgNoToAll 65349
+#define Consts_SMsgDlgYesToAll 65350
+#define Consts_SmkcBkSp 65351
+#define Consts_SmkcTab 65352
+#define Consts_SmkcEsc 65353
+#define Consts_SmkcEnter 65354
+#define Consts_SmkcSpace 65355
+#define Consts_SmkcPgUp 65356
+#define Consts_SmkcPgDn 65357
+#define Consts_SmkcEnd 65358
+#define Consts_SmkcHome 65359
+#define Consts_SRetryButton 65360
+#define Consts_SAbortButton 65361
+#define Consts_SAllButton 65362
+#define Consts_SCannotDragForm 65363
+#define Consts_SVMetafiles 65364
+#define Consts_SVEnhMetafiles 65365
+#define Consts_SVIcons 65366
+#define Consts_SVBitmaps 65367
+#define Consts_SMsgDlgWarning 65368
+#define Consts_SMsgDlgError 65369
+#define Consts_SMsgDlgInformation 65370
+#define Consts_SMsgDlgConfirm 65371
+#define Consts_SMsgDlgYes 65372
+#define Consts_SMsgDlgNo 65373
+#define Consts_SMsgDlgOK 65374
+#define Consts_SMsgDlgCancel 65375
+#define Consts_SPropertyOutOfRange 65376
+#define Consts_SMenuIndexError 65377
+#define Consts_SMenuReinserted 65378
+#define Consts_SMenuNotFound 65379
+#define Consts_SNoTimers 65380
+#define Consts_SGroupIndexTooLow 65381
+#define Consts_SNoMDIForm 65382
+#define Consts_SImageCanvasNeedsBitmap 65383
+#define Consts_SControlParentSetToSelf 65384
+#define Consts_SOKButton 65385
+#define Consts_SCancelButton 65386
+#define Consts_SYesButton 65387
+#define Consts_SNoButton 65388
+#define Consts_SHelpButton 65389
+#define Consts_SCloseButton 65390
+#define Consts_SIgnoreButton 65391
+#define Consts_SChangeIconSize 65392
+#define Consts_SUnknownClipboardFormat 65393
+#define Consts_SOutOfResources 65394
+#define Consts_SNoCanvasHandle 65395
+#define Consts_SInvalidImageSize 65396
+#define Consts_SInvalidImageList 65397
+#define Consts_SImageIndexError 65398
+#define Consts_SImageReadFail 65399
+#define Consts_SImageWriteFail 65400
+#define Consts_SWindowDCError 65401
+#define Consts_SWindowClass 65402
+#define Consts_SCannotFocus 65403
+#define Consts_SParentRequired 65404
+#define Consts_SMDIChildNotVisible 65405
+#define Consts_SVisibleChanged 65406
+#define Consts_SCannotShowModal 65407
 #define RTLConsts_SPropertyException 65408
 #define RTLConsts_SReadError 65409
 #define RTLConsts_SReadOnlyProperty 65410
@@ -107,13 +110,13 @@
 #define RTLConsts_SUnknownGroup 65414
 #define RTLConsts_SUnknownProperty 65415
 #define RTLConsts_SWriteError 65416
-#define Consts_SInvalidBitmap 65417
-#define Consts_SInvalidIcon 65418
-#define Consts_SInvalidMetafile 65419
-#define Consts_SInvalidPixelFormat 65420
-#define Consts_SScanLine 65421
-#define Consts_SChangeIconSize 65422
-#define Consts_SUnknownClipboardFormat 65423
+#define Consts_SInvalidTabPosition 65417
+#define Consts_SInvalidTabStyle 65418
+#define Consts_SInvalidBitmap 65419
+#define Consts_SInvalidIcon 65420
+#define Consts_SInvalidMetafile 65421
+#define Consts_SInvalidPixelFormat 65422
+#define Consts_SScanLine 65423
 #define RTLConsts_SCheckSynchronizeError 65424
 #define RTLConsts_SClassNotFound 65425
 #define RTLConsts_SDuplicateClass 65426
@@ -228,17 +231,19 @@
 #define SysConst_SOverflow 65535
 STRINGTABLE
 BEGIN
-	Consts_SDockTreeRemoveError,	"Error removing control from dock tree"
-	Consts_SDockZoneNotFound,	" - Dock zone not found"
 	Consts_SDockZoneHasNoCtl,	" - Dock zone has no control"
 	HelpIntfs_hNoTableOfContents,	"Unable to find a Table of Contents"
 	HelpIntfs_hNothingFound,	"No help found for %s"
 	HelpIntfs_hNoContext,	"No context-sensitive help installed"
 	HelpIntfs_hNoTopics,	"No topic-based help system installed"
-	ComStrs_sRichEditInsertError,	"RichEdit line insertion error"
-	ComStrs_sRichEditLoadFail,	"Failed to Load Stream"
-	ComStrs_sRichEditSaveFail,	"Failed to Save Stream"
-	Consts_SmkcHome,	"Home"
+	ComStrs_sTabFailClear,	"Failed to clear tab control"
+	ComStrs_sTabFailDelete,	"Failed to delete tab at index %d"
+	ComStrs_sTabFailRetrieve,	"Failed to retrieve tab at index %d"
+	ComStrs_sTabFailGetObject,	"Failed to get object at index %d"
+	ComStrs_sTabFailSet,	"Failed to set tab \"%s\" at index %d"
+	ComStrs_sTabFailSetObject,	"Failed to set object at index %d"
+	ComStrs_sTabMustBeMultiLine,	"MultiLine must be True when TabPosition is tpLeft or tpRight"
+	ComStrs_sPageIndexError,	"%d is an invalid PageIndex value.  PageIndex must be between 0 and %d"
 	Consts_SmkcLeft,	"Left"
 	Consts_SmkcUp,	"Up"
 	Consts_SmkcRight,	"Right"
@@ -251,10 +256,10 @@ BEGIN
 	Consts_SIconToClipboard,	"Clipboard does not support Icons"
 	Consts_SCannotOpenClipboard,	"Cannot open clipboard"
 	Consts_SInvalidMemoSize,	"Text exceeds memo capacity"
-	Consts_SNoDefaultPrinter,	"There is no default printer currently selected"
 	Consts_SDuplicateMenus,	"Menu '%s' is already being used by another form"
 	Consts_SDockedCtlNeedsName,	"Docked control must have a name"
-	Consts_SMsgDlgCancel,	"Cancel"
+	Consts_SDockTreeRemoveError,	"Error removing control from dock tree"
+	Consts_SDockZoneNotFound,	" - Dock zone not found"
 	Consts_SMsgDlgHelp,	"&Help"
 	Consts_SMsgDlgAbort,	"&Abort"
 	Consts_SMsgDlgRetry,	"&Retry"
@@ -270,7 +275,7 @@ BEGIN
 	Consts_SmkcPgUp,	"PgUp"
 	Consts_SmkcPgDn,	"PgDn"
 	Consts_SmkcEnd,	"End"
-	Consts_SIgnoreButton,	"&Ignore"
+	Consts_SmkcHome,	"Home"
 	Consts_SRetryButton,	"&Retry"
 	Consts_SAbortButton,	"Abort"
 	Consts_SAllButton,	"&All"
@@ -286,12 +291,12 @@ BEGIN
 	Consts_SMsgDlgYes,	"&Yes"
 	Consts_SMsgDlgNo,	"&No"
 	Consts_SMsgDlgOK,	"OK"
+	Consts_SMsgDlgCancel,	"Cancel"
+	Consts_SPropertyOutOfRange,	"%s property out of range"
+	Consts_SMenuIndexError,	"Menu index out of range"
+	Consts_SMenuReinserted,	"Menu inserted twice"
 	Consts_SMenuNotFound,	"Sub-menu is not in menu"
 	Consts_SNoTimers,	"Not enough timers available"
-	Consts_SNotPrinting,	"Printer is not currently printing"
-	Consts_SPrinting,	"Printing in progress"
-	Consts_SInvalidPrinter,	"Printer selected is not valid"
-	Consts_SDeviceOnPort,	"%s on %s"
 	Consts_SGroupIndexTooLow,	"GroupIndex cannot be less than a previous menu item's GroupIndex"
 	Consts_SNoMDIForm,	"Cannot create form. No MDI forms are currently active"
 	Consts_SImageCanvasNeedsBitmap,	"Can only modify an image if it contains a bitmap"
@@ -302,6 +307,9 @@ BEGIN
 	Consts_SNoButton,	"&No"
 	Consts_SHelpButton,	"&Help"
 	Consts_SCloseButton,	"&Close"
+	Consts_SIgnoreButton,	"&Ignore"
+	Consts_SChangeIconSize,	"Cannot change the size of an icon"
+	Consts_SUnknownClipboardFormat,	"Unsupported clipboard format"
 	Consts_SOutOfResources,	"Out of system resources"
 	Consts_SNoCanvasHandle,	"Canvas does not allow drawing"
 	Consts_SInvalidImageSize,	"Invalid image size"
@@ -316,8 +324,6 @@ BEGIN
 	Consts_SMDIChildNotVisible,	"Cannot hide an MDI Child Form"
 	Consts_SVisibleChanged,	"Cannot change Visible in OnShow or OnHide"
 	Consts_SCannotShowModal,	"Cannot make a visible window modal"
-	Consts_SMenuIndexError,	"Menu index out of range"
-	Consts_SMenuReinserted,	"Menu inserted twice"
 	RTLConsts_SPropertyException,	"Error reading %s%s%s: %s"
 	RTLConsts_SReadError,	"Stream read error"
 	RTLConsts_SReadOnlyProperty,	"Property is read-only"
@@ -327,13 +333,13 @@ BEGIN
 	RTLConsts_SUnknownGroup,	"%s not in a class registration group"
 	RTLConsts_SUnknownProperty,	"Property %s does not exist"
 	RTLConsts_SWriteError,	"Stream write error"
+	Consts_SInvalidTabPosition,	"Tab position incompatible with current tab style"
+	Consts_SInvalidTabStyle,	"Tab style incompatible with current tab position"
 	Consts_SInvalidBitmap,	"Bitmap image is not valid"
 	Consts_SInvalidIcon,	"Icon image is not valid"
 	Consts_SInvalidMetafile,	"Metafile is not valid"
 	Consts_SInvalidPixelFormat,	"Invalid pixel format"
 	Consts_SScanLine,	"Scan line index out of range"
-	Consts_SChangeIconSize,	"Cannot change the size of an icon"
-	Consts_SUnknownClipboardFormat,	"Unsupported clipboard format"
 	RTLConsts_SCheckSynchronizeError,	"CheckSynchronize called from thread $%x, which is NOT the main thread"
 	RTLConsts_SClassNotFound,	"Class %s not found"
 	RTLConsts_SDuplicateClass,	"A class named %s already exists"

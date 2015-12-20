@@ -45,11 +45,22 @@ type
     TGENCB: TCheckBox;
     OpenDTAButton: TButton;
     OpenDTADialog: TOpenDialog;
-    LogMemo: TRichEdit;
     SaveSTUPButton: TButton;
     Image1: TImage;
     ListSNDSButton: TButton;
-    SaveTextMemo: TMemo;
+    LogMemo: TMemo;
+    PageControl: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    TabSheet3: TTabSheet;
+    TabSheet4: TTabSheet;
+    TabSheet5: TTabSheet;
+    TabSheet6: TTabSheet;
+    TabSheet7: TTabSheet;
+    LabelCRC32: TLabel;
+    LabelName: TLabel;
+    CRC32Label: TLabel;
+    NameLabel: TLabel;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -59,7 +70,6 @@ type
     procedure ListSNDSButtonClick(Sender: TObject);
   private
   public
-      section: TSection;
     procedure ReadVERS;
     procedure ReadSTUP;
     procedure ReadSNDS;
@@ -82,7 +92,6 @@ type
 var
   MainForm: TMainForm;
   pn:word;
-  log: TLogger;
   spath, opath: String;
 
 implementation
@@ -107,8 +116,8 @@ begin
   while (keepReading) do
     begin
 //('VERS','STUP','SNDS','TILE','ZONE','PUZ2','CHAR','CHWP','CAUX','TNAM','ENDF');
-      s := section.ReadString(4);
-      case section.ChunkIndex(s) of
+      s := DTA.ReadString(4);
+      case DTA.ChunkIndex(s) of
        1: ReadVERS; //версия файла
        2: ReadSTUP; //чтение титульной картинки
        3: ReadSNDS; //SNDS, 4 байта размер блока, C0FF, размер названия сэмпла+$0, размер названия сэмпла+$0,... пока не надо
@@ -135,7 +144,7 @@ end;
 procedure TMainForm.ReadTGEN;
 var size:longword;
 begin
-  size := section.ReadLongWord;
+  size := DTA.ReadLongWord;
   LOG.debug('TGEN: '+inttohex(size,4)); //4 байта - длина блока TGEN
   if TGENCB.Checked then
     begin
@@ -151,15 +160,15 @@ var size:longword;
 k:word;
 s:string;
 begin
-  size:=section.ReadLongWord;
+  size:=DTA.ReadLongWord;
   LOG.debug('TNAM: '+inttohex(size,4)); //4 байта - длина блока TNAM
   if TNAMCB.Checked then
     begin
       CreateDir('output/Names');
       repeat
-         k:=section.ReadWord; //2 байта - номер персонажа (тайла)
+         k:=DTA.ReadWord; //2 байта - номер персонажа (тайла)
          if k=$FFFF then break;
-         s:=section.ReadString(24); //24 байта - длина до конца текущего имени
+         s:=DTA.ReadString(24); //24 байта - длина до конца текущего имени
          s:=leftstr(s,pos(chr(0),s)-1);
          if CTCB.Checked then CopyFile(pchar('output/Tiles/'+rightstr('000'+inttostr(k),4)+'.bmp'),
                                  pchar('output/Names/'+s+'.bmp'),false);
@@ -173,7 +182,7 @@ end;
 procedure TMainForm.ReadCAUX;
 var size:longword;
 begin
-  size:=section.ReadLongWord;
+  size:=DTA.ReadLongWord;
   LOG.debug('CAUX: '+inttohex(size,4)); //4 байта - длина блока CAUX
   if CAUXCB.Checked then
     begin
@@ -187,7 +196,7 @@ end;
 procedure TMainForm.ReadCHWP;
 var size:longword;
 begin
-  size:=section.ReadLongWord;
+  size:=DTA.ReadLongWord;
   LOG.debug('CHWP: '+inttohex(size,4)); //4 байта - длина блока CHWP
   if CHWPCB.Checked then
     begin
@@ -201,7 +210,7 @@ end;
 procedure TMainForm.ReadCHAR;
 var size:longword;
 begin
-  size:=section.ReadLongWord;
+  size:=DTA.ReadLongWord;
   LOG.debug('CHAR: '+inttohex(size,4)); //4 байта - длина блока CHAR
   if CHARCB.Checked then
     begin
@@ -217,7 +226,7 @@ end;
 procedure TMainForm.ReadPUZ2;
 var size:longword;
 begin
-  size:=section.ReadLongWord;
+  size:=DTA.ReadLongWord;
   LOG.debug('PUZ2: '+inttohex(size,4)); //4 байта - длина блока PUZ2
   if PUZ2CB.Checked then
     begin
@@ -236,23 +245,23 @@ var s:string;
 size:longword;
 k,w,h,p,i,j:word;
 begin
-  section.ReadWord; // unknown:word; //01 00 - непонятно что
-  section.ReadLongWord; // size:longword; //размер, используемый текущей картой
-  pn:=section.ReadWord; // number:word; //2 байта - это порядковый номер карты, начиная с нуля
+  DTA.ReadWord; // unknown:word; //01 00 - непонятно что
+  DTA.ReadLongWord; // size:longword; //размер, используемый текущей картой
+  pn:=DTA.ReadWord; // number:word; //2 байта - это порядковый номер карты, начиная с нуля
   s:='#'+inttostr(pn);
-  s:=s+' '+section.readString(4); // izon:string[4]; //4 bytes: "IZON"
-  size:=section.ReadLongWord; // unk:longword; //4 байта - размер блока IZON (включая IZON) до object info entry count
+  s:=s+' '+DTA.readString(4); // izon:string[4]; //4 bytes: "IZON"
+  size:=DTA.ReadLongWord; // unk:longword; //4 байта - размер блока IZON (включая IZON) до object info entry count
   s:=s+' '+inttohex(size,4);
   LOG.debug(s);
   Application.ProcessMessages;
   if IZONCB.Checked then
     begin
      CreateDir('output\Maps');
-     w:=section.ReadWord;   // width:word; //2 bytes: map width (W)
-     h:=section.ReadWord;   // height:word; //2 bytes: map height (H)
-     section.ReadWord;      // flags:word; //2 byte: map flags (unknown meanings)* добавил байт снизу
-     section.ReadLongWord;  // unused:longword; //5 bytes: unused (same values for every map)
-     p:=section.ReadWord;   // planet:word; //1 byte: planet (0x01 = desert, 0x02 = snow, 0x03 = forest, 0x05 = swamp)* добавил следующий байт
+     w:=DTA.ReadWord;   // width:word; //2 bytes: map width (W)
+     h:=DTA.ReadWord;   // height:word; //2 bytes: map height (H)
+     DTA.ReadWord;      // flags:word; //2 byte: map flags (unknown meanings)* добавил байт снизу
+     DTA.ReadLongWord;  // unused:longword; //5 bytes: unused (same values for every map)
+     p:=DTA.ReadWord;   // planet:word; //1 byte: planet (0x01 = desert, 0x02 = snow, 0x03 = forest, 0x05 = swamp)* добавил следующий байт
      //Image1.Width:=w*32;
      //Image1.Height:=h*32;
      Image1.Picture.Bitmap.Width:=w*32;
@@ -266,19 +275,19 @@ begin
       begin
        for j:=0 to w-1 do
          begin          //W*H*6 bytes: map data
-           k:=section.ReadWord;
+           k:=DTA.ReadWord;
            if k<>$FFFF then
              begin
                LoadBMP('output\Tiles\'+rightstr('000'+inttostr(k),4)+'.bmp',bmp);
                CopyFrame(Image1,j*32,i*32);
              end;
-           k:=section.ReadWord;
+           k:=DTA.ReadWord;
            if k<>$FFFF then
              begin
                LoadBMP('output\Tiles\'+rightstr('000'+inttostr(k),4)+'.bmp',bmp);
                CopyFrame(Image1,j*32,i*32);
              end;
-           k:=section.ReadWord;
+           k:=DTA.ReadWord;
            if k<>$FFFF then
              begin
                LoadBMP('output\Tiles\'+rightstr('000'+inttostr(k),4)+'.bmp',bmp);
@@ -288,12 +297,12 @@ begin
          application.ProcessMessages;
          Image1.Picture.SaveToFile('output\Maps\'+rightstr('000'+inttostr(pn),3)+'.bmp');
       end;
-     k:=section.ReadWord;                             //2 bytes: object info entry count (X)
+     k:=DTA.ReadWord;                             //2 bytes: object info entry count (X)
      seek(SrcFile,filepos(SrcFile)+k*12);     //X*12 bytes: object info data
     end else
      begin
       seek(SrcFile,filepos(SrcFile)+size-8);   //4 байта - размер блока IZON (включая IZON) до object info entry count
-      k:=section.ReadWord;                             //2 bytes: object info entry count (X)
+      k:=DTA.ReadWord;                             //2 bytes: object info entry count (X)
       seek(SrcFile,filepos(SrcFile)+k*12);     //X*12 bytes: object info data
      end;
    ReadIZAX;
@@ -307,8 +316,8 @@ end;
 procedure TMainForm.ReadIZAX;
 var size:word;
 begin
-  LOG.debug('IZAX: '+section.ReadString(4)); //4 bytes: "IZAX"
-  size:=section.ReadWord; //2 bytes: length (X)
+  LOG.debug('IZAX: '+DTA.ReadString(4)); //4 bytes: "IZAX"
+  size:=DTA.ReadWord; //2 bytes: length (X)
   if IZAXCB.Checked then
     begin
    //X-6 bytes: IZAX data
@@ -321,8 +330,8 @@ end;
 procedure TMainForm.ReadIZX2;
 var size:word;
 begin
-  LOG.debug('IZX2: '+section.ReadString(4)); //4 bytes: "IZX2"
-  size:=section.ReadWord; //2 bytes: length (X)
+  LOG.debug('IZX2: '+DTA.ReadString(4)); //4 bytes: "IZX2"
+  size:=DTA.ReadWord; //2 bytes: length (X)
   if IZX2CB.Checked then
     begin
     //X-6 bytes: IZX2data
@@ -335,8 +344,8 @@ end;
 procedure TMainForm.ReadIZX3;
 var size:word;
 begin
-  LOG.debug('IZX3: '+section.ReadString(4)); //4 bytes: "IZX3"
-  size:=section.ReadWord; //2 bytes: length (X)
+  LOG.debug('IZX3: '+DTA.ReadString(4)); //4 bytes: "IZX3"
+  size:=DTA.ReadWord; //2 bytes: length (X)
   if IZX3CB.Checked then
     begin
     //X-6 bytes: IZX3data
@@ -348,7 +357,7 @@ end;
 
 procedure TMainForm.ReadIZX4;
 begin
-  LOG.debug('IZX4: '+section.ReadString(4)); //4 bytes: "IZX4"
+  LOG.debug('IZX4: '+DTA.ReadString(4)); //4 bytes: "IZX4"
   if IZX4CB.Checked then
     begin
     //8 bytes: IZX4 data
@@ -367,7 +376,7 @@ begin
   if IACTCB.Checked then CreateDir('output\Iacts');
    k:=0;
 l1:
-  s:=section.ReadString(4); //4 bytes: "IACT"
+  s:=DTA.ReadString(4); //4 bytes: "IACT"
   if s<>'IACT' then goto l2;
   inc(k);
   if IACTCB.Checked then
@@ -375,7 +384,7 @@ l1:
       AssignFile(DestFile,'output\Iacts\'+rightstr('000'+inttostr(pn), 3) + '-'+rightstr('00'+inttostr(k),2));
       Rewrite(DestFile,1);
    end;
-  size:=section.ReadLongWord;  //4 bytes: length (X)
+  size:=DTA.ReadLongWord;  //4 bytes: length (X)
   LOG.debug(s+' '+inttohex(size,4));
   if IACTCB.Checked then
      begin
@@ -398,7 +407,7 @@ k,i:word;
 s:string;
 begin
   //Signature: String[4];       // 4 bytes: "ZONE" - уже прочитано
-  k:=section.ReadWord;                  // 2 байта - количество карт $0291=657 штук
+  k:=DTA.ReadWord;                  // 2 байта - количество карт $0291=657 штук
   //дальше повторяющиеся данные структуры TZone
 
   LOG.debug('Maps (zones)');
@@ -410,8 +419,8 @@ begin
     begin
       for i:=1 to k do
         begin
-         section.ReadWord;            //unknown:word; //01 00 - непонятно что
-         sz:=section.ReadLongWord;       //size:longword; //размер, используемый текущей картой
+         DTA.ReadWord;            //unknown:word; //01 00 - непонятно что
+         sz:=DTA.ReadLongWord;       //size:longword; //размер, используемый текущей картой
          seek(SrcFile,filepos(SrcFile)+sz); //пропускаем карту
         end;
       s:='... skipped '+inttostr(k)+' maps';
@@ -423,7 +432,7 @@ procedure TMainForm.ReadTILE;
 var k, sz, i, n:cardinal;
 s:string;
 begin
-  sz:=section.ReadLongWord;
+  sz:=DTA.ReadLongWord;
   s:='Sprites & tiles';
   if TILECB.Checked then
     begin
@@ -433,8 +442,8 @@ begin
       n:=sz div $404;
       for i:=0 to n-1 do
         begin
-          k:=section.ReadLongWord; //атрибуты
-          ReadPicture(section, 0);
+          k:=DTA.ReadLongWord; //атрибуты
+          ReadPicture(DTA, 0);
           CopyPicture(Image1,0,0);
           application.ProcessMessages;
 //          SaveBMP('output/Tiles/'+rightstr('000'+inttostr(i),4)+' - '+inttohex(k,6)+'.bmp',bmp);
@@ -460,12 +469,12 @@ procedure TMainForm.ReadSTUP;
 var s:string;
 sz:longword;
 begin
-  sz:=section.ReadLongWord;
+  sz:=DTA.ReadLongWord;
   s:='Title screen';
   if STUPCB.Checked then
     begin
       BMP.Width:=288; BMP.Height:=288;
-      ReadPicture(section, $10);
+      ReadPicture(DTA, $10);
       CopyPicture(Image1,0,0);
       application.processmessages;
       SaveBMP('output/STUP.bmp',bmp);
@@ -481,38 +490,41 @@ end;
 
 procedure TMainForm.ReadVERS;
 begin
-  LOG.debug('File version: '+inttostr(section.ReadRWord)+'.'+inttostr(section.ReadRWord));
+  LOG.debug('File version: '+inttostr(DTA.ReadRWord)+'.'+inttostr(DTA.ReadRWord));
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   spath := ExtractFilePath(paramstr(0));
   opath := spath + OUTPUT + '\';
-  section := TSection.Create;
   BMP := TBitmap.Create;
   BMP.PixelFormat:=pf8bit;
   FillInternalPalette(BMP, 0, 0, 0);
-  log := TLogger.Create(LogMemo);
   OpenDTADialog.InitialDir := '.\';
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   BMP.Free;
-  section.Free;
-  log.Free;
 end;
 
 procedure TMainForm.Button2Click(Sender: TObject);
 begin
   LoadBMP('output/STUP.bmp',bmp);
   CopyPicture(Image1,0,0);
+  log.SetOutput(LogMemo.lines);
 end;
 
 
 procedure TMainForm.OpenDTAButtonClick(Sender: TObject);
 begin
-  if OpenDTADialog.Execute then section.readDTAMetricks(OpenDTADialog.FileName);
+  if OpenDTADialog.Execute then
+    begin
+      log.Clear;
+      DTA.readDTAMetricks(OpenDTADialog.FileName);
+      CRC32Label.Caption := DTA.crc32;
+      NameLabel.Caption := DTA.dtaRevision;
+    end;
 end;
 
 
@@ -526,7 +538,7 @@ begin
   CreateDir(opath);
   title := knownSections[2]; // STUP
   BMP.Width:=288; BMP.Height:=288;
-  ReadPicture(section, section.GetOffset(title));
+  ReadPicture(DTA, DTA.GetOffset(title));
   CopyPicture(Image1, 0, 0);
   Application.ProcessMessages;
   SaveBMP(opath + title + '.bmp', bmp);
@@ -541,18 +553,17 @@ begin
   Log.debug('Sounds & melodies:');
   Log.debug('');
   title := knownSections[3]; // SNDS
-  section.SetIndex(title);
-  Log.Debug('Unknown value: ' + inttohex(section.ReadWord, 4)); // C0 FF ??????
+  DTA.SetIndex(title);
+  Log.Debug('Unknown value: ' + inttohex(DTA.ReadWord, 4)); // C0 FF ??????
   i := 0;
-  while section.inBound(title) do
+  while DTA.inBound(title) do
    begin
-    msz := section.ReadWord;
-    Log.Debug('#' + rightstr('00'+inttostr(i),2) + ': ' + section.ReadString(msz - 1));
-    section.ReadByte;                   // 00 at the end of string
+    msz := DTA.ReadWord;
+    Log.Debug('#' + rightstr('00'+inttostr(i),2) + ': ' + DTA.ReadString(msz - 1));
+    DTA.ReadByte;                   // 00 at the end of string
     inc(i)
    end;
-  SaveTextMemo.Text := LogMemo.Text;
-  SaveTextMemo.Lines.SaveToFile(opath + 'SNDS.txt');
+  LogMemo.Lines.SaveToFile(opath + 'SNDS.txt');
 end;
 
 end.
