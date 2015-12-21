@@ -9,16 +9,15 @@ uses
   Windows, Forms, BMPUnit, DataStructureUnit, LoggerUnit, StdCtrls, Controls, Classes, ExtCtrls, SysUtils, StrUtils, Graphics, dialogs,
   ComCtrls;
 
-const OUTPUT = 'output';
+const
+  OUTPUT = 'output';
+  TileSize = 32;
+  eBMP = '.bmp';
 
 type
   TMainForm = class(TForm)
     Button1: TButton;
     Button2: TButton;
-    GroupBox1: TGroupBox;
-    STUPCB: TCheckBox;
-    GroupBox2: TGroupBox;
-    SNDSCB: TCheckBox;
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
     TILECB: TCheckBox;
@@ -65,6 +64,29 @@ type
     LabelVersion: TLabel;
     SaveSTUPButton: TButton;
     ListSNDSButton: TButton;
+    TabSheet10: TTabSheet;
+    TilesLabel: TLabel;
+    LabelTiles: TLabel;
+    SaveTilesButton: TButton;
+    LabelSounds: TLabel;
+    SoundsLabel: TLabel;
+    LabelMaps: TLabel;
+    MapsLabel: TLabel;
+    LabelPuzzles: TLabel;
+    PuzzlesLabel: TLabel;
+    LabelChars: TLabel;
+    CharsLabel: TLabel;
+    LabelNames: TLabel;
+    NamesLabel: TLabel;
+    DecimalCheckBox: TCheckBox;
+    HexCheckBox: TCheckBox;
+    AttrCheckBox: TCheckBox;
+    ZeroColorRG: TRadioGroup;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    TilesProgressBar: TProgressBar;
+    TilesProgressLabel: TLabel;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -72,12 +94,9 @@ type
     procedure OpenDTAButtonClick(Sender: TObject);
     procedure SaveSTUPButtonClick(Sender: TObject);
     procedure ListSNDSButtonClick(Sender: TObject);
+    procedure SaveTilesButtonClick(Sender: TObject);
   private
   public
-    procedure ReadVERS;
-    procedure ReadSTUP;
-    procedure ReadSNDS;
-    procedure ReadTILE;
     procedure ReadZONE;
     procedure ReadIZON;
     procedure ReadIZAX;
@@ -119,13 +138,8 @@ begin
   keepReading:=true;
   while (keepReading) do
     begin
-//('VERS','STUP','SNDS','TILE','ZONE','PUZ2','CHAR','CHWP','CAUX','TNAM','ENDF');
       s := DTA.ReadString(4);
       case DTA.ChunkIndex(s) of
-       1: ReadVERS; //версия файла
-       2: ReadSTUP; //чтение титульной картинки
-       3: ReadSNDS; //SNDS, 4 байта размер блока, C0FF, размер названия сэмпла+$0, размер названия сэмпла+$0,... пока не надо
-       4: ReadTILE; //тайлы
        5: ReadZONE; //локации
        6: ReadPUZ2; //ещё диалоги
        7: ReadCHAR; //персонажи?
@@ -154,9 +168,9 @@ begin
     begin
     //надо расшифровать
     showmessage('Обработка tGEN пока не поддерживается!!!');
-    seek(SrcFile,filepos(SrcFile)+size);
+    seek(SrcFile,filepos(SrcFile) + size);
     end else
-       seek(SrcFile,filepos(SrcFile)+size);
+       seek(SrcFile,filepos(SrcFile) + size);
 end;
 
 procedure TMainForm.ReadTNAM;
@@ -432,78 +446,12 @@ begin
   LOG.debug(s);
 end;
 
-procedure TMainForm.ReadTILE;
-var k, sz, i, n:cardinal;
-s:string;
-begin
-  sz:=DTA.ReadLongWord;
-  s:='Sprites & tiles';
-  if TILECB.Checked then
-    begin
-      CreateDir('output/Tiles');
-      CreateDir('output/TilesHex');
-      BMP.Width:=32; BMP.Height:=32;
-      n:=sz div $404;
-      for i:=0 to n-1 do
-        begin
-          k:=DTA.ReadLongWord; //атрибуты
-          ReadPicture(DTA, 0);
-          CopyPicture(Image1,0,0);
-          application.ProcessMessages;
-//          SaveBMP('output/Tiles/'+rightstr('000'+inttostr(i),4)+' - '+inttohex(k,6)+'.bmp',bmp);
-          SaveBMP('output/Tiles/'+rightstr('000'+inttostr(i),4)+'.bmp',bmp);
-          SaveBMP('output/TilesHex/'+inttohex(i,4)+'.bmp',bmp);
-        end;
-      s:=s+'... processed: '+inttostr(n)+' images';
-    end
-    else
-    begin
-      seek(SrcFile,filepos(SrcFile)+sz);
-      s:=s+'... skipped';
-    end;
-  LOG.debug(s);
-end;
-
-
-procedure TMainForm.ReadSNDS;
-begin
-end;
-
-procedure TMainForm.ReadSTUP;
-var s:string;
-sz:longword;
-begin
-  sz:=DTA.ReadLongWord;
-  s:='Title screen';
-  if STUPCB.Checked then
-    begin
-      BMP.Width:=288; BMP.Height:=288;
-      ReadPicture(DTA, $10);
-      CopyPicture(Image1,0,0);
-      application.processmessages;
-      SaveBMP('output/STUP.bmp',bmp);
-      s:=s+'... saved';
-    end
-    else
-    begin
-      seek(SrcFile,filepos(SrcFile)+sz);
-      s:=s+'... skipped';
-    end;
-  LOG.debug(s);
-end;
-
-procedure TMainForm.ReadVERS;
-begin
-  LOG.debug('File version: '+inttostr(DTA.ReadRWord)+'.'+inttostr(DTA.ReadRWord));
-end;
-
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   spath := ExtractFilePath(paramstr(0));
   opath := spath + OUTPUT + '\';
   BMP := TBitmap.Create;
   BMP.PixelFormat:=pf8bit;
-  FillInternalPalette(BMP, 0, 0, 0);
   OpenDTADialog.InitialDir := '.\';
   log.SetOutput(LogMemo.lines);
 end;
@@ -530,6 +478,19 @@ begin
       SizeLabel.Caption := IntToStr(DTA.size);
       CRC32Label.Caption := DTA.crc32;
       NameLabel.Caption := DTA.dtaRevision;
+
+      SoundsLabel.Caption := IntToStr(DTA.soundsCount);
+
+      TilesLabel.Caption := IntToStr(DTA.tilesCount);
+
+      MapsLabel.Caption := IntToStr(DTA.mapsCount);
+
+      PuzzlesLabel.Caption := IntToStr(DTA.puzzlesCount);
+
+      CharsLabel.Caption := IntToStr(DTA.charsCount);
+
+      NamesLabel.Caption := IntToStr(DTA.namesCount);
+
       Log.SaveToFile(opath, 'Structure');
     end;
 end;
@@ -544,6 +505,7 @@ begin
   Log.Clear;
   CreateDir(opath);
   title := knownSections[2]; // STUP
+  FillInternalPalette(BMP, 0, 0, 0);
   BMP.Width:=288; BMP.Height:=288;
   ReadPicture(DTA, DTA.GetOffset(title));
   CopyPicture(Image1, 0, 0);
@@ -573,6 +535,68 @@ begin
   Log.SaveToFile(opath, title);
 end;
 
+function IntToBin(Value: LongWord): string;
+var i: Integer;
+begin
+  SetLength(Result, 32);
+  for i := 1 to 32 do begin
+    if ((Value shl (i-1)) shr 31) = 0 then begin
+      Result[i] := '0'
+    end else begin
+      Result[i] := '1';
+    end;
+  end;
+end;
+
+
+procedure TMainForm.SaveTilesButtonClick(Sender: TObject);
+var tilesPath, hexPath, attrPath, attrFullPath, title: String;
+attr, sz, i: Cardinal;
+begin
+  TilesProgressBar.Position := 0;
+  TilesProgressBar.Max := DTA.tilesCount;
+  tilesPath := opath +'Tiles';
+  hexPath := opath +'TilesHex';
+  attrPath := opath +'TilesByAttr';
+  Log.Clear;
+  CreateDir(opath);
+  if DecimalCheckBox.Checked then CreateDir(tilesPath);
+  if HexCheckBox.Checked then CreateDir(hexPath);
+  if AttrCheckBox.Checked then CreateDir(attrPath);
+  case ZeroColorRG.ItemIndex of
+       0: FillInternalPalette(BMP, 0, 0, 0);
+       1: FillInternalPalette(BMP, $FF, $FF, $FF);
+       2: FillInternalPalette(BMP, $FF, 0, $FF);
+  end;
+  BMP.Width := TileSize;
+  BMP.Height := TileSize;
+  title := knownSections[4]; // TILE
+  DTA.SetIndex(title);
+  for i := 0 to DTA.tilesCount - 1 do
+  begin
+    attr := DTA.ReadLongWord; // attributes
+    ReadPicture(DTA, 0);
+    CopyPicture(Image1, 0, 0);
+    Application.ProcessMessages;
+    //  SaveBMP('output/Tiles/'+rightstr('000'+inttostr(i),4)+' - '+inttohex(k,6)+'.bmp',bmp);
+    if DecimalCheckBox.Checked then
+      SaveBMP(tilesPath + '\' + rightstr('000' + inttostr(i) ,4) + eBMP, bmp);
+    if AttrCheckBox.Checked then
+    begin
+      attrFullPath := attrPath + '\' + IntToBin(attr);
+      CreateDir(attrFullPath);
+      SaveBMP(attrFullPath + '\' + rightstr('000' + inttostr(i) ,4) + eBMP, bmp);
+    end;
+    if HexCheckBox.Checked then
+      SaveBMP(hexPath + '\' + inttohex(i,4) + eBMP,bmp);
+    TilesProgressBar.Position := i;
+    TilesProgressLabel.Caption := Format('%.2f %%', [(i / DTA.tilesCount) * 100]);
+    Application.ProcessMessages;
+  end;
+  Log.Debug('OK');
+end;
+
+
+
+
 end.
-
-

@@ -1,7 +1,7 @@
 object MainForm: TMainForm
   Left = 192
   Top = 114
-  Width = 667
+  Width = 910
   Height = 671
   Caption = 'Yoda Stories Explorer'
   Color = clBtnFace
@@ -39,45 +39,13 @@ object MainForm: TMainForm
     TabOrder = 1
     OnClick = Button2Click
   end
-  object GroupBox1: TGroupBox
-    Left = 8
-    Top = 40
-    Width = 106
-    Height = 34
-    Caption = ' STUP '
-    TabOrder = 2
-    object STUPCB: TCheckBox
-      Left = 14
-      Top = 13
-      Width = 87
-      Height = 17
-      Caption = 'Save to BMP'
-      TabOrder = 0
-    end
-  end
-  object GroupBox2: TGroupBox
-    Left = 8
-    Top = 74
-    Width = 106
-    Height = 34
-    Caption = ' SNDS '
-    TabOrder = 3
-    object SNDSCB: TCheckBox
-      Left = 14
-      Top = 13
-      Width = 87
-      Height = 17
-      Caption = 'List in LOG'
-      TabOrder = 0
-    end
-  end
   object GroupBox3: TGroupBox
     Left = 8
     Top = 280
     Width = 321
     Height = 353
     Caption = ' LOG '
-    TabOrder = 4
+    TabOrder = 2
     object LogMemo: TMemo
       Left = 2
       Top = 15
@@ -93,7 +61,7 @@ object MainForm: TMainForm
     Width = 106
     Height = 34
     Caption = ' TILE '
-    TabOrder = 5
+    TabOrder = 3
     object TILECB: TCheckBox
       Left = 14
       Top = 13
@@ -109,7 +77,7 @@ object MainForm: TMainForm
     Width = 145
     Height = 129
     Caption = ' ZONE '
-    TabOrder = 6
+    TabOrder = 4
     object ZONECB: TCheckBox
       Left = 14
       Top = 13
@@ -173,7 +141,7 @@ object MainForm: TMainForm
     Width = 106
     Height = 34
     Caption = ' PUZ2 '
-    TabOrder = 7
+    TabOrder = 5
     object PUZ2CB: TCheckBox
       Left = 14
       Top = 13
@@ -189,7 +157,7 @@ object MainForm: TMainForm
     Width = 106
     Height = 34
     Caption = ' CHAR '
-    TabOrder = 8
+    TabOrder = 6
     object CHARCB: TCheckBox
       Left = 14
       Top = 13
@@ -205,7 +173,7 @@ object MainForm: TMainForm
     Width = 106
     Height = 34
     Caption = ' CHWP '
-    TabOrder = 9
+    TabOrder = 7
     object CHWPCB: TCheckBox
       Left = 14
       Top = 13
@@ -221,7 +189,7 @@ object MainForm: TMainForm
     Width = 106
     Height = 34
     Caption = ' CAUX '
-    TabOrder = 10
+    TabOrder = 8
     object CAUXCB: TCheckBox
       Left = 14
       Top = 13
@@ -237,7 +205,7 @@ object MainForm: TMainForm
     Width = 145
     Height = 59
     Caption = ' TNAM '
-    TabOrder = 11
+    TabOrder = 9
     object TNAMCB: TCheckBox
       Left = 14
       Top = 13
@@ -261,7 +229,7 @@ object MainForm: TMainForm
     Width = 106
     Height = 34
     Caption = ' TGEN '
-    TabOrder = 12
+    TabOrder = 10
     object TGENCB: TCheckBox
       Left = 14
       Top = 13
@@ -277,31 +245,31 @@ object MainForm: TMainForm
     Width = 75
     Height = 25
     Caption = 'Open DTA'
-    TabOrder = 13
+    TabOrder = 11
     OnClick = OpenDTAButtonClick
   end
   object PageControl: TPageControl
-    Left = 288
-    Top = 136
-    Width = 361
+    Left = 335
+    Top = 305
+    Width = 561
     Height = 313
-    ActivePage = TabSheet3
+    ActivePage = TabSheet4
     MultiLine = True
-    TabIndex = 2
-    TabOrder = 14
+    TabIndex = 3
+    TabOrder = 12
     object TabSheet1: TTabSheet
-      Caption = #1054#1073#1097#1072#1103' '#1080#1085#1092#1086#1088#1084#1072#1094#1080#1103
+      Caption = 'Common information'
       object LabelCRC32: TLabel
         Left = 8
         Top = 24
-        Width = 75
+        Width = 40
         Height = 13
         Caption = 'CRC-32:'
       end
       object LabelName: TLabel
         Left = 8
         Top = 40
-        Width = 75
+        Width = 31
         Height = 13
         Caption = 'Name:'
       end
@@ -320,7 +288,7 @@ object MainForm: TMainForm
       object LabelSize: TLabel
         Left = 8
         Top = 8
-        Width = 75
+        Width = 23
         Height = 13
         Caption = 'Size:'
       end
@@ -345,7 +313,7 @@ object MainForm: TMainForm
       end
     end
     object TabSheet2: TTabSheet
-      Caption = 'STUP'
+      Caption = 'Title screen'
       ImageIndex = 1
       object SaveSTUPButton: TButton
         Left = 6
@@ -358,33 +326,210 @@ object MainForm: TMainForm
       end
     end
     object TabSheet3: TTabSheet
-      Caption = 'SNDS'
+      Caption = 'Sounds'
       ImageIndex = 2
+      object LabelSounds: TLabel
+        Left = 8
+        Top = 8
+        Width = 69
+        Height = 13
+        Caption = 'Sounds count:'
+      end
+      object SoundsLabel: TLabel
+        Left = 88
+        Top = 8
+        Width = 3
+        Height = 13
+      end
       object ListSNDSButton: TButton
         Left = 6
-        Top = 8
-        Width = 131
+        Top = 32
+        Width = 83
         Height = 25
-        Caption = 'List all used sound files'
+        Caption = 'Save list to file'
         TabOrder = 0
         OnClick = ListSNDSButtonClick
       end
     end
     object TabSheet4: TTabSheet
-      Caption = 'TabSheet4'
+      Caption = 'Tiles, sprites'
       ImageIndex = 3
+      object TilesLabel: TLabel
+        Left = 88
+        Top = 8
+        Width = 3
+        Height = 13
+      end
+      object LabelTiles: TLabel
+        Left = 8
+        Top = 8
+        Width = 55
+        Height = 13
+        Caption = 'Tiles count:'
+      end
+      object TilesProgressLabel: TLabel
+        Left = 16
+        Top = 160
+        Width = 193
+        Height = 13
+        Alignment = taCenter
+        AutoSize = False
+      end
+      object TilesProgressBar: TProgressBar
+        Left = 16
+        Top = 136
+        Width = 193
+        Height = 17
+        Min = 0
+        Max = 100
+        Smooth = True
+        Step = 1
+        TabOrder = 8
+      end
+      object SaveTilesButton: TButton
+        Left = 6
+        Top = 32
+        Width = 99
+        Height = 25
+        Caption = 'Save tiles to files'
+        TabOrder = 0
+        OnClick = SaveTilesButtonClick
+      end
+      object DecimalCheckBox: TCheckBox
+        Left = 16
+        Top = 64
+        Width = 145
+        Height = 17
+        Caption = 'Decimal filenames'
+        Checked = True
+        State = cbChecked
+        TabOrder = 1
+      end
+      object HexCheckBox: TCheckBox
+        Left = 16
+        Top = 88
+        Width = 145
+        Height = 17
+        Caption = 'HEX filenames'
+        Checked = True
+        State = cbChecked
+        TabOrder = 2
+      end
+      object AttrCheckBox: TCheckBox
+        Left = 16
+        Top = 112
+        Width = 153
+        Height = 17
+        Caption = 'Group by attributes'
+        Checked = True
+        State = cbChecked
+        TabOrder = 3
+      end
+      object ZeroColorRG: TRadioGroup
+        Left = 232
+        Top = 16
+        Width = 201
+        Height = 105
+        Caption = ' "Zero" color '
+        ItemIndex = 2
+        Items.Strings = (
+          'Black (original)'
+          'White'
+          'Fuchsia (transparent)')
+        TabOrder = 4
+      end
+      object Panel1: TPanel
+        Left = 374
+        Top = 30
+        Width = 48
+        Height = 22
+        Color = clBlack
+        TabOrder = 5
+      end
+      object Panel2: TPanel
+        Left = 374
+        Top = 60
+        Width = 48
+        Height = 22
+        Color = clWhite
+        TabOrder = 6
+      end
+      object Panel3: TPanel
+        Left = 374
+        Top = 89
+        Width = 48
+        Height = 22
+        Color = clFuchsia
+        TabOrder = 7
+      end
     end
     object TabSheet5: TTabSheet
-      Caption = 'TabSheet5'
+      Caption = 'Zones (maps)'
       ImageIndex = 4
+      object LabelMaps: TLabel
+        Left = 8
+        Top = 8
+        Width = 59
+        Height = 13
+        Caption = 'Maps count:'
+      end
+      object MapsLabel: TLabel
+        Left = 88
+        Top = 8
+        Width = 3
+        Height = 13
+      end
     end
     object TabSheet6: TTabSheet
-      Caption = 'TabSheet6'
+      Caption = 'Puzzles'
       ImageIndex = 5
+      object LabelPuzzles: TLabel
+        Left = 8
+        Top = 8
+        Width = 69
+        Height = 13
+        Caption = 'Puzzles count:'
+      end
+      object PuzzlesLabel: TLabel
+        Left = 88
+        Top = 8
+        Width = 3
+        Height = 13
+      end
     end
     object TabSheet7: TTabSheet
-      Caption = 'TabSheet7'
+      Caption = 'Characters'
       ImageIndex = 6
+      object LabelChars: TLabel
+        Left = 8
+        Top = 8
+        Width = 84
+        Height = 13
+        Caption = 'Characters count:'
+      end
+      object CharsLabel: TLabel
+        Left = 98
+        Top = 8
+        Width = 3
+        Height = 13
+      end
+    end
+    object TabSheet10: TTabSheet
+      Caption = 'Names'
+      ImageIndex = 9
+      object LabelNames: TLabel
+        Left = 8
+        Top = 8
+        Width = 66
+        Height = 13
+        Caption = 'Names count:'
+      end
+      object NamesLabel: TLabel
+        Left = 88
+        Top = 8
+        Width = 3
+        Height = 13
+      end
     end
   end
   object OpenDTADialog: TOpenDialog

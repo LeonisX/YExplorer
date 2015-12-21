@@ -8,20 +8,21 @@
   resources were bound to the produced executable.
 */
 
-#define Consts_SDockZoneNotFound 65312
-#define Consts_SDockZoneHasNoCtl 65313
-#define HelpIntfs_hNoTableOfContents 65314
-#define HelpIntfs_hNothingFound 65315
-#define HelpIntfs_hNoContext 65316
-#define HelpIntfs_hNoTopics 65317
-#define ComStrs_sTabFailClear 65318
-#define ComStrs_sTabFailDelete 65319
-#define ComStrs_sTabFailRetrieve 65320
-#define ComStrs_sTabFailGetObject 65321
-#define ComStrs_sTabFailSet 65322
-#define ComStrs_sTabFailSetObject 65323
-#define ComStrs_sTabMustBeMultiLine 65324
-#define ComStrs_sPageIndexError 65325
+#define Consts_SDockTreeRemoveError 65312
+#define Consts_SDockZoneNotFound 65313
+#define Consts_SDockZoneHasNoCtl 65314
+#define HelpIntfs_hNoTableOfContents 65315
+#define HelpIntfs_hNothingFound 65316
+#define HelpIntfs_hNoContext 65317
+#define HelpIntfs_hNoTopics 65318
+#define ComStrs_sTabFailClear 65319
+#define ComStrs_sTabFailDelete 65320
+#define ComStrs_sTabFailRetrieve 65321
+#define ComStrs_sTabFailGetObject 65322
+#define ComStrs_sTabFailSet 65323
+#define ComStrs_sTabFailSetObject 65324
+#define ComStrs_sTabMustBeMultiLine 65325
+#define ComStrs_sPageIndexError 65326
 #define Consts_SmkcHome 65328
 #define Consts_SmkcLeft 65329
 #define Consts_SmkcUp 65330
@@ -32,12 +33,12 @@
 #define Consts_SmkcShift 65335
 #define Consts_SmkcCtrl 65336
 #define Consts_SmkcAlt 65337
-#define Consts_SIconToClipboard 65338
-#define Consts_SCannotOpenClipboard 65339
-#define Consts_SInvalidMemoSize 65340
-#define Consts_SDuplicateMenus 65341
-#define Consts_SDockedCtlNeedsName 65342
-#define Consts_SDockTreeRemoveError 65343
+#define Consts_SOutOfRange 65338
+#define Consts_SIconToClipboard 65339
+#define Consts_SCannotOpenClipboard 65340
+#define Consts_SInvalidMemoSize 65341
+#define Consts_SDuplicateMenus 65342
+#define Consts_SDockedCtlNeedsName 65343
 #define Consts_SMsgDlgCancel 65344
 #define Consts_SMsgDlgHelp 65345
 #define Consts_SMsgDlgAbort 65346
@@ -232,6 +233,7 @@
 #define SysConst_SOverflow 65535
 STRINGTABLE
 BEGIN
+	Consts_SDockTreeRemoveError,	"Error removing control from dock tree"
 	Consts_SDockZoneNotFound,	" - Dock zone not found"
 	Consts_SDockZoneHasNoCtl,	" - Dock zone has no control"
 	HelpIntfs_hNoTableOfContents,	"Unable to find a Table of Contents"
@@ -256,12 +258,12 @@ BEGIN
 	Consts_SmkcShift,	"Shift+"
 	Consts_SmkcCtrl,	"Ctrl+"
 	Consts_SmkcAlt,	"Alt+"
+	Consts_SOutOfRange,	"Value must be between %d and %d"
 	Consts_SIconToClipboard,	"Clipboard does not support Icons"
 	Consts_SCannotOpenClipboard,	"Cannot open clipboard"
 	Consts_SInvalidMemoSize,	"Text exceeds memo capacity"
 	Consts_SDuplicateMenus,	"Menu '%s' is already being used by another form"
 	Consts_SDockedCtlNeedsName,	"Docked control must have a name"
-	Consts_SDockTreeRemoveError,	"Error removing control from dock tree"
 	Consts_SMsgDlgCancel,	"Cancel"
 	Consts_SMsgDlgHelp,	"&Help"
 	Consts_SMsgDlgAbort,	"&Abort"

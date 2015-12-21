@@ -264,9 +264,9 @@ begin
     GetMem(pal, sizeof(TLogPalette) + sizeof(TPaletteEntry) * 255);
     pal.palVersion := $300;
     pal.palNumEntries := 256;
-    pal.palPalEntry[i].peRed := r;
-    pal.palPalEntry[i].peGreen := g;
-    pal.palPalEntry[i].peBlue := b;
+    pal.palPalEntry[0].peRed := r;
+    pal.palPalEntry[0].peGreen := g;
+    pal.palPalEntry[0].peBlue := b;
     for i := 1 to 255 do
     begin
       pal.palPalEntry[i].peRed := GamePalette[i * 4 + 2];

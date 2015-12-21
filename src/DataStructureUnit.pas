@@ -28,7 +28,7 @@ type
     dtaRevision: String;
     version: String;
     soundsCount: Byte;
-    spritesCount: Integer;
+    tilesCount: Integer;
     mapsCount: Integer;
     puzzlesCount: Integer;
     charsCount: Integer;
@@ -213,7 +213,7 @@ begin
   sz := ReadLongWord;            //4 байта - длина блока TGEN
   Add(sectionName, 4 + sz, index);
   MoveIndex(sz);
-  Log.Debug(sectionName + ' - what is it?...';
+  Log.Debug(sectionName + ' - what is it?...');
 end;
 
 // 246 * 26 + size(4) + 'TNAM' + $FFFF = 6406
@@ -303,7 +303,7 @@ end;
 procedure TSection.ScanZONE(sectionName: String);
 var sz: Longword;
 i: Word;
-s: Sing;
+s: String;
 ind: Integer;
 begin
   //Signature: String[4];       // 4 bytes: "ZONE" - уже прочитано
@@ -326,8 +326,8 @@ begin
   sz:=ReadLongWord;             //4 bytes - length of section TILE
   Add(sectionName, 4 + sz, index);
   MoveIndex(sz);
-  spritesCount := sz div $404;
-  Log.debug('Sprites, tiles: ' + IntToStr(spritesCount));
+  tilesCount := sz div $404;
+  Log.debug('Sprites, tiles: ' + IntToStr(tilesCount));
 end;
 
 
