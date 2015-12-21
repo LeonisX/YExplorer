@@ -85,7 +85,6 @@ object MainForm: TMainForm
       Height = 336
       Align = alClient
       TabOrder = 0
-      Visible = False
     end
   end
   object GroupBox4: TGroupBox
@@ -281,71 +280,95 @@ object MainForm: TMainForm
     TabOrder = 13
     OnClick = OpenDTAButtonClick
   end
-  object SaveSTUPButton: TButton
-    Left = 288
-    Top = 72
-    Width = 75
-    Height = 25
-    Caption = 'Save STUP'
-    TabOrder = 14
-    OnClick = SaveSTUPButtonClick
-  end
-  object ListSNDSButton: TButton
-    Left = 288
-    Top = 104
-    Width = 75
-    Height = 25
-    Caption = 'List SNDS'
-    TabOrder = 15
-    OnClick = ListSNDSButtonClick
-  end
   object PageControl: TPageControl
     Left = 288
     Top = 136
     Width = 361
     Height = 313
-    ActivePage = TabSheet1
+    ActivePage = TabSheet3
     MultiLine = True
-    TabIndex = 0
-    TabOrder = 16
+    TabIndex = 2
+    TabOrder = 14
     object TabSheet1: TTabSheet
       Caption = #1054#1073#1097#1072#1103' '#1080#1085#1092#1086#1088#1084#1072#1094#1080#1103
       object LabelCRC32: TLabel
-        Left = 24
-        Top = 56
-        Width = 40
+        Left = 8
+        Top = 24
+        Width = 75
         Height = 13
         Caption = 'CRC-32:'
       end
       object LabelName: TLabel
-        Left = 24
-        Top = 72
-        Width = 31
+        Left = 8
+        Top = 40
+        Width = 75
         Height = 13
         Caption = 'Name:'
       end
       object CRC32Label: TLabel
-        Left = 72
-        Top = 56
-        Width = 48
+        Left = 88
+        Top = 24
+        Width = 3
         Height = 13
-        Caption = '----------------'
       end
       object NameLabel: TLabel
-        Left = 72
-        Top = 72
-        Width = 66
+        Left = 88
+        Top = 40
+        Width = 3
         Height = 13
-        Caption = '----------------------'
+      end
+      object LabelSize: TLabel
+        Left = 8
+        Top = 8
+        Width = 75
+        Height = 13
+        Caption = 'Size:'
+      end
+      object SizeLabel: TLabel
+        Left = 88
+        Top = 8
+        Width = 3
+        Height = 13
+      end
+      object VersionLabel: TLabel
+        Left = 88
+        Top = 56
+        Width = 3
+        Height = 13
+      end
+      object LabelVersion: TLabel
+        Left = 8
+        Top = 56
+        Width = 75
+        Height = 13
+        Caption = 'Internal version:'
       end
     end
     object TabSheet2: TTabSheet
-      Caption = 'TabSheet2'
+      Caption = 'STUP'
       ImageIndex = 1
+      object SaveSTUPButton: TButton
+        Left = 6
+        Top = 8
+        Width = 75
+        Height = 25
+        Caption = 'Save to BMP'
+        TabOrder = 0
+        OnClick = SaveSTUPButtonClick
+      end
     end
     object TabSheet3: TTabSheet
-      Caption = 'TabSheet3'
+      Caption = 'SNDS'
       ImageIndex = 2
+      object ListSNDSButton: TButton
+        Left = 6
+        Top = 8
+        Width = 131
+        Height = 25
+        Caption = 'List all used sound files'
+        TabOrder = 0
+        OnClick = ListSNDSButtonClick
+      end
     end
     object TabSheet4: TTabSheet
       Caption = 'TabSheet4'

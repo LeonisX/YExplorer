@@ -2,7 +2,7 @@ unit LoggerUnit;
 
 interface
 
-uses ComCtrls, Classes;
+uses ComCtrls, Classes, SysUtils;
 
 type
   TLogger = class
@@ -14,8 +14,10 @@ type
     procedure Debug(text: String);
     procedure Error(text: String);
     procedure SetOutput(lines: TStrings);
+    procedure SaveToFile(filePath, fileName: String);
+    procedure NewLine;
     constructor Create;
-    destructor Destroy;
+    destructor Destroy; override;
   end;
 
   var log: TLogger;
@@ -23,7 +25,6 @@ type
 implementation
 
 procedure TLogger.Clear;
-var i: byte;
 begin
   if lines <> nil then lines.Clear;
 end;
@@ -31,25 +32,36 @@ end;
 procedure TLogger.Debug(text: String);
 begin
   //editor.SelAttributes.Color:=$000000;
-  lines.Add(text);
+  if lines <> nil then lines.Add(text);
 end;
 
 procedure TLogger.Info(text: String);
 begin
   //editor.SelAttributes.Color:=$008800;
-  lines.Add(text);
+  if lines <> nil then lines.Add(text);
 end;
 
 procedure TLogger.Error(text: String);
 begin
   //editor.SelAttributes.Color:=$0000EE;
-  lines.Add(text);
+  if lines <> nil then lines.Add(text);
+end;
+
+procedure TLogger.NewLine;
+begin
+  lines.Add('');
 end;
 
 procedure TLogger.SetOutput(lines: TStrings);
 begin
   Self.lines.free;
   Self.lines := lines;
+end;
+
+procedure TLogger.SaveToFile(filePath, fileName: String);
+begin
+  if not DirectoryExists(filePath) then ForceDirectories(filePath);
+  if lines <> nil then lines.SaveToFile(filePath + fileName + '.txt');
 end;
 
 constructor TLogger.Create;
@@ -59,7 +71,7 @@ end;
 
 destructor TLogger.Destroy;
 begin
-  lines.free;
+  //lines.Free;
 end;
 
 initialization

@@ -23,8 +23,16 @@ type
     index: integer;
     crcs: TStringList;
   public
+    size: Cardinal;
     crc32: String;
     dtaRevision: String;
+    version: String;
+    soundsCount: Byte;
+    spritesCount: Integer;
+    mapsCount: Integer;
+    puzzlesCount: Integer;
+    charsCount: Integer;
+    namesCount: Integer;
     procedure Clear;
     procedure Add(section: String; size, offset: integer);
     function GetOffset(section: String): integer;
@@ -32,8 +40,8 @@ type
     function GetFullSize(section: String): integer;
     function Have(section: String): boolean;
 
-    procedure readDTAMetricks(fileName: String);
-    procedure loadFileToArray(fileName: String);
+    procedure ReadDTAMetricks(fileName: String);
+    procedure LoadFileToArray(fileName: String);
 
     procedure SetIndex(offset: integer); overload;
     procedure SetIndex(section: String); overload;
@@ -49,7 +57,7 @@ type
     function ReadRLongWord: Longword; //читает обратный порядок, little-endian, преобразует в нормальное число
 
     constructor Create;
-    destructor Destroy;
+    destructor Destroy; override;
 
     procedure ScanVERS(sectionName: String);
     procedure ScanSTUP(sectionName: String);
@@ -63,7 +71,7 @@ type
     procedure ScanTNAM(sectionName: String);
     procedure ScanTGEN(sectionName: String);
     function ChunkIndex(s:string):byte;
-    function inBound(section: String): boolean;
+    function InBound(section: String): boolean;
   end;
 
   var DTA: TSection;
@@ -128,7 +136,7 @@ begin
 end;
 
 
-function TSection.inBound(section: String): boolean;
+function TSection.InBound(section: String): boolean;
 begin
  result := index + 4 < getOffset(section) + getSize(section)
 end;
@@ -145,16 +153,23 @@ end;
 procedure TSection.readDTAMetricks(fileName: String);
 var keepReading:boolean;
 s: String;
-i: byte;
+i, k: Integer;
 begin
-  loadFileToArray(fileName);
+  Log.Debug('DTA file internal structure');
+  Log.Debug('===========================');
+  Log.NewLine;
+  LoadFileToArray(fileName);
+  Log.NewLine;
 
+  Log.Debug('Sections:');
+  Log.Debug('---------');
+  Log.NewLine;
   keepReading:=true;
   while (keepReading) do
     begin
       Application.ProcessMessages;
       s := ReadString(4);
-      Log.debug(s);
+      //Log.debug(s);
       case ChunkIndex(s) of
        1: ScanVERS(s); //версия файла
        2: ScanSTUP(s); //чтение титульной картинки
@@ -178,155 +193,191 @@ begin
        end;
       end;
   end;
+  Log.NewLine;
+  Log.Debug('Sections detailed:');
+  Log.Debug('------------------');
+  Log.NewLine;
+  Log.Debug(Format('%-7s%14s%10s', ['Section', 'Offset (hex)', 'Size']));
   for i := 0 to sections.Count - 1 do
     begin
-     Log.Debug(sections[i] + '  offset: ' + inttostr(TSectionMetricks(sections.Objects[i]).offset)
-     + ' fullSize: ' + inttostr(TSectionMetricks(sections.Objects[i]).fullSize));
+    k := TSectionMetricks(sections.Objects[i]).offset - 8;
+    if k < 0 then k := 0;
+     Log.Debug(Format('%7s%14x%10d',
+       [sections[i], k, TSectionMetricks(sections.Objects[i]).fullSize]));
     end;
-  log.debug('всё...');
 end;
-
 
 procedure TSection.ScanTGEN(sectionName: String);
-var sz: longword;
+var sz: Longword;
 begin
-  sz:=ReadLongWord;
+  sz := ReadLongWord;            //4 байта - длина блока TGEN
   Add(sectionName, 4 + sz, index);
   MoveIndex(sz);
-  LOG.debug(sectionName + ': ' + inttohex(sz,4)); //4 байта - длина блока TGEN
+  Log.Debug(sectionName + ' - what is it?...';
 end;
 
+// 246 * 26 + size(4) + 'TNAM' + $FFFF = 6406
 procedure TSection.ScanTNAM(sectionName: String);
-var
-k:word;
-s:string;
-sz:longword;
+var k: Word;
+s: String;
+sz: Longword;
+count: Byte;
 begin
-  sz:=ReadLongWord;
+  sz := ReadLongWord;           //4 bytes - length of section TNAM
   Add(sectionName, 4 + sz, index);
-  MoveIndex(sz);
-  LOG.debug(sectionName + ': ' + inttohex(sz,4)); //4 байта - длина блока TNAM
+  //MoveIndex(sz);
+  count := 0;
+  while InBound(sectionName) do
+  begin
+    k := ReadWord;              //2 байта - номер персонажа (тайла)
+    if k = $FFFF then Break;
+    ReadString(24);             //24 bytes - rest of current name length
+    inc(count);
+  end;
+  Log.Debug(sectionName + ': ' + InttoStr(count));
 end;
 
+// 77 * 4 = 308 + size(4) + 'CAUX' + FFFF = 318
 procedure TSection.ScanCAUX(sectionName: String);
-var sz:longword;
+var sz: Longword;
+count: Byte;
 begin
-  sz:=ReadLongWord;
+  sz := ReadLongWord;           //4 bytes - length of section CAUX
   Add(sectionName, 4 + sz, index);
   MoveIndex(sz);
-  LOG.debug(sectionName + ': ' + inttohex(sz,4)); //4 байта - длина блока CAUX
+  count := (sz - 2) div 4;
+  Log.Debug(sectionName + ': ' + inttostr(count));
 end;
 
+// 77 * 6 = 462 + size(4) + 'CHWP' + FFFF = 472
 procedure TSection.ScanCHWP(sectionName: String);
-var sz:longword;
+var sz: Longword;
+count: Byte;
 begin
-  sz:=ReadLongWord;
+  sz := ReadLongWord;           //4 bytes - length of section CHWP
   Add(sectionName, 4 + sz, index);
   MoveIndex(sz);
-  LOG.debug(sectionName + ': ' + inttohex(sz,4)); //4 байта - длина блока CHWP
+    count := (sz - 2) div 6;
+  Log.Debug(sectionName + ': ' + inttostr(count));
 end;
 
+// 78 Characters
 procedure TSection.ScanCHAR(sectionName: String);
-var sz:longword;
+var sz, csz: Longword;
+ch: Word;
 begin
-  sz:=ReadLongWord;
+  sz := ReadLongWord;           //4 bytes - length of section CHAR
   Add(sectionName, 4 + sz, index);
-  MoveIndex(sz);
-  LOG.debug(sectionName + ': ' + inttohex(sz,4)); //4 байта - длина блока CHAR
+  charsCount := 0;
+  while InBound(sectionName) do
+   begin
+    ch := ReadWord;             //2 bytes - index of character
+    if ch = $FFFF then Break;
+    ReadString(4);              //4 bytes - 'ICHA'
+    csz := ReadLongWord;        //4 bytes - rest of current character length
+    ReadString(csz);
+    inc(charsCount);
+   end;
+  Log.Debug('Characters: ' + IntToStr(charsCount));
 end;
 
 procedure TSection.ScanPUZ2(sectionName: String);
-var sz:longword;
+var sz, psz: Longword;
+pz: Word;
 begin
-  sz:=ReadLongWord;
+  sz := ReadLongWord;           //4 bytes - length of section PUZ2
   Add(sectionName, 4 + sz, index);
-  MoveIndex(sz);
-  LOG.debug(sectionName + ': ' + inttohex(sz,4)); //4 байта - длина блока PUZ2
+  puzzlesCount := 0;
+  while InBound(sectionName) do
+   begin
+    pz := ReadWord;             //2 bytes - index of puzzle (from 0)
+    if pz = $FFFF then Break;
+    ReadString(4);              //4 bytes - 'IPUZ'
+    psz := ReadLongWord;        //4 bytes - rest of current puzzle length
+    ReadString(psz);
+    inc(puzzlesCount)
+   end;
+  Log.Debug('Puzzles: ' + IntToStr(puzzlesCount));
 end;
 
 procedure TSection.ScanZONE(sectionName: String);
-var sz:longword;
-k,i:word;
-s:string;
+var sz: Longword;
+i: Word;
+s: Sing;
 ind: Integer;
 begin
   //Signature: String[4];       // 4 bytes: "ZONE" - уже прочитано
   ind := index;
-  k:=ReadWord;                  // 2 байта - количество карт $0291=657 штук
+  mapsCount := ReadWord;        // 2 bytes - maps count $0291=657 штук
   //дальше повторяющиеся данные структуры TZone
-
-  LOG.debug('Maps (zones)');
-  for i:=1 to k do
+  for i:=1 to mapsCount do
     begin
-      ReadWord;            //unknown:word; //01 00 - непонятно что
-      sz:=ReadLongWord;       //size:longword; //размер, используемый текущей картой
+      ReadWord;                //unknown:word;          01 00 - unknown 2 bytes
+      sz:=ReadLongWord;        //size:longword;         size of current map (4b)
       MoveIndex(sz);
     end;
   Add(sectionName, 4 + index - ind, ind);
-  s:='... skipped '+inttostr(k)+' maps';
-  LOG.debug(s);
+  Log.Debug('Maps (zones): ' + IntToStr(mapsCount));
 end;
 
 procedure TSection.ScanTILE(sectionName: String);
-var k, sz, i, n:cardinal;
-s:string;
+var k, sz, i, n: Cardinal;
 begin
-  sz:=ReadLongWord;
+  sz:=ReadLongWord;             //4 bytes - length of section TILE
   Add(sectionName, 4 + sz, index);
   MoveIndex(sz);
-  s:='Sprites & tiles';
-  s:=s+'... skipped';
-  LOG.debug(s);
+  spritesCount := sz div $404;
+  Log.debug('Sprites, tiles: ' + IntToStr(spritesCount));
 end;
 
 
 procedure TSection.ScanSNDS(sectionName: String);
-var sz:word;
-s:string;
+var sz, msz: Word;
 begin
-  sz:=ReadLongWord;
+  sz:=ReadLongWord;             //4 bytes - length of section SNDS
   Add(sectionName, 4 + sz, index);
-  MoveIndex(sz);
-  s:='Sounds';
-  s:=s+'... skipped';
-  LOG.debug(s);
+  soundsCount := 0;
+  ReadWord;
+  while InBound(knownSections[3]) do
+   begin
+    msz := ReadWord;
+    ReadString(msz);
+    inc(soundsCount);
+   end;
+  Log.Debug('Sounds, melodies: ' + IntToStr(soundsCount));
 end;
 
 procedure TSection.ScanSTUP(sectionName: String);
-var s:string;
-sz:longword;
+var sz: Longword;
 begin
-  sz:=ReadLongWord;
+  sz:=ReadLongWord;             //4 bytes - length of section STUP
   Add(sectionName, 4 + sz, index);
-  s:='Title screen';
   MoveIndex(sz);
-      s:=s+'... skipped';
-  LOG.debug(s);
+  Log.Debug('Title screen: exists');
 end;
 
 procedure TSection.ScanVERS(sectionName: String);
 begin
   Add(sectionName, 4 + 0, index);
-//  Showmessage(Inttostr(index));
-  LOG.debug('File version: '+inttostr(ReadRWord)+'.'+inttostr(ReadRWord));
-//      Showmessage(Inttostr(index));
+  version := inttostr(ReadRWord)+'.'+inttostr(ReadRWord);
+  Log.Debug('File version: ' + version);
 end;
 
 
-procedure TSection.loadFileToArray(fileName: String);
+procedure TSection.LoadFileToArray(fileName: String);
 var FS: TFileStream;
 begin
   crc32 := IntToHex(GetFileCRC(fileName), 8);
   if crcs.IndexOfName(crc32) = -1
     then dtaRevision := 'Unknown'
     else dtaRevision := crcs.Values[crc32];
-  Log.debug('CRC-32: ' + crc32);
-  Log.debug('DTA revision: ' + dtaRevision);
+
   dta := nil;
-  Clear;
+  //Clear;
   FS := TFileStream.Create(fileName, fmOpenRead);
   try
-    if FS.Size > 0 then
+    size := FS.size;
+    if size > 0 then
       begin
         SetLength(dta, FS.Size);
         FS.ReadBuffer(Pointer(dta)^, FS.Size);
@@ -334,6 +385,9 @@ begin
   finally
      FreeAndNil(FS);
   end;
+  Log.debug('Size: ' + inttostr(size));
+  Log.debug('CRC-32: ' + crc32);
+  Log.debug('DTA revision: ' + dtaRevision);
   index:=0;
 end;
 

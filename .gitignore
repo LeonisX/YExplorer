@@ -2,7 +2,7 @@
 /output*
 /test
 /other
-/src/dcu*
+/src/dcu/*
 /src/*.~*
 /*.map
 /*.rsm

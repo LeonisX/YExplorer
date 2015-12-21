@@ -45,9 +45,7 @@ type
     TGENCB: TCheckBox;
     OpenDTAButton: TButton;
     OpenDTADialog: TOpenDialog;
-    SaveSTUPButton: TButton;
     Image1: TImage;
-    ListSNDSButton: TButton;
     LogMemo: TMemo;
     PageControl: TPageControl;
     TabSheet1: TTabSheet;
@@ -61,6 +59,12 @@ type
     LabelName: TLabel;
     CRC32Label: TLabel;
     NameLabel: TLabel;
+    LabelSize: TLabel;
+    SizeLabel: TLabel;
+    VersionLabel: TLabel;
+    LabelVersion: TLabel;
+    SaveSTUPButton: TButton;
+    ListSNDSButton: TButton;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -501,6 +505,7 @@ begin
   BMP.PixelFormat:=pf8bit;
   FillInternalPalette(BMP, 0, 0, 0);
   OpenDTADialog.InitialDir := '.\';
+  log.SetOutput(LogMemo.lines);
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -512,7 +517,6 @@ procedure TMainForm.Button2Click(Sender: TObject);
 begin
   LoadBMP('output/STUP.bmp',bmp);
   CopyPicture(Image1,0,0);
-  log.SetOutput(LogMemo.lines);
 end;
 
 
@@ -522,8 +526,11 @@ begin
     begin
       log.Clear;
       DTA.readDTAMetricks(OpenDTADialog.FileName);
+      VersionLabel.Caption := DTA.version;
+      SizeLabel.Caption := IntToStr(DTA.size);
       CRC32Label.Caption := DTA.crc32;
       NameLabel.Caption := DTA.dtaRevision;
+      Log.SaveToFile(opath, 'Structure');
     end;
 end;
 
@@ -550,20 +557,20 @@ var sz, msz, i: Integer;
   title: String;
 begin
   Log.Clear;
-  Log.debug('Sounds & melodies:');
-  Log.debug('');
+  Log.Debug('Sounds & melodies:');
+  Log.Debug('');
   title := knownSections[3]; // SNDS
   DTA.SetIndex(title);
   Log.Debug('Unknown value: ' + inttohex(DTA.ReadWord, 4)); // C0 FF ??????
   i := 0;
-  while DTA.inBound(title) do
+  while DTA.InBound(title) do
    begin
     msz := DTA.ReadWord;
     Log.Debug('#' + rightstr('00'+inttostr(i),2) + ': ' + DTA.ReadString(msz - 1));
     DTA.ReadByte;                   // 00 at the end of string
     inc(i)
    end;
-  LogMemo.Lines.SaveToFile(opath + 'SNDS.txt');
+  Log.SaveToFile(opath, title);
 end;
 
 end.
