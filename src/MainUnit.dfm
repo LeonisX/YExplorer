@@ -2,7 +2,7 @@ object MainForm: TMainForm
   Left = 192
   Top = 114
   Width = 910
-  Height = 671
+  Height = 800
   Caption = 'Yoda Stories Explorer'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,7 +17,7 @@ object MainForm: TMainForm
   TextHeight = 13
   object Image1: TImage
     Left = 336
-    Top = 8
+    Top = 328
     Width = 313
     Height = 297
   end
@@ -41,107 +41,28 @@ object MainForm: TMainForm
   end
   object GroupBox3: TGroupBox
     Left = 8
-    Top = 280
+    Top = 216
     Width = 321
-    Height = 353
+    Height = 545
     Caption = ' LOG '
     TabOrder = 2
     object LogMemo: TMemo
       Left = 2
       Top = 15
       Width = 317
-      Height = 336
+      Height = 528
       Align = alClient
+      ScrollBars = ssVertical
       TabOrder = 0
-    end
-  end
-  object GroupBox4: TGroupBox
-    Left = 8
-    Top = 108
-    Width = 106
-    Height = 34
-    Caption = ' TILE '
-    TabOrder = 3
-    object TILECB: TCheckBox
-      Left = 14
-      Top = 13
-      Width = 87
-      Height = 17
-      Caption = 'Save to BMP'
-      TabOrder = 0
-    end
-  end
-  object GroupBox5: TGroupBox
-    Left = 120
-    Top = 40
-    Width = 145
-    Height = 129
-    Caption = ' ZONE '
-    TabOrder = 4
-    object ZONECB: TCheckBox
-      Left = 14
-      Top = 13
-      Width = 123
-      Height = 17
-      Caption = 'Process ZONE'
-      TabOrder = 0
-    end
-    object IZONCB: TCheckBox
-      Left = 14
-      Top = 29
-      Width = 123
-      Height = 17
-      Caption = 'Save IZON to BMP'
-      TabOrder = 1
-    end
-    object IZAXCB: TCheckBox
-      Left = 14
-      Top = 45
-      Width = 87
-      Height = 17
-      Caption = 'Process IZAX'
-      TabOrder = 2
-    end
-    object IZX2CB: TCheckBox
-      Left = 14
-      Top = 61
-      Width = 87
-      Height = 17
-      Caption = 'Process IZX2'
-      TabOrder = 3
-    end
-    object IZX3CB: TCheckBox
-      Left = 14
-      Top = 77
-      Width = 87
-      Height = 17
-      Caption = 'Process IZX3'
-      TabOrder = 4
-    end
-    object IZX4CB: TCheckBox
-      Left = 14
-      Top = 93
-      Width = 87
-      Height = 17
-      Caption = 'Process IZX4'
-      TabOrder = 5
-    end
-    object IACTCB: TCheckBox
-      Left = 14
-      Top = 109
-      Width = 87
-      Height = 17
-      Caption = 'Process IACT'
-      TabOrder = 6
     end
   end
   object GroupBox6: TGroupBox
     Left = 8
-    Top = 142
+    Top = 46
     Width = 106
     Height = 34
     Caption = ' PUZ2 '
-    TabOrder = 5
+    TabOrder = 3
     object PUZ2CB: TCheckBox
       Left = 14
       Top = 13
@@ -153,11 +74,11 @@ object MainForm: TMainForm
   end
   object GroupBox7: TGroupBox
     Left = 8
-    Top = 176
+    Top = 88
     Width = 106
     Height = 34
     Caption = ' CHAR '
-    TabOrder = 6
+    TabOrder = 4
     object CHARCB: TCheckBox
       Left = 14
       Top = 13
@@ -169,11 +90,11 @@ object MainForm: TMainForm
   end
   object GroupBox8: TGroupBox
     Left = 8
-    Top = 211
+    Top = 131
     Width = 106
     Height = 34
     Caption = ' CHWP '
-    TabOrder = 7
+    TabOrder = 5
     object CHWPCB: TCheckBox
       Left = 14
       Top = 13
@@ -185,11 +106,11 @@ object MainForm: TMainForm
   end
   object GroupBox9: TGroupBox
     Left = 8
-    Top = 246
+    Top = 174
     Width = 106
     Height = 34
     Caption = ' CAUX '
-    TabOrder = 8
+    TabOrder = 6
     object CAUXCB: TCheckBox
       Left = 14
       Top = 13
@@ -201,11 +122,11 @@ object MainForm: TMainForm
   end
   object GroupBox10: TGroupBox
     Left = 120
-    Top = 174
+    Top = 46
     Width = 145
     Height = 59
     Caption = ' TNAM '
-    TabOrder = 9
+    TabOrder = 7
     object TNAMCB: TCheckBox
       Left = 14
       Top = 13
@@ -225,11 +146,11 @@ object MainForm: TMainForm
   end
   object GroupBox11: TGroupBox
     Left = 120
-    Top = 235
+    Top = 115
     Width = 106
     Height = 34
     Caption = ' TGEN '
-    TabOrder = 10
+    TabOrder = 8
     object TGENCB: TCheckBox
       Left = 14
       Top = 13
@@ -245,18 +166,18 @@ object MainForm: TMainForm
     Width = 75
     Height = 25
     Caption = 'Open DTA'
-    TabOrder = 11
+    TabOrder = 9
     OnClick = OpenDTAButtonClick
   end
   object PageControl: TPageControl
     Left = 335
-    Top = 305
+    Top = 8
     Width = 561
     Height = 313
-    ActivePage = TabSheet4
+    ActivePage = TabSheet5
     MultiLine = True
-    TabIndex = 3
-    TabOrder = 12
+    TabIndex = 4
+    TabOrder = 10
     object TabSheet1: TTabSheet
       Caption = 'Common information'
       object LabelCRC32: TLabel
@@ -478,6 +399,74 @@ object MainForm: TMainForm
         Top = 8
         Width = 3
         Height = 13
+      end
+      object MapProgressLabel: TLabel
+        Left = 16
+        Top = 184
+        Width = 193
+        Height = 13
+        Alignment = taCenter
+        AutoSize = False
+      end
+      object SaveMapsButton: TButton
+        Left = 6
+        Top = 32
+        Width = 99
+        Height = 25
+        Caption = 'Save maps to files'
+        TabOrder = 0
+        OnClick = SaveMapsButtonClick
+      end
+      object MapProgressBar: TProgressBar
+        Left = 16
+        Top = 160
+        Width = 193
+        Height = 17
+        Min = 0
+        Max = 100
+        Smooth = True
+        Step = 1
+        TabOrder = 1
+      end
+      object MapPlanetSaveCheckBox: TCheckBox
+        Left = 16
+        Top = 112
+        Width = 153
+        Height = 17
+        Caption = 'Group by planet type'
+        Checked = True
+        State = cbChecked
+        TabOrder = 2
+      end
+      object MapFlagSaveCheckBox: TCheckBox
+        Left = 16
+        Top = 88
+        Width = 145
+        Height = 17
+        Caption = 'Group by flags'
+        Checked = True
+        State = cbChecked
+        TabOrder = 3
+      end
+      object MapSaveCheckBox: TCheckBox
+        Left = 16
+        Top = 64
+        Width = 145
+        Height = 17
+        Caption = 'Normal save'
+        Checked = True
+        State = cbChecked
+        TabOrder = 4
+      end
+      object ActionsCheckBox: TCheckBox
+        Left = 16
+        Top = 136
+        Width = 145
+        Height = 17
+        Caption = 'Dump actions'
+        Checked = True
+        State = cbChecked
+        TabOrder = 5
       end
     end
     object TabSheet6: TTabSheet

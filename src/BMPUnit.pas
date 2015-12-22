@@ -108,7 +108,7 @@ type
     procedure LoadBMP(s:string;bmp:tbitmap);
     procedure SaveBMP(s:string;bmp:tbitmap);
     procedure InitBMP;
-
+    procedure GetTile(section: TSection; id: Word; bmp: TBitmap);
 
 var
   BMP:TBitMap;
@@ -239,19 +239,35 @@ begin
 end;
 
 procedure ReadPicture(section: TSection; offset: Cardinal);
-var i:cardinal;
-x,y:word;
-P: PByteArray;
+var i, j: Word;
+x, y: Word;
+p: PByteArray;
 begin
   if Offset > 0 then section.setIndex(offset);
-  for i := 0 to BMP.Width * BMP.Height - 1 do
-   begin
-    y := i div BMP.Width;
-    x := i - y * BMP.Width;
-    P := BMP.ScanLine[y];
-    P[x] := section.ReadByte;
-   end;
+  for i := 0 to BMP.Height - 1 do
+    for j := 0 to BMP.Width - 1 do
+    begin
+      p := BMP.ScanLine[i];
+      p[j] := section.ReadByte;
+    end;
 end;
+
+procedure GetTile(section: TSection; id: Word; bmp: TBitmap);
+var i, j, index2: Cardinal;
+  p: PByteArray;
+begin  
+  index2 := section.GetOffset(knownSections[4]) + id * $404 + 4;
+  for i := 0 to bmp.Height - 1 do
+  begin
+    p := bmp.ScanLine[i];
+    for j := 0 to bmp.Width - 1 do
+    begin
+      p[j] := section.dta[index2];
+      inc(index2);
+    end;
+  end;
+end;
+
 
 procedure FillInternalPalette(BM:TBitMap; r, g, b: Byte);
 var
@@ -280,7 +296,7 @@ begin
   end;
 end;
 
-procedure FillPalette(BM:TBitMap);
+procedure FillPalette(bm: TBitMap);
 var
   pal: PLogPalette;
   hpal: HPALETTE;

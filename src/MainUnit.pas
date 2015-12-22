@@ -11,24 +11,14 @@ uses
 
 const
   OUTPUT = 'output';
-  TileSize = 32;
   eBMP = '.bmp';
-
+  TileSize = 32;
+  
 type
   TMainForm = class(TForm)
     Button1: TButton;
     Button2: TButton;
     GroupBox3: TGroupBox;
-    GroupBox4: TGroupBox;
-    TILECB: TCheckBox;
-    GroupBox5: TGroupBox;
-    ZONECB: TCheckBox;
-    IZONCB: TCheckBox;
-    IZAXCB: TCheckBox;
-    IZX2CB: TCheckBox;
-    IZX3CB: TCheckBox;
-    IZX4CB: TCheckBox;
-    IACTCB: TCheckBox;
     GroupBox6: TGroupBox;
     PUZ2CB: TCheckBox;
     GroupBox7: TGroupBox;
@@ -87,6 +77,13 @@ type
     Panel3: TPanel;
     TilesProgressBar: TProgressBar;
     TilesProgressLabel: TLabel;
+    SaveMapsButton: TButton;
+    MapProgressBar: TProgressBar;
+    MapPlanetSaveCheckBox: TCheckBox;
+    MapFlagSaveCheckBox: TCheckBox;
+    MapSaveCheckBox: TCheckBox;
+    MapProgressLabel: TLabel;
+    ActionsCheckBox: TCheckBox;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -95,21 +92,23 @@ type
     procedure SaveSTUPButtonClick(Sender: TObject);
     procedure ListSNDSButtonClick(Sender: TObject);
     procedure SaveTilesButtonClick(Sender: TObject);
+    procedure SaveMapsButtonClick(Sender: TObject);
   private
   public
-    procedure ReadZONE;
-    procedure ReadIZON;
-    procedure ReadIZAX;
-    procedure ReadIZX2;
-    procedure ReadIZX3;
-    procedure ReadIZX4;
-    procedure ReadIACT;
+    procedure ReadOIE(id: Word);
+    procedure ReadIZON(id: Word);
+    procedure ReadIZAX(id: Word);
+    procedure ReadIZX2(id: Word);
+    procedure ReadIZX3(id: Word);
+    procedure ReadIZX4(id: Word);
+    procedure ReadIACT(id: Word);
     procedure ReadPUZ2;
     procedure ReadCHAR;
     procedure ReadCHWP;
     procedure ReadCAUX;
     procedure ReadTNAM;
     procedure ReadTGEN;
+    procedure DumpData(fileName: String; offset, size: Cardinal);
   end;
 
 var
@@ -140,7 +139,6 @@ begin
     begin
       s := DTA.ReadString(4);
       case DTA.ChunkIndex(s) of
-       5: ReadZONE; //локации
        6: ReadPUZ2; //ещЄ диалоги
        7: ReadCHAR; //персонажи?
        8: ReadCHWP; //персонажи?????
@@ -256,194 +254,6 @@ begin
     seek(SrcFile,filepos(SrcFile)+size);
     end else
        seek(SrcFile,filepos(SrcFile)+size);
-end;
-
-procedure TMainForm.ReadIZON;
-var s:string;
-size:longword;
-k,w,h,p,i,j:word;
-begin
-  DTA.ReadWord; // unknown:word; //01 00 - непон€тно что
-  DTA.ReadLongWord; // size:longword; //размер, используемый текущей картой
-  pn:=DTA.ReadWord; // number:word; //2 байта - это пор€дковый номер карты, начина€ с нул€
-  s:='#'+inttostr(pn);
-  s:=s+' '+DTA.readString(4); // izon:string[4]; //4 bytes: "IZON"
-  size:=DTA.ReadLongWord; // unk:longword; //4 байта - размер блока IZON (включа€ IZON) до object info entry count
-  s:=s+' '+inttohex(size,4);
-  LOG.debug(s);
-  Application.ProcessMessages;
-  if IZONCB.Checked then
-    begin
-     CreateDir('output\Maps');
-     w:=DTA.ReadWord;   // width:word; //2 bytes: map width (W)
-     h:=DTA.ReadWord;   // height:word; //2 bytes: map height (H)
-     DTA.ReadWord;      // flags:word; //2 byte: map flags (unknown meanings)* добавил байт снизу
-     DTA.ReadLongWord;  // unused:longword; //5 bytes: unused (same values for every map)
-     p:=DTA.ReadWord;   // planet:word; //1 byte: planet (0x01 = desert, 0x02 = snow, 0x03 = forest, 0x05 = swamp)* добавил следующий байт
-     //Image1.Width:=w*32;
-     //Image1.Height:=h*32;
-     Image1.Picture.Bitmap.Width:=w*32;
-     Image1.Picture.Bitmap.Height:=h*32;
-
-     image1.Picture.bitmap.Canvas.Pen.Color:=0;
-     image1.Picture.bitmap.Canvas.Brush.Color:=0;
-     image1.picture.Bitmap.canvas.Rectangle(0,0,image1.picture.bitmap.width,image1.picture.bitmap.height);
-     LOG.debug('Map #' + inttostr(pn) + ' offset: ' + inttohex(filepos(SrcFile),6));
-     for i:=0 to h-1 do
-      begin
-       for j:=0 to w-1 do
-         begin          //W*H*6 bytes: map data
-           k:=DTA.ReadWord;
-           if k<>$FFFF then
-             begin
-               LoadBMP('output\Tiles\'+rightstr('000'+inttostr(k),4)+'.bmp',bmp);
-               CopyFrame(Image1,j*32,i*32);
-             end;
-           k:=DTA.ReadWord;
-           if k<>$FFFF then
-             begin
-               LoadBMP('output\Tiles\'+rightstr('000'+inttostr(k),4)+'.bmp',bmp);
-               CopyFrame(Image1,j*32,i*32);
-             end;
-           k:=DTA.ReadWord;
-           if k<>$FFFF then
-             begin
-               LoadBMP('output\Tiles\'+rightstr('000'+inttostr(k),4)+'.bmp',bmp);
-               CopyFrame(Image1,j*32,i*32);
-             end;
-         end;
-         application.ProcessMessages;
-         Image1.Picture.SaveToFile('output\Maps\'+rightstr('000'+inttostr(pn),3)+'.bmp');
-      end;
-     k:=DTA.ReadWord;                             //2 bytes: object info entry count (X)
-     seek(SrcFile,filepos(SrcFile)+k*12);     //X*12 bytes: object info data
-    end else
-     begin
-      seek(SrcFile,filepos(SrcFile)+size-8);   //4 байта - размер блока IZON (включа€ IZON) до object info entry count
-      k:=DTA.ReadWord;                             //2 bytes: object info entry count (X)
-      seek(SrcFile,filepos(SrcFile)+k*12);     //X*12 bytes: object info data
-     end;
-   ReadIZAX;
-   ReadIZX2;
-   ReadIZX3;
-   ReadIZX4;
-   ReadIACT;
-end;
-
-
-procedure TMainForm.ReadIZAX;
-var size:word;
-begin
-  LOG.debug('IZAX: '+DTA.ReadString(4)); //4 bytes: "IZAX"
-  size:=DTA.ReadWord; //2 bytes: length (X)
-  if IZAXCB.Checked then
-    begin
-   //X-6 bytes: IZAX data
-   //showmessage('ќбработка IZAX пока не поддерживаетс€!!!');
-    seek(SrcFile,filepos(SrcFile)+size-6);
-    end else
-       seek(SrcFile,filepos(SrcFile)+size-6);
-end;
-
-procedure TMainForm.ReadIZX2;
-var size:word;
-begin
-  LOG.debug('IZX2: '+DTA.ReadString(4)); //4 bytes: "IZX2"
-  size:=DTA.ReadWord; //2 bytes: length (X)
-  if IZX2CB.Checked then
-    begin
-    //X-6 bytes: IZX2data
-    //showmessage('ќбработка IZX2 пока не поддерживаетс€!!!');
-    seek(SrcFile,filepos(SrcFile)+size-6);
-    end else
-       seek(SrcFile,filepos(SrcFile)+size-6);
-end;
-
-procedure TMainForm.ReadIZX3;
-var size:word;
-begin
-  LOG.debug('IZX3: '+DTA.ReadString(4)); //4 bytes: "IZX3"
-  size:=DTA.ReadWord; //2 bytes: length (X)
-  if IZX3CB.Checked then
-    begin
-    //X-6 bytes: IZX3data
-    //showmessage('ќбработка IZX3 пока не поддерживаетс€!!!');
-    seek(SrcFile,filepos(SrcFile)+size-6);
-    end else
-       seek(SrcFile,filepos(SrcFile)+size-6);
-end;
-
-procedure TMainForm.ReadIZX4;
-begin
-  LOG.debug('IZX4: '+DTA.ReadString(4)); //4 bytes: "IZX4"
-  if IZX4CB.Checked then
-    begin
-    //8 bytes: IZX4 data
-    //showmessage('ќбработка IZX4 пока не поддерживаетс€!!!');
-    seek(SrcFile,filepos(SrcFile)+8);
-    end else
-       seek(SrcFile,filepos(SrcFile)+8);
-end;
-
-procedure TMainForm.ReadIACT;
-label l1,l2;
-var s:string;
-size:longword;
-k: integer;
-begin
-  if IACTCB.Checked then CreateDir('output\Iacts');
-   k:=0;
-l1:
-  s:=DTA.ReadString(4); //4 bytes: "IACT"
-  if s<>'IACT' then goto l2;
-  inc(k);
-  if IACTCB.Checked then
-    begin
-      AssignFile(DestFile,'output\Iacts\'+rightstr('000'+inttostr(pn), 3) + '-'+rightstr('00'+inttostr(k),2));
-      Rewrite(DestFile,1);
-   end;
-  size:=DTA.ReadLongWord;  //4 bytes: length (X)
-  LOG.debug(s+' '+inttohex(size,4));
-  if IACTCB.Checked then
-     begin
-      //X bytes: action data
-      BlockRead(SrcFile,buf,size);
-      BlockWrite(DestFile,buf,size);
-      Closefile(DestFile);
-     end else
-        seek(SrcFile,filepos(SrcFile)+size);
-  goto l1;
-l2:
-  seek(SrcFile,filepos(SrcFile)-4);
-//  showmessage(inttohex(filepos(SrcFile),4));
-//  showmessage('IACTs all');
-end;
-
-procedure TMainForm.ReadZONE;
-var sz:longword;
-k,i:word;
-s:string;
-begin
-  //Signature: String[4];       // 4 bytes: "ZONE" - уже прочитано
-  k:=DTA.ReadWord;                  // 2 байта - количество карт $0291=657 штук
-  //дальше повтор€ющиес€ данные структуры TZone
-
-  LOG.debug('Maps (zones)');
-  if ZONECB.checked then
-    begin
-      for i:=1 to k do ReadIZON;
-      s:='... processed '+inttostr(k)+' maps';
-    end else
-    begin
-      for i:=1 to k do
-        begin
-         DTA.ReadWord;            //unknown:word; //01 00 - непон€тно что
-         sz:=DTA.ReadLongWord;       //size:longword; //размер, используемый текущей картой
-         seek(SrcFile,filepos(SrcFile)+sz); //пропускаем карту
-        end;
-      s:='... skipped '+inttostr(k)+' maps';
-    end;
-  LOG.debug(s);
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
@@ -590,13 +400,192 @@ begin
     if HexCheckBox.Checked then
       SaveBMP(hexPath + '\' + inttohex(i,4) + eBMP,bmp);
     TilesProgressBar.Position := i;
-    TilesProgressLabel.Caption := Format('%.2f %%', [(i / DTA.tilesCount) * 100]);
+    TilesProgressLabel.Caption := Format('%.2f %%', [((i + 1) / DTA.tilesCount) * 100]);
     Application.ProcessMessages;
   end;
   Log.Debug('OK');
 end;
 
 
+procedure TMainForm.SaveMapsButtonClick(Sender: TObject);
+var i: Word;
+begin
+  CreateDir(opath);
+  if MapSaveCheckBox.Checked then CreateDir(opath + 'Maps');
+  if MapFlagSaveCheckBox.Checked then CreateDir(opath + 'MapsByFlags');
+  if MapPlanetSaveCheckBox.Checked then CreateDir(opath + 'MapsByPlanetType');
+  if ActionsCheckBox.Checked then
+  begin
+    CreateDir(opath + 'IZAX');
+    CreateDir(opath + 'IZX2');
+    CreateDir(opath + 'IZX3');
+    CreateDir(opath + 'IZX4');
+    CreateDir(opath + 'IACT');
+  end;
 
+  bmp.PixelFormat := pf8bit;
+  bmp.Width := TileSize;
+  bmp.Height := TileSize;
+  FillInternalPalette(BMP, $FF, 0, $FF);
+
+  MapProgressBar.Position := 0;
+  MapProgressBar.Max := DTA.mapsCount;
+
+  Log.Clear;
+  Log.Debug('Maps (zones):');
+  Log.Debug('');
+  Log.Debug('Total count: ' + IntToStr(DTA.mapsCount));
+  Log.Debug('');
+  //DTA.SetIndex(knownSections[5]);          // ZONE
+  for i:=0 to DTA.mapsCount - 1 do ReadIZON(i);
+end;
+
+procedure TMainForm.ReadIZON(id: Word);
+var s: String;
+size: Longword;
+k, w, h, p, i, j, flag, planet: Word;
+begin
+  DTA.SetIndex(TMap(DTA.maps.Objects[id]).mapOffset);   // go to map data
+  pn := DTA.ReadWord;               // number:word; //2 bytes - serial number of the map starting with 0
+  if pn <> id then ShowMessage(IntToStr(pn) + ' <> ' + IntToStr(id));
+  DTA.ReadString(4);                // izon:string[4]; //4 bytes: "IZON"
+  size := DTA.ReadLongWord;         // longword; //4 bytes - size of block IZON (include 'IZON') until object info entry count
+
+  Application.ProcessMessages;
+
+  w := DTA.ReadWord;                // width:word; //2 bytes: map width (W)
+  h := DTA.ReadWord;                // height:word; //2 bytes: map height (H)
+  flag := DTA.ReadWord;             // flags:word; //2 byte: map flags (unknown meanings)* добавил байт снизу
+  DTA.ReadLongWord;                 // unused:longword; //5 bytes: unused (same values for every map)
+  planet := DTA.ReadWord;           // planet:word; //1 byte: planet (0x01 = desert, 0x02 = snow, 0x03 = forest, 0x05 = swamp)* добавил следующий байт
+  Image1.Width := w * 32;
+  Image1.Height := h * 32;
+  Image1.Picture.Bitmap.Width := w * 32;
+  Image1.Picture.Bitmap.Height := h * 32;
+
+  image1.Picture.bitmap.Canvas.Pen.Color := 0;
+  image1.Picture.bitmap.Canvas.Brush.Color := 0;
+  image1.picture.Bitmap.canvas.Rectangle(0, 0, image1.picture.bitmap.width, image1.picture.bitmap.height);
+  Log.Debug('Map #' + inttostr(pn) + ' offset: ' + inttohex(DTA.GetIndex, 8));
+  for i:=0 to h-1 do
+  begin
+    for j:=0 to w-1 do
+    begin          //W*H*6 bytes: map data
+      k := DTA.ReadWord;
+      if k <> $FFFF then
+      begin
+        GetTile(dta, k, bmp);
+        CopyFrame(Image1, j * 32, i * 32);
+      end;
+      k := DTA.ReadWord;
+      if k <> $FFFF then
+      begin
+        GetTile(dta, k, bmp);
+        CopyFrame(Image1, j * 32, i * 32);
+      end;
+      k := DTA.ReadWord;
+      if k <> $FFFF then
+      begin
+        GetTile(dta, k, bmp);
+        CopyFrame(Image1, j * 32, i * 32);
+      end;
+    end;
+    Application.ProcessMessages;
+    if MapSaveCheckBox.Checked then
+      Image1.Picture.SaveToFile(opath + 'Maps\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
+    if MapFlagSaveCheckBox.Checked then
+    begin
+      s := opath + 'MapsByFlags\' + IntToBin(flag);
+      CreateDir(s);
+      Image1.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
+    end;
+    if MapPlanetSaveCheckBox.Checked then
+    begin
+      s := opath + 'MapsByPlanetType\' + planets[planet];
+      CreateDir(s);
+      Image1.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
+    end;
+
+
+    MapProgressBar.Position := id;
+    MapProgressLabel.Caption := Format('%.2f %%', [((id + 1)/ DTA.mapsCount) * 100]);
+    Application.ProcessMessages;
+  end;
+  //k:=DTA.ReadWord;                             //2 bytes: object info entry count (X)
+  //DTA.MoveIndex(k * 12);                       //X*12 bytes: object info data
+
+  if ActionsCheckBox.Checked then
+  begin
+   //ReadOIE(id);
+   ReadIZAX(id);
+   ReadIZX2(id);
+   ReadIZX3(id);
+   ReadIZX4(id);
+   ReadIACT(id);
+  end;
+end;
+
+
+procedure TMainForm.DumpData(fileName: String; offset, size: Cardinal);
+var f: File of Byte;
+i: Cardinal;
+b: Byte;
+begin
+  DTA.SetIndex(offset);
+  AssignFile(f, fileName);
+  Rewrite(f);
+  for i := 0 to size - 1 do
+  begin
+    b := DTA.ReadByte;
+    Write(f, b);
+    //DTA.MoveIndex(1);
+  end;
+  CloseFile(f);
+end;
+
+procedure TMainForm.ReadOIE(id: Word);
+begin
+  DumpData(opath + 'OIE\' + IntToStr(id), TMap(DTA.maps.Objects[id]).oieOffset, TMap(DTA.maps.Objects[id]).oieSize);
+end;
+
+procedure TMainForm.ReadIZAX(id: Word);
+begin
+  DumpData(opath + 'IZAX\' + IntToStr(id), TMap(DTA.maps.Objects[id]).izaxOffset, TMap(DTA.maps.Objects[id]).izaxSize);
+end;
+
+procedure TMainForm.ReadIZX2(id: Word);
+begin
+  DumpData(opath + 'IZX2\' + IntToStr(id), TMap(DTA.maps.Objects[id]).izx2Offset, TMap(DTA.maps.Objects[id]).izx2Size);
+end;
+
+procedure TMainForm.ReadIZX3(id: Word);
+begin
+  DumpData(opath + 'IZX3\' + IntToStr(id), TMap(DTA.maps.Objects[id]).izx3Offset, TMap(DTA.maps.Objects[id]).izx3Size);
+end;
+
+procedure TMainForm.ReadIZX4;
+begin
+  DumpData(opath + 'IZX4\' + IntToStr(id), TMap(DTA.maps.Objects[id]).izx4Offset, TMap(DTA.maps.Objects[id]).izx4Size);
+end;
+
+procedure TMainForm.ReadIACT(id: Word);
+label l1, l2;
+var s: String;
+size, idx: Longword;
+k: Integer;
+begin
+  k := 0;
+  DTA.SetIndex(TMap(DTA.maps.Objects[id]).iactOffset);
+l1:
+  if DTA.ReadString(4) <> 'IACT' then goto l2;
+  inc(k);
+  size := DTA.ReadLongWord;  //4 bytes: length (X)
+  DumpData(opath + 'IACT\' + rightstr('000' + inttostr(id), 3) + '-'+rightstr('00'+inttostr(k),2), DTA.GetIndex, size);
+  goto l1;
+l2:
+  //seek(SrcFile,filepos(SrcFile)-4);
+//  showmessage(inttohex(filepos(SrcFile),4));
+//  showmessage('IACTs all');
+end;
 
 end.
