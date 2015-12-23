@@ -7,7 +7,7 @@ interface
 
 uses
   Windows, Forms, BMPUnit, DataStructureUnit, LoggerUnit, StdCtrls, Controls, Classes, ExtCtrls, SysUtils, StrUtils, Graphics, dialogs,
-  ComCtrls;
+  ComCtrls, Grids, MPHexEditor;
 
 const
   OUTPUT = 'output';
@@ -16,26 +16,8 @@ const
   
 type
   TMainForm = class(TForm)
-    Button1: TButton;
-    Button2: TButton;
-    GroupBox3: TGroupBox;
-    GroupBox6: TGroupBox;
-    PUZ2CB: TCheckBox;
-    GroupBox7: TGroupBox;
-    CHARCB: TCheckBox;
-    GroupBox8: TGroupBox;
-    CHWPCB: TCheckBox;
-    GroupBox9: TGroupBox;
-    CAUXCB: TCheckBox;
-    GroupBox10: TGroupBox;
-    TNAMCB: TCheckBox;
-    CTCB: TCheckBox;
-    GroupBox11: TGroupBox;
-    TGENCB: TCheckBox;
     OpenDTAButton: TButton;
     OpenDTADialog: TOpenDialog;
-    Image1: TImage;
-    LogMemo: TMemo;
     PageControl: TPageControl;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
@@ -84,6 +66,35 @@ type
     MapSaveCheckBox: TCheckBox;
     MapProgressLabel: TLabel;
     ActionsCheckBox: TCheckBox;
+    BottomPageControl: TPageControl;
+    TabSheet8: TTabSheet;
+    TabSheet9: TTabSheet;
+    LogMemo: TMemo;
+    HEX: TMPHexEditor;
+    StatusBar: TStatusBar;
+    SectionsStringGrid: TStringGrid;
+    TitleImage: TImage;
+    TileImage: TImage;
+    MapImage: TImage;
+    GroupBox11: TGroupBox;
+    TGENCB: TCheckBox;
+    GroupBox10: TGroupBox;
+    TNAMCB: TCheckBox;
+    CTCB: TCheckBox;
+    GroupBox9: TGroupBox;
+    CAUXCB: TCheckBox;
+    GroupBox8: TGroupBox;
+    CHWPCB: TCheckBox;
+    GroupBox7: TGroupBox;
+    CHARCB: TCheckBox;
+    GroupBox6: TGroupBox;
+    PUZ2CB: TCheckBox;
+    Button2: TButton;
+    Button1: TButton;
+    Splitter1: TSplitter;
+    MapsStringGrid: TStringGrid;
+    TilesDrawGrid: TDrawGrid;
+    Memo1: TMemo;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -93,10 +104,21 @@ type
     procedure ListSNDSButtonClick(Sender: TObject);
     procedure SaveTilesButtonClick(Sender: TObject);
     procedure SaveMapsButtonClick(Sender: TObject);
+    procedure HEXMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure HEXKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure HEXSelectionChanged(Sender: TObject);
+    procedure SectionsStringGridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+    procedure MapsStringGridSelectCell(Sender: TObject; ACol,
+      ARow: Integer; var CanSelect: Boolean);
+    procedure TilesDrawGridDrawCell(Sender: TObject; ACol, ARow: Integer;
+      Rect: TRect; State: TGridDrawState);
+    procedure Memo1DragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure Memo1DragOver(Sender, Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean);
   private
   public
     procedure ReadOIE(id: Word);
-    procedure ReadIZON(id: Word);
+    procedure ReadIZON(id: Word; save: Boolean);
     procedure ReadIZAX(id: Word);
     procedure ReadIZX2(id: Word);
     procedure ReadIZX3(id: Word);
@@ -109,6 +131,10 @@ type
     procedure ReadTNAM;
     procedure ReadTGEN;
     procedure DumpData(fileName: String; offset, size: Cardinal);
+
+    procedure ShowHEXCaretIndex;
+
+    procedure DrawTitleImage;
   end;
 
 var
@@ -261,7 +287,12 @@ begin
   spath := ExtractFilePath(paramstr(0));
   opath := spath + OUTPUT + '\';
   BMP := TBitmap.Create;
-  BMP.PixelFormat:=pf8bit;
+  BMP.PixelFormat := pf8bit;
+  TileImage.Picture.Bitmap.PixelFormat := pf8bit;
+  TitleImage.Picture.Bitmap.PixelFormat := pf8bit;
+  MapImage.Picture.Bitmap.PixelFormat := pf8bit;
+  FillInternalPalette(TitleImage.Picture.Bitmap, 0, 0, 0);
+  FillInternalPalette(MapImage.Picture.Bitmap, 0, 0, 0);
   OpenDTADialog.InitialDir := '.\';
   log.SetOutput(LogMemo.lines);
 end;
@@ -274,20 +305,24 @@ end;
 procedure TMainForm.Button2Click(Sender: TObject);
 begin
   LoadBMP('output/STUP.bmp',bmp);
-  CopyPicture(Image1,0,0);
+  //CopyPicture(Image1,0,0);
 end;
 
 
 procedure TMainForm.OpenDTAButtonClick(Sender: TObject);
+var i: Word;
 begin
   if OpenDTADialog.Execute then
     begin
       log.Clear;
       DTA.readDTAMetricks(OpenDTADialog.FileName);
+      HEX.LoadFromFile(OpenDTADialog.FileName);
       VersionLabel.Caption := DTA.version;
       SizeLabel.Caption := IntToStr(DTA.size);
       CRC32Label.Caption := DTA.crc32;
       NameLabel.Caption := DTA.dtaRevision;
+
+      DrawTitleImage;
 
       SoundsLabel.Caption := IntToStr(DTA.soundsCount);
 
@@ -302,25 +337,106 @@ begin
       NamesLabel.Caption := IntToStr(DTA.namesCount);
 
       Log.SaveToFile(opath, 'Structure');
+
+
+      // refactor
+      SectionsStringGrid.RowCount := DTA.sections.Count + 1;
+      SectionsStringGrid.Cells[1, 0] := 'Section';
+      SectionsStringGrid.Cells[1, 0] := 'Data size';
+      SectionsStringGrid.Cells[2, 0] := 'Full size';
+      SectionsStringGrid.Cells[3, 0] := 'Data offset';
+      SectionsStringGrid.Cells[4, 0] := 'Start offset';
+
+      for i := 0 to DTA.sections.Count - 1 do
+      begin
+        SectionsStringGrid.Cells[0, i + 1] := DTA.sections[i];
+        SectionsStringGrid.Cells[1, i + 1] := IntToStr(DTA.GetDataSize(DTA.sections[i]));
+        SectionsStringGrid.Cells[2, i + 1] := IntToStr(DTA.GetFullSize(DTA.sections[i]));
+        SectionsStringGrid.Cells[3, i + 1] := '$' + IntToHex(DTA.GetDataOffset(DTA.sections[i]), 6);
+        SectionsStringGrid.Cells[4, i + 1] := '$' + IntToHex(DTA.GetStartOffset(DTA.sections[i]), 6);
+      end;
+
+      // refactor
+      MapsStringGrid.Cells[0, 0] := 'Section';
+      MapsStringGrid.Cells[1, 0] := 'Data size';
+      MapsStringGrid.Cells[2, 0] := 'Full size';
+      MapsStringGrid.Cells[3, 0] := 'Data offset';
+      MapsStringGrid.Cells[4, 0] := 'Start offset';
+
+      for i := 0 to DTA.sections.Count - 1 do
+      begin
+        MapsStringGrid.Cells[0, i + 1] := DTA.sections[i];
+        MapsStringGrid.Cells[1, i + 1] := IntToStr(DTA.GetDataSize(DTA.sections[i]));
+        MapsStringGrid.Cells[2, i + 1] := IntToStr(DTA.GetFullSize(DTA.sections[i]));
+        MapsStringGrid.Cells[3, i + 1] := '$' + IntToHex(DTA.GetDataOffset(DTA.sections[i]), 6);
+        MapsStringGrid.Cells[4, i + 1] := '$' + IntToHex(DTA.GetStartOffset(DTA.sections[i]), 6);
+      end;
+
+      MapsStringGrid.RowCount := DTA.mapsCount + 1;
+      MapsStringGrid.Cells[0, 0] := 'Map #';
+      MapsStringGrid.Cells[1, 0] := 'Map offset';
+      MapsStringGrid.Cells[2, 0] := 'Map size';
+      MapsStringGrid.Cells[3, 0] := 'IZON offset';
+      MapsStringGrid.Cells[4, 0] := 'IZON size';
+      MapsStringGrid.Cells[5, 0] := 'OIE offset';
+      MapsStringGrid.Cells[6, 0] := 'OIE size';
+      MapsStringGrid.Cells[7, 0] := 'OIE count';
+
+      MapsStringGrid.Cells[8, 0] := 'IZAX offset';
+      MapsStringGrid.Cells[9, 0] := 'IZAX size';
+      MapsStringGrid.Cells[10, 0] := 'IZX2 offset';
+      MapsStringGrid.Cells[11, 0] := 'IZX2 size';
+      MapsStringGrid.Cells[12, 0] := 'IZX3 offset';
+      MapsStringGrid.Cells[13, 0] := 'IZX3 size';
+      MapsStringGrid.Cells[14, 0] := 'IZX4 offset';
+      MapsStringGrid.Cells[15, 0] := 'IZX4 size';
+      MapsStringGrid.Cells[16, 0] := 'IACT offset';
+      MapsStringGrid.Cells[17, 0] := 'IACT size';
+
+      for i := 0 to DTA.mapsCount - 1 do
+      begin
+        MapsStringGrid.Cells[0, i + 1] := IntToStr(i);
+        MapsStringGrid.Cells[1, i + 1] := '$' + IntToHex(TMap(DTA.maps.Objects[i]).mapOffset, 6);
+        MapsStringGrid.Cells[2, i + 1] := IntToStr(TMap(DTA.maps.Objects[i]).mapSize);
+        MapsStringGrid.Cells[3, i + 1] := '$' + IntToHex(TMap(DTA.maps.Objects[i]).izonOffset, 6);
+        MapsStringGrid.Cells[4, i + 1] := IntToStr(TMap(DTA.maps.Objects[i]).izonSize);
+        MapsStringGrid.Cells[5, i + 1] := '$' + IntToHex(TMap(DTA.maps.Objects[i]).oieOffset, 6);
+        MapsStringGrid.Cells[6, i + 1] := IntToStr(TMap(DTA.maps.Objects[i]).oieSize);
+        MapsStringGrid.Cells[7, i + 1] := IntToStr(TMap(DTA.maps.Objects[i]).oieCount);
+        MapsStringGrid.Cells[8, i + 1] := '$' + IntToHex(TMap(DTA.maps.Objects[i]).izaxOffset, 6);
+        MapsStringGrid.Cells[9, i + 1] := IntToStr(TMap(DTA.maps.Objects[i]).izaxSize);
+        MapsStringGrid.Cells[10, i + 1] := '$' + IntToHex(TMap(DTA.maps.Objects[i]).izx2Offset, 6);
+        MapsStringGrid.Cells[11, i + 1] := IntToStr(TMap(DTA.maps.Objects[i]).izx2Size);
+        MapsStringGrid.Cells[12, i + 1] := '$' + IntToHex(TMap(DTA.maps.Objects[i]).izx3Offset, 6);
+        MapsStringGrid.Cells[13, i + 1] := IntToStr(TMap(DTA.maps.Objects[i]).izx3Size);
+        MapsStringGrid.Cells[14, i + 1] := '$' + IntToHex(TMap(DTA.maps.Objects[i]).izx4Offset, 6);
+        MapsStringGrid.Cells[15, i + 1] := IntToStr(TMap(DTA.maps.Objects[i]).izx4Size);
+        MapsStringGrid.Cells[16, i + 1] := '$' + IntToHex(TMap(DTA.maps.Objects[i]).iactOffset, 6);
+        MapsStringGrid.Cells[17, i + 1] := IntToStr(TMap(DTA.maps.Objects[i]).iactSize);
+      end;
+
+      TilesDrawGrid.RowCount := DTA.tilesCount div 16 + 1;
+
+      PageControl.Visible := true;
     end;
 end;
 
 
-
+procedure TMainForm.DrawTitleImage;
+begin
+  FillInternalPalette(BMP, 0, 0, 0);
+  BMP.Width := TitleImage.Width;
+  BMP.Height := TitleImage.Height;
+  ReadPicture(DTA, DTA.GetDataOffset(knownSections[2]));
+  CopyPicture(TitleImage, 0, 0);
+end;
 
 
 procedure TMainForm.SaveSTUPButtonClick(Sender: TObject);
-var title: String;
 begin
   Log.Clear;
   CreateDir(opath);
-  title := knownSections[2]; // STUP
-  FillInternalPalette(BMP, 0, 0, 0);
-  BMP.Width:=288; BMP.Height:=288;
-  ReadPicture(DTA, DTA.GetOffset(title));
-  CopyPicture(Image1, 0, 0);
-  Application.ProcessMessages;
-  SaveBMP(opath + title + '.bmp', bmp);
+  TitleImage.Picture.SaveToFile(opath + knownSections[2] + '.bmp');
   Log.Debug('Title screen saved');
 end;
 
@@ -386,7 +502,7 @@ begin
   begin
     attr := DTA.ReadLongWord; // attributes
     ReadPicture(DTA, 0);
-    CopyPicture(Image1, 0, 0);
+    CopyPicture(TileImage, 0, 0);
     Application.ProcessMessages;
     //  SaveBMP('output/Tiles/'+rightstr('000'+inttostr(i),4)+' - '+inttohex(k,6)+'.bmp',bmp);
     if DecimalCheckBox.Checked then
@@ -398,7 +514,7 @@ begin
       SaveBMP(attrFullPath + '\' + rightstr('000' + inttostr(i) ,4) + eBMP, bmp);
     end;
     if HexCheckBox.Checked then
-      SaveBMP(hexPath + '\' + inttohex(i,4) + eBMP,bmp);
+      SaveBMP(hexPath + '\' + inttohex(i,4) + eBMP, bmp);
     TilesProgressBar.Position := i;
     TilesProgressLabel.Caption := Format('%.2f %%', [((i + 1) / DTA.tilesCount) * 100]);
     Application.ProcessMessages;
@@ -421,6 +537,7 @@ begin
     CreateDir(opath + 'IZX3');
     CreateDir(opath + 'IZX4');
     CreateDir(opath + 'IACT');
+    CreateDir(opath + 'OIE');
   end;
 
   bmp.PixelFormat := pf8bit;
@@ -437,10 +554,10 @@ begin
   Log.Debug('Total count: ' + IntToStr(DTA.mapsCount));
   Log.Debug('');
   //DTA.SetIndex(knownSections[5]);          // ZONE
-  for i:=0 to DTA.mapsCount - 1 do ReadIZON(i);
+  for i:=0 to DTA.mapsCount - 1 do ReadIZON(i, true);
 end;
 
-procedure TMainForm.ReadIZON(id: Word);
+procedure TMainForm.ReadIZON(id: Word; save: Boolean);
 var s: String;
 size: Longword;
 k, w, h, p, i, j, flag, planet: Word;
@@ -458,14 +575,14 @@ begin
   flag := DTA.ReadWord;             // flags:word; //2 byte: map flags (unknown meanings)* добавил байт снизу
   DTA.ReadLongWord;                 // unused:longword; //5 bytes: unused (same values for every map)
   planet := DTA.ReadWord;           // planet:word; //1 byte: planet (0x01 = desert, 0x02 = snow, 0x03 = forest, 0x05 = swamp)* добавил следующий байт
-  Image1.Width := w * 32;
-  Image1.Height := h * 32;
-  Image1.Picture.Bitmap.Width := w * 32;
-  Image1.Picture.Bitmap.Height := h * 32;
+  MapImage.Width := w * 32;
+  MapImage.Height := h * 32;
+  MapImage.Picture.Bitmap.Width := w * 32;
+  MapImage.Picture.Bitmap.Height := h * 32;
 
-  image1.Picture.bitmap.Canvas.Pen.Color := 0;
-  image1.Picture.bitmap.Canvas.Brush.Color := 0;
-  image1.picture.Bitmap.canvas.Rectangle(0, 0, image1.picture.bitmap.width, image1.picture.bitmap.height);
+  MapImage.Picture.bitmap.Canvas.Pen.Color := 0;
+  MapImage.Picture.bitmap.Canvas.Brush.Color := 0;
+  MapImage.picture.Bitmap.canvas.Rectangle(0, 0, MapImage.picture.bitmap.width, MapImage.picture.bitmap.height);
   Log.Debug('Map #' + inttostr(pn) + ' offset: ' + inttohex(DTA.GetIndex, 8));
   for i:=0 to h-1 do
   begin
@@ -475,35 +592,35 @@ begin
       if k <> $FFFF then
       begin
         GetTile(dta, k, bmp);
-        CopyFrame(Image1, j * 32, i * 32);
+        CopyFrame(MapImage.Canvas, j * 32, i * 32);
       end;
       k := DTA.ReadWord;
       if k <> $FFFF then
       begin
         GetTile(dta, k, bmp);
-        CopyFrame(Image1, j * 32, i * 32);
+        CopyFrame(MapImage.Canvas, j * 32, i * 32);
       end;
       k := DTA.ReadWord;
       if k <> $FFFF then
       begin
         GetTile(dta, k, bmp);
-        CopyFrame(Image1, j * 32, i * 32);
+        CopyFrame(MapImage.Canvas, j * 32, i * 32);
       end;
     end;
     Application.ProcessMessages;
-    if MapSaveCheckBox.Checked then
-      Image1.Picture.SaveToFile(opath + 'Maps\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
-    if MapFlagSaveCheckBox.Checked then
+    if MapSaveCheckBox.Checked and save then
+      MapImage.Picture.SaveToFile(opath + 'Maps\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
+    if MapFlagSaveCheckBox.Checked and save then
     begin
       s := opath + 'MapsByFlags\' + IntToBin(flag);
       CreateDir(s);
-      Image1.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
+      MapImage.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
     end;
-    if MapPlanetSaveCheckBox.Checked then
+    if MapPlanetSaveCheckBox.Checked and save then
     begin
       s := opath + 'MapsByPlanetType\' + planets[planet];
       CreateDir(s);
-      Image1.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
+      MapImage.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
     end;
 
 
@@ -522,6 +639,7 @@ begin
    ReadIZX3(id);
    ReadIZX4(id);
    ReadIACT(id);
+   ReadOIE(id);
   end;
 end;
 
@@ -534,12 +652,13 @@ begin
   DTA.SetIndex(offset);
   AssignFile(f, fileName);
   Rewrite(f);
-  for i := 0 to size - 1 do
-  begin
-    b := DTA.ReadByte;
-    Write(f, b);
-    //DTA.MoveIndex(1);
-  end;
+  if size > 0 then
+    for i := 0 to size - 1 do
+    begin
+      b := DTA.ReadByte;
+      Write(f, b);
+      //DTA.MoveIndex(1);
+    end;
   CloseFile(f);
 end;
 
@@ -586,6 +705,129 @@ l2:
   //seek(SrcFile,filepos(SrcFile)-4);
 //  showmessage(inttohex(filepos(SrcFile),4));
 //  showmessage('IACTs all');
+end;
+
+procedure TMainForm.HEXMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  ShowHEXCaretIndex;
+end;
+
+procedure TMainForm.HEXKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  ShowHEXCaretIndex;
+end;
+
+procedure TMainForm.HEXSelectionChanged(Sender: TObject);
+begin
+  ShowHEXCaretIndex;
+end;
+
+procedure TMainForm.ShowHEXCaretIndex;
+begin
+  if HEX.HasFile then StatusBar.Panels[0].Text := 'Offset: 0x' + IntToHex(HEX.GetSelStart, 8);
+end;
+
+procedure TMainForm.SectionsStringGridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+begin
+  if ACol <> 3 then
+  begin
+    HEX.SetSelStart(StrToInt(SectionsStringGrid.Cells[4, ARow]));
+    HEX.SetSelEnd(StrToInt(SectionsStringGrid.Cells[4, ARow]) + 3);
+  end else
+  begin
+    HEX.SetSelStart(StrToInt(SectionsStringGrid.Cells[ACol, ARow]));
+    HEX.SetSelEnd(StrToInt(SectionsStringGrid.Cells[ACol, ARow]) + StrToInt(SectionsStringGrid.Cells[1, ARow]) - 1);
+  end;
+end;
+
+procedure TMainForm.MapsStringGridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+var pos: Cardinal;
+begin
+  case ACol of
+    0..2: begin
+            pos := StrToInt(MapsStringGrid.Cells[1, ARow]);
+            HEX.SetSelStart(pos);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[2, ARow]) -1);
+          end;
+    3, 4: begin
+            pos := StrToInt(MapsStringGrid.Cells[3, ARow]);
+            HEX.SetSelStart(pos);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[4, ARow]) -1);
+          end;
+    5..7: begin
+            pos := StrToInt(MapsStringGrid.Cells[5, ARow]);
+            HEX.SetSelStart(pos);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[6, ARow]) -1);
+          end;
+    8, 9: begin
+            pos := StrToInt(MapsStringGrid.Cells[8, ARow]);
+            HEX.SetSelStart(pos);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[9, ARow]) -1);
+          end;
+    10, 11: begin
+            pos := StrToInt(MapsStringGrid.Cells[10, ARow]);
+            HEX.SetSelStart(pos);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[11, ARow]) -1);
+          end;
+    12, 13: begin
+            pos := StrToInt(MapsStringGrid.Cells[12, ARow]);
+            HEX.SetSelStart(pos);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[13, ARow]) -1);
+          end;
+    14, 15: begin
+            pos := StrToInt(MapsStringGrid.Cells[14, ARow]);
+            HEX.SetSelStart(pos);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[15, ARow]) -1);
+          end;
+    16, 17: begin
+            pos := StrToInt(MapsStringGrid.Cells[16, ARow]);
+            HEX.SetSelStart(pos);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[17, ARow]) -1);
+          end;
+  end;
+  HEX.CenterCursorPosition;
+
+  bmp.PixelFormat := pf8bit;
+  bmp.Width := TileSize;
+  bmp.Height := TileSize;
+  FillInternalPalette(BMP, $FF, 0, $FF);
+
+  ReadIZON(StrToInt(MapsStringGrid.Cells[0, ARow]), false);
+end;
+
+procedure TMainForm.TilesDrawGridDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+var id: Word;
+begin
+  id := ACol + ARow * 16;
+  if id < DTA.tilesCount then
+  begin
+    bmp.PixelFormat := pf8bit;
+    bmp.Width := TileSize;
+    bmp.Height := TileSize;
+    case ZeroColorRG.ItemIndex of
+       0: FillInternalPalette(BMP, 0, 0, 0);
+       1: FillInternalPalette(BMP, $FF, $FF, $FF);
+       2: FillInternalPalette(BMP, $FF, 0, $FF);
+    end;
+
+    TilesDrawGrid.Canvas.Brush.Color := clBtnFace;
+    TilesDrawGrid.Canvas.Brush.Style := bsSolid;
+    GetTile(dta, id, bmp);
+    CopyFrame(TilesDrawGrid.Canvas, Rect.Left, Rect.Top);
+    TilesDrawGrid.Canvas.TextOut(Rect.Left,Rect.Top,inttostr(id));
+  end;
+end;
+
+procedure TMainForm.Memo1DragDrop(Sender, Source: TObject; X, Y: Integer);
+begin
+  Showmessage('sdfdsfsd');
+end;
+
+procedure TMainForm.Memo1DragOver(Sender, Source: TObject; X, Y: Integer;
+  State: TDragState; var Accept: Boolean);
+begin
+ Accept := (Source is TDrawGrid);
+ // тут какая-то логика
 end;
 
 end.

@@ -6,7 +6,8 @@ uses
   BMPUnit in 'BMPUnit.pas',
   DataStructureUnit in 'DataStructureUnit.pas',
   CRCUnit in 'CRCUnit.pas',
-  LoggerUnit in 'LoggerUnit.pas';
+  LoggerUnit in 'LoggerUnit.pas',
+  MPHexEditor in 'MPHexEditor.pas';
 
 {$R *.res}
 

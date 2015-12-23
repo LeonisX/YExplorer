@@ -12,10 +12,11 @@ const
 type
   TSectionMetricks = class
     public
-    size: Cardinal;
+    dataSize: Cardinal;
     fullSize: Cardinal;
-    offset: Cardinal;
-    constructor Create(size, offset: Cardinal);
+    startOffset: Cardinal;
+    dataOffset: Cardinal;
+    constructor Create(dataSize, fullSize, dataOffset, startOffset: Cardinal);
   end;
 
   TMap = class
@@ -27,11 +28,10 @@ type
 
   TSection = class
   private
-    sections: TStringList;
     index: Cardinal;
-    index2: Cardinal;
     crcs: TStringList;
   public
+    sections: TStringList;
     dta: array of Byte;
     maps: TStringList;
     size: Cardinal;
@@ -48,9 +48,10 @@ type
 
     procedure AddMap(id: Word);
 
-    procedure Add(section: String; size, offset: Integer);
-    function GetOffset(section: String): Integer;
-    function GetSize(section: String): Integer;
+    procedure Add(section: String; dataSize, fullSize, dataOffset, startOffset: Cardinal);
+    function GetStartOffset(section: String): Integer;
+    function GetDataOffset(section: String): Integer;
+    function GetDataSize(section: String): Integer;
     function GetFullSize(section: String): Integer;
     function Have(section: String): Boolean;
 
@@ -122,11 +123,12 @@ begin
 end;
 
 
-constructor TSectionMetricks.Create(size, offset: Cardinal);
+constructor TSectionMetricks.Create(dataSize, fullSize, dataOffset, startOffset: Cardinal);
 begin
-  Self.size := size;
-  Self.offset := offset;
-  Self.fullSize := size + 4;
+  Self.dataSize := dataSize;
+  Self.fullSize := fullSize;
+  Self.startOffset := startOffset;
+  Self.dataOffset := dataOffset;
 end;
 
 procedure TSection.Clear;
@@ -145,19 +147,24 @@ begin
   maps.AddObject(IntToStr(id), TMap.Create);
 end;
 
-procedure TSection.Add(section: String; size, offset: integer);
+procedure TSection.Add(section: String; dataSize, fullSize, dataOffset, startOffset: Cardinal);
 begin
-  sections.AddObject(section, TSectionMetricks.Create(size, offset))
+  sections.AddObject(section, TSectionMetricks.Create(dataSize, fullSize, dataOffset, startOffset))
 end;
 
-function TSection.GetOffset(section: String): integer;
+function TSection.GetStartOffset(section: String): integer;
 begin
-  result := TSectionMetricks(sections.Objects[sections.IndexOf(section)]).offset;
+  result := TSectionMetricks(sections.Objects[sections.IndexOf(section)]).startOffset;
 end;
 
-function TSection.GetSize(section: String): integer;
+function TSection.GetDataOffset(section: String): integer;
 begin
-  result := TSectionMetricks(sections.Objects[sections.IndexOf(section)]).size;
+  result := TSectionMetricks(sections.Objects[sections.IndexOf(section)]).dataOffset;
+end;
+
+function TSection.GetDataSize(section: String): integer;
+begin
+  result := TSectionMetricks(sections.Objects[sections.IndexOf(section)]).dataSize;
 end;
 
 function TSection.GetFullSize(section: String): integer;
@@ -192,7 +199,7 @@ end;
 
 function TSection.InBound(section: String): boolean;
 begin
- result := index + 4 < getOffset(section) + getSize(section)
+ result := index < getDataOffset(section) + getDataSize(section)
 end;
 
 
@@ -237,7 +244,7 @@ begin
        10: ScanTNAM(s); //названи€+тайлы
        11: ScanTGEN(s); //встречаетс€ в германском образе. „то такое - не знаю.
        12: begin
-         Add(s, 4, index);
+         Add(s, 4, 8, index, index - 4);
          keepReading:=false;
          end;
       else
@@ -251,13 +258,17 @@ begin
   Log.Debug('Sections detailed:');
   Log.Debug('------------------');
   Log.NewLine;
-  Log.Debug(Format('%-7s%14s%10s', ['Section', 'Offset (hex)', 'Size']));
+  Log.Debug(Format('%7s %12s %11s %12s %11s', ['Section', 'Data offset', 'Data size', 'Start offset', 'Full size']));
   for i := 0 to sections.Count - 1 do
     begin
-    k := TSectionMetricks(sections.Objects[i]).offset - 8;
     if k < 0 then k := 0;
-     Log.Debug(Format('%7s%14x%10d',
-       [sections[i], k, TSectionMetricks(sections.Objects[i]).fullSize]));
+     Log.Debug(Format('%7s %12x %11d %12x %11d',
+       [sections[i],
+        TSectionMetricks(sections.Objects[i]).dataOffset,
+        TSectionMetricks(sections.Objects[i]).dataSize,
+        TSectionMetricks(sections.Objects[i]).startOffset,
+        TSectionMetricks(sections.Objects[i]).fullSize
+       ]));
     end;
 
   Log.NewLine;
@@ -282,7 +293,8 @@ procedure TSection.ScanTGEN(sectionName: String);
 var sz: Longword;
 begin
   sz := ReadLongWord;            //4 байта - длина блока TGEN
-  Add(sectionName, 4 + sz, index);
+  //Add(sectionName, 4 + sz, index);
+  Add(sectionName, sz, sz + 4 + 4, index, index - 4 - 4);
   MoveIndex(sz);
   Log.Debug(sectionName + ' - what is it?...');
 end;
@@ -294,7 +306,7 @@ sz: Longword;
 count: Byte;
 begin
   sz := ReadLongWord;           //4 bytes - length of section TNAM
-  Add(sectionName, 4 + sz, index);
+  Add(sectionName, sz, sz + 4 + 4, index, index - 4 - 4);
   //MoveIndex(sz);
   count := 0;
   while InBound(sectionName) do
@@ -313,7 +325,7 @@ var sz: Longword;
 count: Byte;
 begin
   sz := ReadLongWord;           //4 bytes - length of section CAUX
-  Add(sectionName, 4 + sz, index);
+  Add(sectionName, sz, sz + 4 + 4, index, index - 4 - 4);
   MoveIndex(sz);
   count := (sz - 2) div 4;
   Log.Debug(sectionName + ': ' + inttostr(count));
@@ -325,7 +337,7 @@ var sz: Longword;
 count: Byte;
 begin
   sz := ReadLongWord;           //4 bytes - length of section CHWP
-  Add(sectionName, 4 + sz, index);
+  Add(sectionName, sz, sz + 4 + 4, index, index - 4 - 4);
   MoveIndex(sz);
     count := (sz - 2) div 6;
   Log.Debug(sectionName + ': ' + inttostr(count));
@@ -337,7 +349,7 @@ var sz, csz: Longword;
 ch: Word;
 begin
   sz := ReadLongWord;           //4 bytes - length of section CHAR
-  Add(sectionName, 4 + sz, index);
+  Add(sectionName, sz, sz + 4 + 4, index, index - 4 - 4);
   charsCount := 0;
   while InBound(sectionName) do
    begin
@@ -356,7 +368,7 @@ var sz, psz: Longword;
 pz: Word;
 begin
   sz := ReadLongWord;           //4 bytes - length of section PUZ2
-  Add(sectionName, 4 + sz, index);
+  Add(sectionName, sz, sz + 4 + 4, index, index - 4 - 4);
   puzzlesCount := 0;
   while InBound(sectionName) do
    begin
@@ -385,7 +397,8 @@ begin
       sz:=ReadLongWord;        //size:longword;         size of current map (4b)
       MoveIndex(sz);
     end;
-  Add(sectionName, 4 + index - ind, ind);
+  //Add(sectionName, 4 + index - ind, ind);
+  Add(sectionName, index - ind, index - ind + 4, ind, ind - 4);
   Log.Debug('Maps (zones): ' + IntToStr(mapsCount));
   //Log.NewLine;
 
@@ -442,33 +455,33 @@ begin
 end;
 
 procedure TSection.ScanIZAX(id: Word);
-var size: Word;
+var size: Longword;
 begin
   ReadString(4);                //4 bytes: "IZAX"
-  size := ReadWord;             //2 bytes: length (X)
+  size := ReadLongWord;         //4 bytes: length (X)
   TMap(maps.Objects[id]).izaxOffset := index;
-  TMap(maps.Objects[id]).izaxSize := size - 6;
-  MoveIndex(size - 6);          //X-6 bytes: IZAX data
+  TMap(maps.Objects[id]).izaxSize := size - 8;
+  MoveIndex(size - 8);          //X-8 bytes: IZAX data
 end;
 
 procedure TSection.ScanIZX2(id: Word);
-var size: Word;
+var size: Longword;
 begin
   ReadString(4);                //4 bytes: "IZX2"
-  size := ReadWord;             //2 bytes: length (X)
+  size := ReadLongWord;         //4 bytes: length (X)
   TMap(maps.Objects[id]).izx2Offset := index;
-  TMap(maps.Objects[id]).izx2Size := size - 6;
-  MoveIndex(size - 6);          //X-6 bytes: IZX2 data
+  TMap(maps.Objects[id]).izx2Size := size - 8;
+  MoveIndex(size - 8);          //X-8 bytes: IZX2 data
 end;
 
 procedure TSection.ScanIZX3(id: Word);
-var size: Word;
+var size: Longword;
 begin
   ReadString(4);                //4 bytes: "IZX3"
-  size := ReadWord;             //2 bytes: length (X)
+  size := ReadLongWord;         //4 bytes: length (X)
   TMap(maps.Objects[id]).izx3Offset := index;
-  TMap(maps.Objects[id]).izx3Size := size - 6;
-  MoveIndex(size - 6);          //X-6 bytes: IZX3 data
+  TMap(maps.Objects[id]).izx3Size := size - 8;
+  MoveIndex(size - 8);          //X-8 bytes: IZX3 data
 end;
 
 procedure TSection.ScanIZX4(id: Word);
@@ -504,7 +517,7 @@ procedure TSection.ScanTILE(sectionName: String);
 var sz: Cardinal;
 begin
   sz:=ReadLongWord;             //4 bytes - length of section TILE
-  Add(sectionName, 4 + sz, index);
+  Add(sectionName, sz, sz + 4 + 4, index, index - 4 - 4);
   MoveIndex(sz);
   tilesCount := sz div $404;
   Log.debug('Sprites, tiles: ' + IntToStr(tilesCount));
@@ -515,7 +528,7 @@ procedure TSection.ScanSNDS(sectionName: String);
 var sz, msz: Word;
 begin
   sz:=ReadLongWord;             //4 bytes - length of section SNDS
-  Add(sectionName, 4 + sz, index);
+  Add(sectionName, sz, sz + 4 + 4, index, index - 4 - 4);
   soundsCount := 0;
   ReadWord;
   while InBound(knownSections[3]) do
@@ -531,14 +544,14 @@ procedure TSection.ScanSTUP(sectionName: String);
 var sz: Longword;
 begin
   sz:=ReadLongWord;             //4 bytes - length of section STUP
-  Add(sectionName, 4 + sz, index);
+  Add(sectionName, sz, sz + 4 + 4, index, index - 4 - 4);
   MoveIndex(sz);
   Log.Debug('Title screen: exists');
 end;
 
 procedure TSection.ScanVERS(sectionName: String);
 begin
-  Add(sectionName, 4 + 0, index);
+  Add(sectionName, 4, 4 + 4, index, index - 4);
   version := inttostr(ReadRWord)+'.'+inttostr(ReadRWord);
   Log.Debug('File version: ' + version);
 end;
@@ -578,7 +591,7 @@ end;
 
 procedure TSection.SetIndex(section: String);
 begin
- index := GetOffset(section);
+ index := GetDataOffset(section);
 end;
 
 procedure TSection.MoveIndex(offset: integer);

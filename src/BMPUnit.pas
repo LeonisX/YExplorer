@@ -104,7 +104,7 @@ type
     procedure FillPalette(BM:TBitMap); //заполняет палитру нужного БитМапа. СТрого 256 цветов
     procedure ReadPicture(section: TSection; offset: Cardinal); //читает картинку из DTA файла согласно её смещению
     procedure CopyPicture(Image:TImage;x,y:word); //берёт прочитанную картинку и кидает куда нам нужно
-    procedure CopyFrame(Image:TImage;x,y:word); //копирует блочок на большой холст
+    procedure CopyFrame(Canvas: TCanvas; x, y: Word); //копирует блочок на большой холст
     procedure LoadBMP(s:string;bmp:tbitmap);
     procedure SaveBMP(s:string;bmp:tbitmap);
     procedure InitBMP;
@@ -228,19 +228,18 @@ begin
 //  image.Picture.Bitmap.PixelFormat:=pf8bit;
   image.picture.bitmap.width:=BMP.Width;
   image.picture.bitmap.height:=BMP.Height;
-  CopyFrame(Image,x,y);
+  CopyFrame(Image.Canvas,x,y);
 end;
 
-procedure CopyFrame(Image:TImage;x,y:word);
+procedure CopyFrame(Canvas: TCanvas; x, y: Word);
 begin
 //  Image.Canvas.CopyRect(rect(0+x,0+y,BMP.Width+x,BMP.Height+y), BMP.Canvas, rect(0,0,BMP.Width,BMP.Height));
-  Image.Canvas.Brush.Style:=bsClear;
-  Image.Canvas.BrushCopy(rect(0+x,0+y,BMP.Width+x,BMP.Height+y), BMP, rect(0,0,BMP.Width,BMP.Height),clFuchsia);
+  Canvas.Brush.Style := bsClear;
+  Canvas.BrushCopy(Rect(0 + x, 0 + y, BMP.Width + x, BMP.Height + y), BMP, Rect(0, 0, BMP.Width, BMP.Height), clFuchsia);
 end;
 
 procedure ReadPicture(section: TSection; offset: Cardinal);
 var i, j: Word;
-x, y: Word;
 p: PByteArray;
 begin
   if Offset > 0 then section.setIndex(offset);
@@ -256,7 +255,7 @@ procedure GetTile(section: TSection; id: Word; bmp: TBitmap);
 var i, j, index2: Cardinal;
   p: PByteArray;
 begin  
-  index2 := section.GetOffset(knownSections[4]) + id * $404 + 4;
+  index2 := section.GetDataOffset(knownSections[4]) + id * $404 + 4;
   for i := 0 to bmp.Height - 1 do
   begin
     p := bmp.ScanLine[i];

@@ -8,117 +8,171 @@
   resources were bound to the produced executable.
 */
 
-#define Consts_SDockTreeRemoveError 65312
-#define Consts_SDockZoneNotFound 65313
-#define Consts_SDockZoneHasNoCtl 65314
-#define HelpIntfs_hNoTableOfContents 65315
-#define HelpIntfs_hNothingFound 65316
-#define HelpIntfs_hNoContext 65317
-#define HelpIntfs_hNoTopics 65318
-#define ComStrs_sTabFailClear 65319
-#define ComStrs_sTabFailDelete 65320
-#define ComStrs_sTabFailRetrieve 65321
-#define ComStrs_sTabFailGetObject 65322
-#define ComStrs_sTabFailSet 65323
-#define ComStrs_sTabFailSetObject 65324
-#define ComStrs_sTabMustBeMultiLine 65325
-#define ComStrs_sPageIndexError 65326
-#define Consts_SmkcHome 65328
-#define Consts_SmkcLeft 65329
-#define Consts_SmkcUp 65330
-#define Consts_SmkcRight 65331
-#define Consts_SmkcDown 65332
-#define Consts_SmkcIns 65333
-#define Consts_SmkcDel 65334
-#define Consts_SmkcShift 65335
-#define Consts_SmkcCtrl 65336
-#define Consts_SmkcAlt 65337
-#define Consts_SOutOfRange 65338
-#define Consts_SIconToClipboard 65339
-#define Consts_SCannotOpenClipboard 65340
-#define Consts_SInvalidMemoSize 65341
-#define Consts_SDuplicateMenus 65342
-#define Consts_SDockedCtlNeedsName 65343
-#define Consts_SMsgDlgCancel 65344
-#define Consts_SMsgDlgHelp 65345
-#define Consts_SMsgDlgAbort 65346
-#define Consts_SMsgDlgRetry 65347
-#define Consts_SMsgDlgIgnore 65348
-#define Consts_SMsgDlgAll 65349
-#define Consts_SMsgDlgNoToAll 65350
-#define Consts_SMsgDlgYesToAll 65351
-#define Consts_SmkcBkSp 65352
-#define Consts_SmkcTab 65353
-#define Consts_SmkcEsc 65354
-#define Consts_SmkcEnter 65355
-#define Consts_SmkcSpace 65356
-#define Consts_SmkcPgUp 65357
-#define Consts_SmkcPgDn 65358
-#define Consts_SmkcEnd 65359
-#define Consts_SIgnoreButton 65360
-#define Consts_SRetryButton 65361
-#define Consts_SAbortButton 65362
-#define Consts_SAllButton 65363
-#define Consts_SCannotDragForm 65364
-#define Consts_SVMetafiles 65365
-#define Consts_SVEnhMetafiles 65366
-#define Consts_SVIcons 65367
-#define Consts_SVBitmaps 65368
-#define Consts_SMsgDlgWarning 65369
-#define Consts_SMsgDlgError 65370
-#define Consts_SMsgDlgInformation 65371
-#define Consts_SMsgDlgConfirm 65372
-#define Consts_SMsgDlgYes 65373
-#define Consts_SMsgDlgNo 65374
-#define Consts_SMsgDlgOK 65375
-#define Consts_SCannotShowModal 65376
-#define Consts_SPropertyOutOfRange 65377
-#define Consts_SMenuIndexError 65378
-#define Consts_SMenuReinserted 65379
-#define Consts_SMenuNotFound 65380
-#define Consts_SNoTimers 65381
-#define Consts_SGroupIndexTooLow 65382
-#define Consts_SNoMDIForm 65383
-#define Consts_SImageCanvasNeedsBitmap 65384
-#define Consts_SControlParentSetToSelf 65385
-#define Consts_SOKButton 65386
-#define Consts_SCancelButton 65387
-#define Consts_SYesButton 65388
-#define Consts_SNoButton 65389
-#define Consts_SHelpButton 65390
-#define Consts_SCloseButton 65391
-#define Consts_SScanLine 65392
-#define Consts_SChangeIconSize 65393
-#define Consts_SUnknownClipboardFormat 65394
-#define Consts_SOutOfResources 65395
-#define Consts_SNoCanvasHandle 65396
-#define Consts_SInvalidImageSize 65397
-#define Consts_SInvalidImageList 65398
-#define Consts_SImageIndexError 65399
-#define Consts_SImageReadFail 65400
-#define Consts_SImageWriteFail 65401
-#define Consts_SWindowDCError 65402
-#define Consts_SWindowClass 65403
-#define Consts_SCannotFocus 65404
-#define Consts_SParentRequired 65405
-#define Consts_SMDIChildNotVisible 65406
-#define Consts_SVisibleChanged 65407
-#define RTLConsts_SMemoryStreamError 65408
-#define RTLConsts_SPropertyException 65409
-#define RTLConsts_SReadError 65410
-#define RTLConsts_SReadOnlyProperty 65411
-#define RTLConsts_SResNotFound 65412
-#define RTLConsts_SSeekNotImplemented 65413
-#define RTLConsts_SSortedListError 65414
-#define RTLConsts_SUnknownGroup 65415
-#define RTLConsts_SUnknownProperty 65416
-#define RTLConsts_SWriteError 65417
-#define Consts_SInvalidTabPosition 65418
-#define Consts_SInvalidTabStyle 65419
-#define Consts_SInvalidBitmap 65420
-#define Consts_SInvalidIcon 65421
-#define Consts_SInvalidMetafile 65422
-#define Consts_SInvalidPixelFormat 65423
+#define MPHexEditor_ERR_DATA_BOUNDS 65248
+#define MPHexEditor_ERR_NO_TRANSLATION_IN_UNICODE_MODE 65249
+#define MPHexEditor_ERR_ODD_FILESIZE_UNICODE 65250
+#define MPHexEditor_ERR_NOUNDO 65251
+#define MPHexEditor_UNNAMED_FILE 65252
+#define MPHexEditor_UNDO_ALLDATA 65264
+#define MPHexEditor_ERR_FILE_OPEN_FAILED 65265
+#define MPHexEditor_ERR_FILE_READONLY 65266
+#define MPHexEditor_ERR_INVALID_BOOKMARK 65267
+#define MPHexEditor_ERR_INVALID_SELSTART 65268
+#define MPHexEditor_ERR_INVALID_SELEND 65269
+#define MPHexEditor_ERR_INVALID_BYTESPERLINE 65270
+#define MPHexEditor_ERR_INVALID_BYTESPERCOL 65271
+#define MPHexEditor_ERR_INVALID_BOOKMARKBMP 65272
+#define MPHexEditor_ERR_CANCELLED 65273
+#define MPHexEditor_ERR_MISSING_FORMATCHAR 65274
+#define MPHexEditor_ERR_INVALID_FORMATRADIX 65275
+#define MPHexEditor_ERR_INVALID_RADIXCHAR 65276
+#define MPHexEditor_ERR_INVALID_BPU 65277
+#define MPHexEditor_ERR_INVALID_BPU_U 65278
+#define MPHexEditor_ERR_INVALID_RBPU 65279
+#define MPHexEditor_MPH_TK_DOS8_S 65280
+#define MPHexEditor_MPH_TK_ASCII7_S 65281
+#define MPHexEditor_MPH_TK_MAC_S 65282
+#define MPHexEditor_MPH_TK_BCD38_S 65283
+#define MPHexEditor_MPH_TK_CUSTOM_S 65284
+#define MPHexEditor_MPH_TK_CUSTOM 65285
+#define MPHexEditor_UNDO_BYTESCHANGED 65286
+#define MPHexEditor_UNDO_REMOVED 65287
+#define MPHexEditor_UNDO_INSERT 65288
+#define MPHexEditor_UNDO_REPLACE 65289
+#define MPHexEditor_UNDO_APPEND 65290
+#define MPHexEditor_UNDO_INSNIBBLE 65291
+#define MPHexEditor_UNDO_DELNIBBLE 65292
+#define MPHexEditor_UNDO_CONVERT 65293
+#define MPHexEditor_UNDO_SELECTION 65294
+#define MPHexEditor_UNDO_COMBINED 65295
+#define HelpIntfs_hNoContext 65296
+#define HelpIntfs_hNoTopics 65297
+#define ComStrs_sTabFailClear 65298
+#define ComStrs_sTabFailDelete 65299
+#define ComStrs_sTabFailRetrieve 65300
+#define ComStrs_sTabFailGetObject 65301
+#define ComStrs_sTabFailSet 65302
+#define ComStrs_sTabFailSetObject 65303
+#define ComStrs_sTabMustBeMultiLine 65304
+#define ComStrs_sPageIndexError 65305
+#define MPHexEditor_MPH_TK_ASIS 65306
+#define MPHexEditor_MPH_TK_DOS8 65307
+#define MPHexEditor_MPH_TK_ASCII7 65308
+#define MPHexEditor_MPH_TK_MAC 65309
+#define MPHexEditor_MPH_TK_BCD38 65310
+#define MPHexEditor_MPH_TK_ASIS_S 65311
+#define Consts_SmkcDel 65312
+#define Consts_SmkcShift 65313
+#define Consts_SmkcCtrl 65314
+#define Consts_SmkcAlt 65315
+#define Consts_SOutOfRange 65316
+#define Consts_SInvalidClipFmt 65317
+#define Consts_SIconToClipboard 65318
+#define Consts_SCannotOpenClipboard 65319
+#define Consts_SInvalidMemoSize 65320
+#define Consts_SDuplicateMenus 65321
+#define Consts_SDockedCtlNeedsName 65322
+#define Consts_SDockTreeRemoveError 65323
+#define Consts_SDockZoneNotFound 65324
+#define Consts_SDockZoneHasNoCtl 65325
+#define HelpIntfs_hNoTableOfContents 65326
+#define HelpIntfs_hNothingFound 65327
+#define Consts_SMsgDlgNoToAll 65328
+#define Consts_SMsgDlgYesToAll 65329
+#define Consts_SmkcBkSp 65330
+#define Consts_SmkcTab 65331
+#define Consts_SmkcEsc 65332
+#define Consts_SmkcEnter 65333
+#define Consts_SmkcSpace 65334
+#define Consts_SmkcPgUp 65335
+#define Consts_SmkcPgDn 65336
+#define Consts_SmkcEnd 65337
+#define Consts_SmkcHome 65338
+#define Consts_SmkcLeft 65339
+#define Consts_SmkcUp 65340
+#define Consts_SmkcRight 65341
+#define Consts_SmkcDown 65342
+#define Consts_SmkcIns 65343
+#define Consts_SVBitmaps 65344
+#define Consts_SMaskErr 65345
+#define Consts_SMaskEditErr 65346
+#define Consts_SMsgDlgWarning 65347
+#define Consts_SMsgDlgError 65348
+#define Consts_SMsgDlgInformation 65349
+#define Consts_SMsgDlgConfirm 65350
+#define Consts_SMsgDlgYes 65351
+#define Consts_SMsgDlgNo 65352
+#define Consts_SMsgDlgOK 65353
+#define Consts_SMsgDlgCancel 65354
+#define Consts_SMsgDlgHelp 65355
+#define Consts_SMsgDlgAbort 65356
+#define Consts_SMsgDlgRetry 65357
+#define Consts_SMsgDlgIgnore 65358
+#define Consts_SMsgDlgAll 65359
+#define Consts_SImageCanvasNeedsBitmap 65360
+#define Consts_SControlParentSetToSelf 65361
+#define Consts_SOKButton 65362
+#define Consts_SCancelButton 65363
+#define Consts_SYesButton 65364
+#define Consts_SNoButton 65365
+#define Consts_SHelpButton 65366
+#define Consts_SCloseButton 65367
+#define Consts_SIgnoreButton 65368
+#define Consts_SRetryButton 65369
+#define Consts_SAbortButton 65370
+#define Consts_SAllButton 65371
+#define Consts_SCannotDragForm 65372
+#define Consts_SVMetafiles 65373
+#define Consts_SVEnhMetafiles 65374
+#define Consts_SVIcons 65375
+#define Consts_SImageWriteFail 65376
+#define Consts_SWindowDCError 65377
+#define Consts_SWindowClass 65378
+#define Consts_SCannotFocus 65379
+#define Consts_SParentRequired 65380
+#define Consts_SParentGivenNotAParent 65381
+#define Consts_SMDIChildNotVisible 65382
+#define Consts_SVisibleChanged 65383
+#define Consts_SCannotShowModal 65384
+#define Consts_SPropertyOutOfRange 65385
+#define Consts_SMenuIndexError 65386
+#define Consts_SMenuReinserted 65387
+#define Consts_SMenuNotFound 65388
+#define Consts_SNoTimers 65389
+#define Consts_SGroupIndexTooLow 65390
+#define Consts_SNoMDIForm 65391
+#define RTLConsts_SWriteError 65392
+#define Consts_SInvalidTabPosition 65393
+#define Consts_SInvalidTabStyle 65394
+#define Consts_SInvalidBitmap 65395
+#define Consts_SInvalidIcon 65396
+#define Consts_SInvalidMetafile 65397
+#define Consts_SInvalidPixelFormat 65398
+#define Consts_SScanLine 65399
+#define Consts_SChangeIconSize 65400
+#define Consts_SUnknownClipboardFormat 65401
+#define Consts_SOutOfResources 65402
+#define Consts_SNoCanvasHandle 65403
+#define Consts_SInvalidImageSize 65404
+#define Consts_SInvalidImageList 65405
+#define Consts_SImageIndexError 65406
+#define Consts_SImageReadFail 65407
+#define RTLConsts_SInvalidPropertyPath 65408
+#define RTLConsts_SInvalidPropertyValue 65409
+#define RTLConsts_SInvalidStringGridOp 65410
+#define RTLConsts_SListCapacityError 65411
+#define RTLConsts_SListCountError 65412
+#define RTLConsts_SListIndexError 65413
+#define RTLConsts_SMemoryStreamError 65414
+#define RTLConsts_SPropertyException 65415
+#define RTLConsts_SReadError 65416
+#define RTLConsts_SReadOnlyProperty 65417
+#define RTLConsts_SResNotFound 65418
+#define RTLConsts_SSeekNotImplemented 65419
+#define RTLConsts_SSortedListError 65420
+#define RTLConsts_STooManyDeleted 65421
+#define RTLConsts_SUnknownGroup 65422
+#define RTLConsts_SUnknownProperty 65423
 #define RTLConsts_SCantWriteResourceStreamError 65424
 #define RTLConsts_SCheckSynchronizeError 65425
 #define RTLConsts_SClassNotFound 65426
@@ -127,14 +181,14 @@
 #define RTLConsts_SDuplicateName 65429
 #define RTLConsts_SDuplicateString 65430
 #define RTLConsts_SFCreateError 65431
-#define RTLConsts_SFOpenError 65432
-#define RTLConsts_SInvalidImage 65433
-#define RTLConsts_SInvalidName 65434
-#define RTLConsts_SInvalidPropertyPath 65435
-#define RTLConsts_SInvalidPropertyValue 65436
-#define RTLConsts_SListCapacityError 65437
-#define RTLConsts_SListCountError 65438
-#define RTLConsts_SListIndexError 65439
+#define RTLConsts_SFixedColTooBig 65432
+#define RTLConsts_SFixedRowTooBig 65433
+#define RTLConsts_SFOpenError 65434
+#define RTLConsts_SGridTooLarge 65435
+#define RTLConsts_SIndexOutOfRange 65436
+#define RTLConsts_SInvalidImage 65437
+#define RTLConsts_SInvalidName 65438
+#define RTLConsts_SInvalidProperty 65439
 #define SysConst_SShortDayNameTue 65440
 #define SysConst_SShortDayNameWed 65441
 #define SysConst_SShortDayNameThu 65442
@@ -233,11 +287,43 @@
 #define SysConst_SOverflow 65535
 STRINGTABLE
 BEGIN
-	Consts_SDockTreeRemoveError,	"Error removing control from dock tree"
-	Consts_SDockZoneNotFound,	" - Dock zone not found"
-	Consts_SDockZoneHasNoCtl,	" - Dock zone has no control"
-	HelpIntfs_hNoTableOfContents,	"Unable to find a Table of Contents"
-	HelpIntfs_hNothingFound,	"No help found for %s"
+	MPHexEditor_ERR_DATA_BOUNDS,	"Data position/length out of data bounds"
+	MPHexEditor_ERR_NO_TRANSLATION_IN_UNICODE_MODE,	"Translations cannot be used in unicode mode"
+	MPHexEditor_ERR_ODD_FILESIZE_UNICODE,	"Cannot use unicode mode with odd-sized files"
+	MPHexEditor_ERR_NOUNDO,	"Cannot update undo storage"
+	MPHexEditor_UNNAMED_FILE,	"Untitled"
+	MPHexEditor_UNDO_ALLDATA,	"All data saved"
+	MPHexEditor_ERR_FILE_OPEN_FAILED,	"Cannot open %s.\r\n(%s.)"
+	MPHexEditor_ERR_FILE_READONLY,	"Cannot save readonly file %s."
+	MPHexEditor_ERR_INVALID_BOOKMARK,	"Invalid bookmark index"
+	MPHexEditor_ERR_INVALID_SELSTART,	"Invalid selection start"
+	MPHexEditor_ERR_INVALID_SELEND,	"Invalid selection end"
+	MPHexEditor_ERR_INVALID_BYTESPERLINE,	"Invalid bytes per line argument"
+	MPHexEditor_ERR_INVALID_BYTESPERCOL,	"Invalid bytes per column argument"
+	MPHexEditor_ERR_INVALID_BOOKMARKBMP,	"Invalid bookmark bitmap (must be 10 x 200 px)"
+	MPHexEditor_ERR_CANCELLED,	"Operation cancelled"
+	MPHexEditor_ERR_MISSING_FORMATCHAR,	"Missing char in offset format: %s"
+	MPHexEditor_ERR_INVALID_FORMATRADIX,	"Invalid radix in offset format (%xh), allowed: 02h..10h"
+	MPHexEditor_ERR_INVALID_RADIXCHAR,	"Invalid character %s, cannot convert using radix %xh"
+	MPHexEditor_ERR_INVALID_BPU,	"Invalid bytes per unit value %d, allowed: 1,2,4,8"
+	MPHexEditor_ERR_INVALID_BPU_U,	"BytesPerUnit must be set to 2 in unicode mode"
+	MPHexEditor_ERR_INVALID_RBPU,	"Invalid ruler bytes per unit value %d, allowed: -1,1,2,4,8"
+	MPHexEditor_MPH_TK_DOS8_S,	"DOS"
+	MPHexEditor_MPH_TK_ASCII7_S,	"ASC"
+	MPHexEditor_MPH_TK_MAC_S,	"MAC"
+	MPHexEditor_MPH_TK_BCD38_S,	"BCD"
+	MPHexEditor_MPH_TK_CUSTOM_S,	"Cust"
+	MPHexEditor_MPH_TK_CUSTOM,	"Custom translation"
+	MPHexEditor_UNDO_BYTESCHANGED,	"Change byte(s)"
+	MPHexEditor_UNDO_REMOVED,	"Remove data"
+	MPHexEditor_UNDO_INSERT,	"Insert buffer"
+	MPHexEditor_UNDO_REPLACE,	"Replace"
+	MPHexEditor_UNDO_APPEND,	"Append buffer"
+	MPHexEditor_UNDO_INSNIBBLE,	"Insert nibble"
+	MPHexEditor_UNDO_DELNIBBLE,	"Delete nibble"
+	MPHexEditor_UNDO_CONVERT,	"Convert"
+	MPHexEditor_UNDO_SELECTION,	"Cursor movement"
+	MPHexEditor_UNDO_COMBINED,	"Multiple modification"
 	HelpIntfs_hNoContext,	"No context-sensitive help installed"
 	HelpIntfs_hNoTopics,	"No topic-based help system installed"
 	ComStrs_sTabFailClear,	"Failed to clear tab control"
@@ -248,28 +334,28 @@ BEGIN
 	ComStrs_sTabFailSetObject,	"Failed to set object at index %d"
 	ComStrs_sTabMustBeMultiLine,	"MultiLine must be True when TabPosition is tpLeft or tpRight"
 	ComStrs_sPageIndexError,	"%d is an invalid PageIndex value.  PageIndex must be between 0 and %d"
-	Consts_SmkcHome,	"Home"
-	Consts_SmkcLeft,	"Left"
-	Consts_SmkcUp,	"Up"
-	Consts_SmkcRight,	"Right"
-	Consts_SmkcDown,	"Down"
-	Consts_SmkcIns,	"Ins"
+	MPHexEditor_MPH_TK_ASIS,	"Windows"
+	MPHexEditor_MPH_TK_DOS8,	"Dos 8 bits"
+	MPHexEditor_MPH_TK_ASCII7,	"ASCII 7 bits"
+	MPHexEditor_MPH_TK_MAC,	"Macintosh"
+	MPHexEditor_MPH_TK_BCD38,	"EBCDIC codepage 38"
+	MPHexEditor_MPH_TK_ASIS_S,	"WIN"
 	Consts_SmkcDel,	"Del"
 	Consts_SmkcShift,	"Shift+"
 	Consts_SmkcCtrl,	"Ctrl+"
 	Consts_SmkcAlt,	"Alt+"
 	Consts_SOutOfRange,	"Value must be between %d and %d"
+	Consts_SInvalidClipFmt,	"Invalid clipboard format"
 	Consts_SIconToClipboard,	"Clipboard does not support Icons"
 	Consts_SCannotOpenClipboard,	"Cannot open clipboard"
 	Consts_SInvalidMemoSize,	"Text exceeds memo capacity"
 	Consts_SDuplicateMenus,	"Menu '%s' is already being used by another form"
 	Consts_SDockedCtlNeedsName,	"Docked control must have a name"
-	Consts_SMsgDlgCancel,	"Cancel"
-	Consts_SMsgDlgHelp,	"&Help"
-	Consts_SMsgDlgAbort,	"&Abort"
-	Consts_SMsgDlgRetry,	"&Retry"
-	Consts_SMsgDlgIgnore,	"&Ignore"
-	Consts_SMsgDlgAll,	"&All"
+	Consts_SDockTreeRemoveError,	"Error removing control from dock tree"
+	Consts_SDockZoneNotFound,	" - Dock zone not found"
+	Consts_SDockZoneHasNoCtl,	" - Dock zone has no control"
+	HelpIntfs_hNoTableOfContents,	"Unable to find a Table of Contents"
+	HelpIntfs_hNothingFound,	"No help found for %s"
 	Consts_SMsgDlgNoToAll,	"N&o to All"
 	Consts_SMsgDlgYesToAll,	"Yes to &All"
 	Consts_SmkcBkSp,	"BkSp"
@@ -280,15 +366,15 @@ BEGIN
 	Consts_SmkcPgUp,	"PgUp"
 	Consts_SmkcPgDn,	"PgDn"
 	Consts_SmkcEnd,	"End"
-	Consts_SIgnoreButton,	"&Ignore"
-	Consts_SRetryButton,	"&Retry"
-	Consts_SAbortButton,	"Abort"
-	Consts_SAllButton,	"&All"
-	Consts_SCannotDragForm,	"Cannot drag a form"
-	Consts_SVMetafiles,	"Metafiles"
-	Consts_SVEnhMetafiles,	"Enhanced Metafiles"
-	Consts_SVIcons,	"Icons"
+	Consts_SmkcHome,	"Home"
+	Consts_SmkcLeft,	"Left"
+	Consts_SmkcUp,	"Up"
+	Consts_SmkcRight,	"Right"
+	Consts_SmkcDown,	"Down"
+	Consts_SmkcIns,	"Ins"
 	Consts_SVBitmaps,	"Bitmaps"
+	Consts_SMaskErr,	"Invalid input value"
+	Consts_SMaskEditErr,	"Invalid input value.  Use escape key to abandon changes"
 	Consts_SMsgDlgWarning,	"Warning"
 	Consts_SMsgDlgError,	"Error"
 	Consts_SMsgDlgInformation,	"Information"
@@ -296,14 +382,12 @@ BEGIN
 	Consts_SMsgDlgYes,	"&Yes"
 	Consts_SMsgDlgNo,	"&No"
 	Consts_SMsgDlgOK,	"OK"
-	Consts_SCannotShowModal,	"Cannot make a visible window modal"
-	Consts_SPropertyOutOfRange,	"%s property out of range"
-	Consts_SMenuIndexError,	"Menu index out of range"
-	Consts_SMenuReinserted,	"Menu inserted twice"
-	Consts_SMenuNotFound,	"Sub-menu is not in menu"
-	Consts_SNoTimers,	"Not enough timers available"
-	Consts_SGroupIndexTooLow,	"GroupIndex cannot be less than a previous menu item's GroupIndex"
-	Consts_SNoMDIForm,	"Cannot create form. No MDI forms are currently active"
+	Consts_SMsgDlgCancel,	"Cancel"
+	Consts_SMsgDlgHelp,	"&Help"
+	Consts_SMsgDlgAbort,	"&Abort"
+	Consts_SMsgDlgRetry,	"&Retry"
+	Consts_SMsgDlgIgnore,	"&Ignore"
+	Consts_SMsgDlgAll,	"&All"
 	Consts_SImageCanvasNeedsBitmap,	"Can only modify an image if it contains a bitmap"
 	Consts_SControlParentSetToSelf,	"A control cannot have itself as its parent"
 	Consts_SOKButton,	"OK"
@@ -312,6 +396,37 @@ BEGIN
 	Consts_SNoButton,	"&No"
 	Consts_SHelpButton,	"&Help"
 	Consts_SCloseButton,	"&Close"
+	Consts_SIgnoreButton,	"&Ignore"
+	Consts_SRetryButton,	"&Retry"
+	Consts_SAbortButton,	"Abort"
+	Consts_SAllButton,	"&All"
+	Consts_SCannotDragForm,	"Cannot drag a form"
+	Consts_SVMetafiles,	"Metafiles"
+	Consts_SVEnhMetafiles,	"Enhanced Metafiles"
+	Consts_SVIcons,	"Icons"
+	Consts_SImageWriteFail,	"Failed to write ImageList data to stream"
+	Consts_SWindowDCError,	"Error creating window device context"
+	Consts_SWindowClass,	"Error creating window class"
+	Consts_SCannotFocus,	"Cannot focus a disabled or invisible window"
+	Consts_SParentRequired,	"Control '%s' has no parent window"
+	Consts_SParentGivenNotAParent,	"Parent given is not a parent of '%s'"
+	Consts_SMDIChildNotVisible,	"Cannot hide an MDI Child Form"
+	Consts_SVisibleChanged,	"Cannot change Visible in OnShow or OnHide"
+	Consts_SCannotShowModal,	"Cannot make a visible window modal"
+	Consts_SPropertyOutOfRange,	"%s property out of range"
+	Consts_SMenuIndexError,	"Menu index out of range"
+	Consts_SMenuReinserted,	"Menu inserted twice"
+	Consts_SMenuNotFound,	"Sub-menu is not in menu"
+	Consts_SNoTimers,	"Not enough timers available"
+	Consts_SGroupIndexTooLow,	"GroupIndex cannot be less than a previous menu item's GroupIndex"
+	Consts_SNoMDIForm,	"Cannot create form. No MDI forms are currently active"
+	RTLConsts_SWriteError,	"Stream write error"
+	Consts_SInvalidTabPosition,	"Tab position incompatible with current tab style"
+	Consts_SInvalidTabStyle,	"Tab style incompatible with current tab position"
+	Consts_SInvalidBitmap,	"Bitmap image is not valid"
+	Consts_SInvalidIcon,	"Icon image is not valid"
+	Consts_SInvalidMetafile,	"Metafile is not valid"
+	Consts_SInvalidPixelFormat,	"Invalid pixel format"
 	Consts_SScanLine,	"Scan line index out of range"
 	Consts_SChangeIconSize,	"Cannot change the size of an icon"
 	Consts_SUnknownClipboardFormat,	"Unsupported clipboard format"
@@ -321,13 +436,12 @@ BEGIN
 	Consts_SInvalidImageList,	"Invalid ImageList"
 	Consts_SImageIndexError,	"Invalid ImageList Index"
 	Consts_SImageReadFail,	"Failed to read ImageList data from stream"
-	Consts_SImageWriteFail,	"Failed to write ImageList data to stream"
-	Consts_SWindowDCError,	"Error creating window device context"
-	Consts_SWindowClass,	"Error creating window class"
-	Consts_SCannotFocus,	"Cannot focus a disabled or invisible window"
-	Consts_SParentRequired,	"Control '%s' has no parent window"
-	Consts_SMDIChildNotVisible,	"Cannot hide an MDI Child Form"
-	Consts_SVisibleChanged,	"Cannot change Visible in OnShow or OnHide"
+	RTLConsts_SInvalidPropertyPath,	"Invalid property path"
+	RTLConsts_SInvalidPropertyValue,	"Invalid property value"
+	RTLConsts_SInvalidStringGridOp,	"Cannot insert or delete rows from grid"
+	RTLConsts_SListCapacityError,	"List capacity out of bounds (%d)"
+	RTLConsts_SListCountError,	"List count out of bounds (%d)"
+	RTLConsts_SListIndexError,	"List index out of bounds (%d)"
 	RTLConsts_SMemoryStreamError,	"Out of memory while expanding memory stream"
 	RTLConsts_SPropertyException,	"Error reading %s%s%s: %s"
 	RTLConsts_SReadError,	"Stream read error"
@@ -335,15 +449,9 @@ BEGIN
 	RTLConsts_SResNotFound,	"Resource %s not found"
 	RTLConsts_SSeekNotImplemented,	"%s.Seek not implemented"
 	RTLConsts_SSortedListError,	"Operation not allowed on sorted list"
+	RTLConsts_STooManyDeleted,	"Too many rows or columns deleted"
 	RTLConsts_SUnknownGroup,	"%s not in a class registration group"
 	RTLConsts_SUnknownProperty,	"Property %s does not exist"
-	RTLConsts_SWriteError,	"Stream write error"
-	Consts_SInvalidTabPosition,	"Tab position incompatible with current tab style"
-	Consts_SInvalidTabStyle,	"Tab style incompatible with current tab position"
-	Consts_SInvalidBitmap,	"Bitmap image is not valid"
-	Consts_SInvalidIcon,	"Icon image is not valid"
-	Consts_SInvalidMetafile,	"Metafile is not valid"
-	Consts_SInvalidPixelFormat,	"Invalid pixel format"
 	RTLConsts_SCantWriteResourceStreamError,	"Can't write to a read-only resource stream"
 	RTLConsts_SCheckSynchronizeError,	"CheckSynchronize called from thread $%x, which is NOT the main thread"
 	RTLConsts_SClassNotFound,	"Class %s not found"
@@ -352,14 +460,14 @@ BEGIN
 	RTLConsts_SDuplicateName,	"A component named %s already exists"
 	RTLConsts_SDuplicateString,	"String list does not allow duplicates"
 	RTLConsts_SFCreateError,	"Cannot create file %s"
+	RTLConsts_SFixedColTooBig,	"Fixed column count must be less than column count"
+	RTLConsts_SFixedRowTooBig,	"Fixed row count must be less than row count"
 	RTLConsts_SFOpenError,	"Cannot open file %s"
+	RTLConsts_SGridTooLarge,	"Grid too large for operation"
+	RTLConsts_SIndexOutOfRange,	"Grid index out of range"
 	RTLConsts_SInvalidImage,	"Invalid stream format"
 	RTLConsts_SInvalidName,	"''%s'' is not a valid component name"
-	RTLConsts_SInvalidPropertyPath,	"Invalid property path"
-	RTLConsts_SInvalidPropertyValue,	"Invalid property value"
-	RTLConsts_SListCapacityError,	"List capacity out of bounds (%d)"
-	RTLConsts_SListCountError,	"List count out of bounds (%d)"
-	RTLConsts_SListIndexError,	"List index out of bounds (%d)"
+	RTLConsts_SInvalidProperty,	"Invalid property value"
 	SysConst_SShortDayNameTue,	"Tue"
 	SysConst_SShortDayNameWed,	"Wed"
 	SysConst_SShortDayNameThu,	"Thu"
