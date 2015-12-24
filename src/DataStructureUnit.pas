@@ -33,6 +33,7 @@ type
   public
     sections: TStringList;
     dta: array of Byte;
+    tiles: array of Boolean;
     maps: TStringList;
     size: Cardinal;
     crc32: String;
@@ -141,6 +142,7 @@ begin
   if maps.Count > 0 then
         for i := 0 to maps.Count - 1 do maps.Objects[i].Free;
   maps.Clear;
+  SetLength(tiles, 0);
 end;
 
 procedure TSection.AddMap(id: Word);
@@ -516,11 +518,14 @@ end;
 
 procedure TSection.ScanTILE(sectionName: String);
 var sz: Cardinal;
+i: Word;
 begin
   sz:=ReadLongWord;             //4 bytes - length of section TILE
   Add(sectionName, sz - 4, sz + 4 + 4, index + 4, index - 4 - 4);
   MoveIndex(sz);
   tilesCount := sz div $404;
+  SetLength(tiles, tilesCount);
+  for i := 0 to tilesCount - 1 do tiles[i] := false;
   Log.debug('Sprites, tiles: ' + IntToStr(tilesCount));
 end;
 

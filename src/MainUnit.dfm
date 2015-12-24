@@ -311,7 +311,7 @@ object MainForm: TMainForm
         Caption = 'Tiles count:'
       end
       object TilesProgressLabel: TLabel
-        Left = 152
+        Left = 216
         Top = 32
         Width = 193
         Height = 13
@@ -319,7 +319,7 @@ object MainForm: TMainForm
         AutoSize = False
       end
       object TileImage: TImage
-        Left = 112
+        Left = 176
         Top = 8
         Width = 32
         Height = 32
@@ -331,8 +331,15 @@ object MainForm: TMainForm
         Height = 13
         Caption = 'Clipboard image'
       end
+      object Label2: TLabel
+        Left = 8
+        Top = 256
+        Width = 71
+        Height = 13
+        Caption = 'Tiles in a row:  '
+      end
       object TilesProgressBar: TProgressBar
-        Left = 152
+        Left = 216
         Top = 8
         Width = 193
         Height = 17
@@ -345,9 +352,9 @@ object MainForm: TMainForm
       object SaveTilesButton: TButton
         Left = 6
         Top = 8
-        Width = 99
+        Width = 163
         Height = 25
-        Caption = 'Save tiles to files'
+        Caption = 'Save tiles to files (separate)'
         TabOrder = 0
         OnClick = SaveTilesButtonClick
       end
@@ -481,6 +488,23 @@ object MainForm: TMainForm
         TabOrder = 13
         OnClick = Button5Click
       end
+      object Button8: TButton
+        Left = 6
+        Top = 224
+        Width = 163
+        Height = 25
+        Caption = 'Save tiles to one file'
+        TabOrder = 14
+        OnClick = Button8Click
+      end
+      object Edit1: TEdit
+        Left = 80
+        Top = 253
+        Width = 41
+        Height = 21
+        TabOrder = 15
+        Text = '16'
+      end
     end
     object TabSheet5: TTabSheet
       Caption = 'Zones (maps)'
@@ -500,7 +524,7 @@ object MainForm: TMainForm
       end
       object MapProgressLabel: TLabel
         Left = 16
-        Top = 184
+        Top = 216
         Width = 193
         Height = 13
         Alignment = taCenter
@@ -523,7 +547,7 @@ object MainForm: TMainForm
       end
       object MapProgressBar: TProgressBar
         Left = 16
-        Top = 160
+        Top = 192
         Width = 193
         Height = 17
         Min = 0
@@ -573,8 +597,8 @@ object MainForm: TMainForm
         TabOrder = 5
       end
       object MapsStringGrid: TStringGrid
-        Left = 8
-        Top = 80
+        Left = 232
+        Top = 112
         Width = 1089
         Height = 249
         ColCount = 18
@@ -583,6 +607,16 @@ object MainForm: TMainForm
         RowCount = 2
         TabOrder = 6
         OnSelectCell = MapsStringGridSelectCell
+      end
+      object CheckBox1: TCheckBox
+        Left = 16
+        Top = 160
+        Width = 145
+        Height = 17
+        Caption = 'Save unused tiles'
+        Checked = True
+        State = cbChecked
+        TabOrder = 7
       end
     end
     object TabSheet6: TTabSheet

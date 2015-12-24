@@ -105,6 +105,10 @@ type
     SaveDTADialog: TSaveDialog;
     Button6: TButton;
     Button7: TButton;
+    Button8: TButton;
+    Label2: TLabel;
+    Edit1: TEdit;
+    CheckBox1: TCheckBox;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -127,14 +131,12 @@ type
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
-    procedure ClipboardImageMouseDown(Sender: TObject;
-      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure TilesDrawGridDragOver(Sender, Source: TObject; X, Y: Integer;
-      State: TDragState; var Accept: Boolean);
-    procedure TilesDrawGridDragDrop(Sender, Source: TObject; X,
-      Y: Integer);
+    procedure ClipboardImageMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure TilesDrawGridDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+    procedure TilesDrawGridDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
+    procedure Button8Click(Sender: TObject);
   private
   public
     procedure ReadOIE(id: Word);
@@ -328,6 +330,7 @@ end;
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   BMP.Free;
+  BMP2.Free;
 end;
 
 procedure TMainForm.Button2Click(Sender: TObject);
@@ -578,11 +581,26 @@ begin
 
   Log.Clear;
   Log.Debug('Maps (zones):');
-  Log.Debug('');
+  Log.NewLine;
   Log.Debug('Total count: ' + IntToStr(DTA.mapsCount));
-  Log.Debug('');
+  Log.NewLine;
   //DTA.SetIndex(knownSections[5]);          // ZONE
   for i:=0 to DTA.mapsCount - 1 do ReadIZON(i, true);
+
+  if CheckBox1.Checked then
+  begin
+    Log.NewLine;
+    Log.Debug('Unused tiles:');
+    Log.NewLine;
+    CreateDir(opath + 'TilesUnused');
+    for i:=0 to DTA.tilesCount -1 do
+     if not DTA.tiles[i] then
+       begin
+         Log.Debug(inttostr(i));
+         GetTile(dta, i, bmp);
+         SaveBMP(opath + 'TilesUnused\' + rightstr('000' + inttostr(i) ,4) + eBMP, bmp);
+       end;
+  end;
 end;
 
 procedure TMainForm.ReadIZON(id: Word; save: Boolean);
@@ -621,18 +639,21 @@ begin
       k := DTA.ReadWord;
       if k <> $FFFF then
       begin
+        DTA.tiles[k] := true;
         GetTile(dta, k, bmp);
         CopyFrame(MapImage.Canvas, j * 32, i * 32);
       end;
       k := DTA.ReadWord;
       if k <> $FFFF then
       begin
+        DTA.tiles[k] := true;
         GetTile(dta, k, bmp);
         CopyFrame(MapImage.Canvas, j * 32, i * 32);
       end;
       k := DTA.ReadWord;
       if k <> $FFFF then
       begin
+        DTA.tiles[k] := true;
         GetTile(dta, k, bmp);
         CopyFrame(MapImage.Canvas, j * 32, i * 32);
       end;
@@ -903,7 +924,6 @@ var left, top: Word;
 begin
   if (Source is TDrawGrid) then
   begin
-    //oldColor := currentFillColor;
     bmp.PixelFormat := pf8bit;
     bmp.Width := TileSize;
     bmp.Height := TileSize;
@@ -917,36 +937,12 @@ begin
        1: FillInternalPalette(ClipboardImage.Picture.Bitmap, $FEFEFE);
        2: FillInternalPalette(ClipboardImage.Picture.Bitmap, $FE00FE);
     end;
- //   case ZeroColorRG.ItemIndex of
- //      0: currentFillColor := $010101;
- //      1: currentFillColor := $FEFEFE;
- //      2: currentFillColor := $FE00FE;
- //   end;
 
     left := x div 32 * 32;
     top := y div 32 * 32;
     GetTile(dta, selectedCell, bmp);
-    //CopyFrame(ClipboardImage.Canvas, left, top);
-    //ClipboardImage.Canvas.CopyRect(Rect(left, top, BMP.Width + left, BMP.Height + top), BMP.Canvas, Rect(0, 0, BMP.Width, BMP.Height));
-    //bmp.Width := ClipboardImage.Width;
-    //bmp.Height := ClipboardImage.Height;
-    //r := Rect(0,0, ClipboardImage.Width, ClipboardImage.Height);
-    //bmp.Canvas.CopyRect(r, ClipboardImage.Canvas, r);
-
-    //for i := 0 to 100 do
-    //begin
-    //  p := ClipboardImage.Picture.Bitmap.ScanLine[i];
-    //  for j := 0 to 100 do
-    //    if ClipboardImage.Canvas.Pixels[i,j] = oldCOlor then ClipboardImage.Canvas.Pixels[i,j] := currentFillColor;
-    //end;
     DrawBMP(ClipboardImage.Picture.Bitmap, left, top, BMP);
-
-    //ClipboardImage.Canvas.CopyRect(r, bmp.Canvas, r);
-
-
     ClipboardImage.Repaint;
-    //p :=
-    //Showmessage(inttohex(p[0], 6));
   end;
 end;
 
@@ -1041,6 +1037,33 @@ begin
     end;
     TilesDrawGrid.Repaint;
   end;
+end;
+
+procedure TMainForm.Button8Click(Sender: TObject);
+var w, h, left, top, i, j, k, l: Word;
+p: PByteArray;
+begin
+  w := StrToInt(Edit1.text);
+  h := DTA.tilesCount div w + 1;
+  BMP2 := TBitmap.Create;
+  BMP2.PixelFormat := pf8bit;
+  case ZeroColorRG.ItemIndex of
+       0: FillInternalPalette(BMP2, $010101);
+       1: FillInternalPalette(BMP2, $FEFEFE);
+       2: FillInternalPalette(BMP2, $FE00FE);
+  end;
+  BMP2.Width := w * 32;
+  BMP2.Height := h * 32;
+
+  for i := 0 to h - 1 do
+    for j := 0 to w - 1 do
+             if i * w + j < DTA.tilesCount then
+               begin
+                 GetTile(dta, i * w + j, bmp);
+                 DrawBMP(BMP2, j * 32, i * 32, BMP);
+               end;
+
+  BMP2.SaveToFile(opath + 'tiles' + inttostr(w) +'x' + inttostr(h) + '.bmp');
 end;
 
 end.

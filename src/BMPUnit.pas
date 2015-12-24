@@ -112,7 +112,7 @@ type
     procedure DrawBMP(destBMP: TBitmap; x, y: Word; bmp: TBitmap);
     procedure ChangeBackground(bmp: TBitmap);
 var
-  BMP:TBitMap;
+  BMP, BMP2: TBitMap;
   SrcFile, DestFile: File;
   Buf: array[1..2048] of Byte;
   NumRead:cardinal;
