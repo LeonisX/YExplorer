@@ -2,7 +2,7 @@ object MainForm: TMainForm
   Left = 192
   Top = 114
   Width = 1119
-  Height = 772
+  Height = 817
   Caption = 'Yoda Stories Explorer'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,7 +17,7 @@ object MainForm: TMainForm
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 0
-    Top = 417
+    Top = 452
     Width = 1111
     Height = 12
     Cursor = crVSplit
@@ -37,11 +37,11 @@ object MainForm: TMainForm
     Left = 0
     Top = 0
     Width = 1111
-    Height = 417
-    ActivePage = TabSheet4
+    Height = 452
+    ActivePage = TabSheet5
     Align = alClient
     MultiLine = True
-    TabIndex = 3
+    TabIndex = 4
     TabOrder = 1
     Visible = False
     object TabSheet1: TTabSheet
@@ -230,6 +230,15 @@ object MainForm: TMainForm
         TabOrder = 8
         OnClick = Button1Click
       end
+      object Button6: TButton
+        Left = 16
+        Top = 344
+        Width = 75
+        Height = 25
+        Caption = 'Save DTA'
+        TabOrder = 9
+        OnClick = Button6Click
+      end
     end
     object TabSheet2: TTabSheet
       Caption = 'Title screen'
@@ -243,11 +252,20 @@ object MainForm: TMainForm
       object SaveSTUPButton: TButton
         Left = 6
         Top = 8
-        Width = 75
+        Width = 83
         Height = 25
         Caption = 'Save to BMP'
         TabOrder = 0
         OnClick = SaveSTUPButtonClick
+      end
+      object Button7: TButton
+        Left = 8
+        Top = 40
+        Width = 81
+        Height = 25
+        Caption = 'Load from BMP'
+        TabOrder = 1
+        OnClick = Button7Click
       end
     end
     object TabSheet3: TTabSheet
@@ -280,35 +298,42 @@ object MainForm: TMainForm
       Caption = 'Tiles, sprites'
       ImageIndex = 3
       object TilesLabel: TLabel
-        Left = 88
-        Top = 8
+        Left = 592
+        Top = 4
         Width = 3
         Height = 13
       end
       object LabelTiles: TLabel
-        Left = 8
-        Top = 8
+        Left = 512
+        Top = 4
         Width = 55
         Height = 13
         Caption = 'Tiles count:'
       end
       object TilesProgressLabel: TLabel
-        Left = 16
-        Top = 160
+        Left = 152
+        Top = 32
         Width = 193
         Height = 13
         Alignment = taCenter
         AutoSize = False
       end
       object TileImage: TImage
-        Left = 16
-        Top = 160
+        Left = 112
+        Top = 8
         Width = 32
         Height = 32
       end
+      object Label1: TLabel
+        Left = 216
+        Top = 350
+        Width = 75
+        Height = 13
+        Caption = 'Clipboard image'
+      end
       object TilesProgressBar: TProgressBar
-        Left = 16
-        Top = 136
+        Left = 152
+        Top = 8
         Width = 193
         Height = 17
         Min = 0
@@ -319,7 +344,7 @@ object MainForm: TMainForm
       end
       object SaveTilesButton: TButton
         Left = 6
-        Top = 32
+        Top = 8
         Width = 99
         Height = 25
         Caption = 'Save tiles to files'
@@ -328,7 +353,7 @@ object MainForm: TMainForm
       end
       object DecimalCheckBox: TCheckBox
         Left = 16
-        Top = 64
+        Top = 40
         Width = 145
         Height = 17
         Caption = 'Decimal filenames'
@@ -338,7 +363,7 @@ object MainForm: TMainForm
       end
       object HexCheckBox: TCheckBox
         Left = 16
-        Top = 88
+        Top = 64
         Width = 145
         Height = 17
         Caption = 'HEX filenames'
@@ -348,7 +373,7 @@ object MainForm: TMainForm
       end
       object AttrCheckBox: TCheckBox
         Left = 16
-        Top = 112
+        Top = 88
         Width = 153
         Height = 17
         Caption = 'Group by attributes'
@@ -357,8 +382,8 @@ object MainForm: TMainForm
         TabOrder = 3
       end
       object ZeroColorRG: TRadioGroup
-        Left = 232
-        Top = 16
+        Left = 4
+        Top = 112
         Width = 201
         Height = 105
         Caption = ' "Zero" color '
@@ -368,60 +393,93 @@ object MainForm: TMainForm
           'White'
           'Fuchsia (transparent)')
         TabOrder = 4
+        OnClick = ZeroColorRGClick
       end
       object Panel1: TPanel
-        Left = 374
-        Top = 30
+        Left = 142
+        Top = 126
         Width = 48
         Height = 22
         Color = clBlack
         TabOrder = 5
       end
       object Panel2: TPanel
-        Left = 374
-        Top = 60
+        Left = 142
+        Top = 156
         Width = 48
         Height = 22
         Color = clWhite
         TabOrder = 6
       end
       object Panel3: TPanel
-        Left = 374
-        Top = 89
+        Left = 142
+        Top = 185
         Width = 48
         Height = 22
         Color = clFuchsia
         TabOrder = 7
       end
       object TilesDrawGrid: TDrawGrid
-        Left = 440
-        Top = 16
+        Left = 512
+        Top = 24
         Width = 585
-        Height = 361
+        Height = 385
         Color = clBtnFace
         ColCount = 16
         DefaultColWidth = 32
         DefaultRowHeight = 32
-        DragMode = dmAutomatic
         FixedCols = 0
         FixedRows = 0
-        GridLineWidth = 2
         Options = [goVertLine, goHorzLine, goDrawFocusSelected]
         TabOrder = 9
+        OnDragDrop = TilesDrawGridDragDrop
+        OnDragOver = TilesDrawGridDragOver
         OnDrawCell = TilesDrawGridDrawCell
+        OnMouseDown = TilesDrawGridMouseDown
       end
-      object Memo1: TMemo
-        Left = 128
-        Top = 208
-        Width = 185
-        Height = 89
-        DragKind = dkDock
-        DragMode = dmAutomatic
-        Lines.Strings = (
-          'Memo1')
+      object Panel4: TPanel
+        Left = 214
+        Top = 48
+        Width = 288
+        Height = 288
+        BevelOuter = bvLowered
         TabOrder = 10
-        OnDragDrop = Memo1DragDrop
-        OnDragOver = Memo1DragOver
+        object ClipboardImage: TImage
+          Left = 0
+          Top = 0
+          Width = 288
+          Height = 288
+          OnDragDrop = ClipboardImageDragDrop
+          OnDragOver = ClipboardImageDragOver
+          OnMouseDown = ClipboardImageMouseDown
+        end
+      end
+      object Button3: TButton
+        Left = 304
+        Top = 344
+        Width = 57
+        Height = 25
+        Caption = 'Save'
+        TabOrder = 11
+        OnClick = Button3Click
+      end
+      object Button4: TButton
+        Left = 368
+        Top = 344
+        Width = 57
+        Height = 25
+        Caption = 'Load'
+        TabOrder = 12
+        OnClick = Button4Click
+      end
+      object Button5: TButton
+        Left = 432
+        Top = 344
+        Width = 57
+        Height = 25
+        Caption = 'Clear'
+        TabOrder = 13
+        OnClick = Button5Click
       end
     end
     object TabSheet5: TTabSheet
@@ -581,9 +639,9 @@ object MainForm: TMainForm
   end
   object BottomPageControl: TPageControl
     Left = 0
-    Top = 429
+    Top = 464
     Width = 1111
-    Height = 290
+    Height = 300
     ActivePage = TabSheet9
     Align = alBottom
     TabIndex = 1
@@ -607,7 +665,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 1103
-        Height = 262
+        Height = 272
         Cursor = crIBeam
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
@@ -646,7 +704,7 @@ object MainForm: TMainForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 719
+    Top = 764
     Width = 1111
     Height = 19
     Panels = <
@@ -657,8 +715,27 @@ object MainForm: TMainForm
   end
   object OpenDTADialog: TOpenDialog
     DefaultExt = '*.dta'
-    Filter = 'Desktop Adventures|*.dta;*.daw|All files|*.*'
+    Filter = 'Desktop Adventures|*.dta|All files|*.*'
     Left = 832
-    Top = 120
+    Top = 104
+  end
+  object SaveClipboardDialog: TSaveDialog
+    DefaultExt = '*.bmp'
+    FileName = 'unnamed.bmp'
+    Filter = 'Bitmaps|*.bmp'
+    Left = 872
+    Top = 104
+  end
+  object OpenClipboardDialog: TOpenDialog
+    DefaultExt = '*.bmp'
+    Filter = 'Bitmaps|*.bmp|All files|*.*'
+    Left = 912
+    Top = 104
+  end
+  object SaveDTADialog: TSaveDialog
+    DefaultExt = '*.dta'
+    Filter = 'Desktop Adventures|*.dta|All files|*.*'
+    Left = 832
+    Top = 144
   end
 end

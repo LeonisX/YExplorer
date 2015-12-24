@@ -57,6 +57,7 @@ type
 
     procedure ReadDTAMetricks(fileName: String);
     procedure LoadFileToArray(fileName: String);
+    procedure SaveToFile(fileName: String);
 
     procedure SetIndex(offset: Cardinal); overload;
     procedure SetIndex(section: String); overload;
@@ -517,7 +518,7 @@ procedure TSection.ScanTILE(sectionName: String);
 var sz: Cardinal;
 begin
   sz:=ReadLongWord;             //4 bytes - length of section TILE
-  Add(sectionName, sz, sz + 4 + 4, index, index - 4 - 4);
+  Add(sectionName, sz - 4, sz + 4 + 4, index + 4, index - 4 - 4);
   MoveIndex(sz);
   tilesCount := sz div $404;
   Log.debug('Sprites, tiles: ' + IntToStr(tilesCount));
@@ -583,6 +584,18 @@ begin
   Log.debug('DTA revision: ' + dtaRevision);
   index:=0;
 end;
+
+procedure TSection.SaveToFile(fileName: String);
+var FS: TFileStream;
+begin
+  FS := TFileStream.Create(fileName, fmCreate);
+  try
+    FS.WriteBuffer(Pointer(dta)^, Length(dta));
+  finally
+     FreeAndNil(FS);
+  end;
+end;
+
 
 procedure TSection.SetIndex(offset: Cardinal);
 begin

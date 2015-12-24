@@ -5,7 +5,7 @@ interface
 uses Windows, Classes, ExtCtrls, SysUtils, Graphics, Dialogs, DataStructureUnit;
 
 const
-GamePalette: array[0..1023] of byte = (	$FF, $00, $FF, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00,
+GamePalette: array[0..1023] of byte = (	$FE, $00, $FE, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00,
 	$00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00,
 	$00, $00, $00, $00, $00, $00, $00, $00, $FF, $FF, $8B, $00, $C3, $CF, $4B, $00,
 	$8B, $A3, $1B, $00, $57, $77, $00, $00, $8B, $A3, $1B, $00, $C3, $CF, $4B, $00,
@@ -100,7 +100,7 @@ type
   Palette : packed array[0..255,0..3]of byte; {таблица палитры}
   end;
 
-    procedure FillInternalPalette(BM:TBitMap; r, g, b: Byte); //заполняет палитру нужного БитМапа. СТрого 256 цветов. Палитра прошита в программе
+    procedure FillInternalPalette(BM:TBitMap; color: TColor); //заполняет палитру нужного БитМапа. СТрого 256 цветов. Палитра прошита в программе
     procedure FillPalette(BM:TBitMap); //заполняет палитру нужного БитМапа. СТрого 256 цветов
     procedure ReadPicture(section: TSection; offset: Cardinal); //читает картинку из DTA файла согласно её смещению
     procedure CopyPicture(Image:TImage;x,y:word); //берёт прочитанную картинку и кидает куда нам нужно
@@ -109,7 +109,8 @@ type
     procedure SaveBMP(s:string;bmp:tbitmap);
     procedure InitBMP;
     procedure GetTile(section: TSection; id: Word; bmp: TBitmap);
-
+    procedure DrawBMP(destBMP: TBitmap; x, y: Word; bmp: TBitmap);
+    procedure ChangeBackground(bmp: TBitmap);
 var
   BMP:TBitMap;
   SrcFile, DestFile: File;
@@ -210,8 +211,7 @@ begin
       Pal.palversion := $300;
       Pal.palnumentries := 256;
       // read palette data from bitmap
-      fBitmapPalEntries := GetPaletteEntries(bmp.Palette, 0, 256,
-      Pal.palPalEntry[0]);
+      fBitmapPalEntries := GetPaletteEntries(bmp.Palette, 0, 256, Pal.palPalEntry[0]);
       for i := 0 to fBitmapPalEntries - 1 do
         begin
           bmh.Palette[i][0]:=Pal.PalPalEntry[ i ].PeBlue;     //b
@@ -234,8 +234,8 @@ end;
 procedure CopyFrame(Canvas: TCanvas; x, y: Word);
 begin
 //  Image.Canvas.CopyRect(rect(0+x,0+y,BMP.Width+x,BMP.Height+y), BMP.Canvas, rect(0,0,BMP.Width,BMP.Height));
-  Canvas.Brush.Style := bsClear;
-  Canvas.BrushCopy(Rect(0 + x, 0 + y, BMP.Width + x, BMP.Height + y), BMP, Rect(0, 0, BMP.Width, BMP.Height), clFuchsia);
+  //Canvas.Brush.Style := bsClear;
+  Canvas.BrushCopy(Rect(0 + x, 0 + y, BMP.Width + x, BMP.Height + y), BMP, Rect(0, 0, BMP.Width, BMP.Height), $FE00FE);
 end;
 
 procedure ReadPicture(section: TSection; offset: Cardinal);
@@ -254,8 +254,8 @@ end;
 procedure GetTile(section: TSection; id: Word; bmp: TBitmap);
 var i, j, index2: Cardinal;
   p: PByteArray;
-begin  
-  index2 := section.GetDataOffset(knownSections[4]) + id * $404 + 4;
+begin
+  index2 := section.GetDataOffset(knownSections[4]) + id * $404;
   for i := 0 to bmp.Height - 1 do
   begin
     p := bmp.ScanLine[i];
@@ -267,8 +267,32 @@ begin
   end;
 end;
 
+procedure DrawBMP(destBMP: TBitmap; x, y: Word; bmp: TBitmap);
+var i, j: Cardinal;
+  pb, pd: PByteArray;
+begin
+  for i := 0 to bmp.Height - 1 do
+  begin
+    pb := bmp.ScanLine[i];
+    pd := destBMP.ScanLine[i + y];
+    for j := 0 to bmp.Width - 1 do
+      pd[j + x] := pb[j];
+  end;
+end;
 
-procedure FillInternalPalette(BM:TBitMap; r, g, b: Byte);
+procedure ChangeBackground(bmp: TBitmap);
+var i, j: Cardinal;
+  p: PByteArray;
+begin
+  for i := 0 to bmp.Height - 1 do
+  begin
+    p := bmp.ScanLine[i];
+    for j := 0 to bmp.Width - 1 do
+      p[j] := 0;
+  end;
+end;
+
+procedure FillInternalPalette(BM:TBitMap; color: TColor);
 var
   pal: PLogPalette;
   hpal: HPALETTE;
@@ -279,9 +303,9 @@ begin
     GetMem(pal, sizeof(TLogPalette) + sizeof(TPaletteEntry) * 255);
     pal.palVersion := $300;
     pal.palNumEntries := 256;
-    pal.palPalEntry[0].peRed := r;
-    pal.palPalEntry[0].peGreen := g;
-    pal.palPalEntry[0].peBlue := b;
+    pal.palPalEntry[0].peRed := color and $FF;
+    pal.palPalEntry[0].peGreen := (color shr 8) and $FF;
+    pal.palPalEntry[0].peBlue := (color shr 16) and $FF;
     for i := 1 to 255 do
     begin
       pal.palPalEntry[i].peRed := GamePalette[i * 4 + 2];
