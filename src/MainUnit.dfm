@@ -1,7 +1,7 @@
 object MainForm: TMainForm
   Left = 192
   Top = 114
-  Width = 1119
+  Width = 626
   Height = 817
   Caption = 'Yoda Stories Explorer'
   Color = clBtnFace
@@ -17,8 +17,8 @@ object MainForm: TMainForm
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 0
-    Top = 252
-    Width = 1111
+    Top = 348
+    Width = 618
     Height = 12
     Cursor = crVSplit
     Align = alBottom
@@ -36,8 +36,8 @@ object MainForm: TMainForm
   object PageControl: TPageControl
     Left = 0
     Top = 0
-    Width = 1111
-    Height = 252
+    Width = 618
+    Height = 348
     ActivePage = TabSheet5
     Align = alClient
     MultiLine = True
@@ -524,7 +524,7 @@ object MainForm: TMainForm
       end
       object MapProgressLabel: TLabel
         Left = 16
-        Top = 216
+        Top = 240
         Width = 193
         Height = 13
         Alignment = taCenter
@@ -547,7 +547,7 @@ object MainForm: TMainForm
       end
       object MapProgressBar: TProgressBar
         Left = 16
-        Top = 192
+        Top = 216
         Width = 193
         Height = 17
         Min = 0
@@ -562,8 +562,6 @@ object MainForm: TMainForm
         Width = 153
         Height = 17
         Caption = 'Group by planet type'
-        Checked = True
-        State = cbChecked
         TabOrder = 2
       end
       object MapFlagSaveCheckBox: TCheckBox
@@ -572,8 +570,6 @@ object MainForm: TMainForm
         Width = 145
         Height = 17
         Caption = 'Group by flags'
-        Checked = True
-        State = cbChecked
         TabOrder = 3
       end
       object MapSaveCheckBox: TCheckBox
@@ -582,8 +578,6 @@ object MainForm: TMainForm
         Width = 145
         Height = 17
         Caption = 'Normal save'
-        Checked = True
-        State = cbChecked
         TabOrder = 4
       end
       object ActionsCheckBox: TCheckBox
@@ -592,8 +586,6 @@ object MainForm: TMainForm
         Width = 145
         Height = 17
         Caption = 'Dump actions'
-        Checked = True
-        State = cbChecked
         TabOrder = 5
       end
       object MapsStringGrid: TStringGrid
@@ -610,13 +602,21 @@ object MainForm: TMainForm
       end
       object CheckBox1: TCheckBox
         Left = 16
-        Top = 160
+        Top = 184
         Width = 145
         Height = 17
         Caption = 'Save unused tiles'
+        TabOrder = 7
+      end
+      object CheckBox2: TCheckBox
+        Left = 16
+        Top = 160
+        Width = 145
+        Height = 17
+        Caption = 'Dump text'
         Checked = True
         State = cbChecked
-        TabOrder = 7
+        TabOrder = 8
       end
     end
     object TabSheet6: TTabSheet
@@ -673,9 +673,9 @@ object MainForm: TMainForm
   end
   object BottomPageControl: TPageControl
     Left = 0
-    Top = 264
-    Width = 1111
-    Height = 500
+    Top = 360
+    Width = 618
+    Height = 404
     ActivePage = TabSheet9
     Align = alBottom
     TabIndex = 1
@@ -698,8 +698,8 @@ object MainForm: TMainForm
       object HEX: TMPHexEditor
         Left = 0
         Top = 0
-        Width = 1103
-        Height = 472
+        Width = 610
+        Height = 376
         Cursor = crIBeam
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
@@ -739,7 +739,7 @@ object MainForm: TMainForm
   object StatusBar: TStatusBar
     Left = 0
     Top = 764
-    Width = 1111
+    Width = 618
     Height = 19
     Panels = <
       item

@@ -109,6 +109,7 @@ type
     Label2: TLabel;
     Edit1: TEdit;
     CheckBox1: TCheckBox;
+    CheckBox2: TCheckBox;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -138,6 +139,7 @@ type
     procedure Button7Click(Sender: TObject);
     procedure Button8Click(Sender: TObject);
   private
+    texts: TStringList;
   public
     procedure ReadOIE(id: Word);
     procedure ReadIZON(id: Word; save: Boolean);
@@ -325,6 +327,7 @@ begin
   FillInternalPalette(TitleImage.Picture.Bitmap, 0);
   FillInternalPalette(MapImage.Picture.Bitmap, 0);
   OpenDTADialog.InitialDir := '.\';
+  texts := TStringList.Create;
   log.SetOutput(LogMemo.lines);
 end;
 
@@ -332,6 +335,7 @@ procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   BMP.Free;
   BMP2.Free;
+  texts.Free;
 end;
 
 procedure TMainForm.Button2Click(Sender: TObject);
@@ -580,6 +584,8 @@ begin
   MapProgressBar.Position := 0;
   MapProgressBar.Max := DTA.mapsCount;
 
+  if CheckBox2.Checked then texts.Clear;
+
   Log.Clear;
   Log.Debug('Maps (zones):');
   Log.NewLine;
@@ -602,6 +608,8 @@ begin
          SaveBMP(opath + 'TilesUnused\' + rightstr('000' + inttostr(i) ,4) + eBMP, bmp);
        end;
   end;
+
+  if CheckBox2.Checked then texts.SaveToFile(opath + 'iact.txt');
 end;
 
 procedure TMainForm.ReadIZON(id: Word; save: Boolean);
@@ -622,59 +630,62 @@ begin
   flag := DTA.ReadWord;             // flags:word; //2 byte: map flags (unknown meanings)* ‰Ó·‡‚ËÎ ·‡ÈÚ ÒÌËÁÛ
   DTA.ReadLongWord;                 // unused:longword; //5 bytes: unused (same values for every map)
   planet := DTA.ReadWord;           // planet:word; //1 byte: planet (0x01 = desert, 0x02 = snow, 0x03 = forest, 0x05 = swamp)* ‰Ó·‡‚ËÎ ÒÎÂ‰Û˛˘ËÈ ·‡ÈÚ
-  MapImage.Width := w * 32;
-  MapImage.Height := h * 32;
-  MapImage.Picture.Bitmap.Width := w * 32;
-  MapImage.Picture.Bitmap.Height := h * 32;
-
-  MapImage.Picture.bitmap.Canvas.Pen.Color := $010101;
-  MapImage.Picture.bitmap.Canvas.Brush.Color := $010101;
-  MapImage.picture.Bitmap.canvas.Rectangle(0, 0, MapImage.picture.bitmap.width, MapImage.picture.bitmap.height);
-  MapImage.Canvas.Brush.Style := bsClear;
-
   Log.Debug('Map #' + inttostr(pn) + ' offset: ' + inttohex(DTA.GetIndex, 8));
-  for i:=0 to h-1 do
-  begin
-    for j:=0 to w-1 do
-    begin          //W*H*6 bytes: map data
-      k := DTA.ReadWord;
-      if k <> $FFFF then
-      begin
-        DTA.tiles[k] := true;
-        GetTile(dta, k, bmp);
-        CopyFrame(MapImage.Canvas, j * 32, i * 32);
-      end;
-      k := DTA.ReadWord;
-      if k <> $FFFF then
-      begin
-        DTA.tiles[k] := true;
-        GetTile(dta, k, bmp);
-        CopyFrame(MapImage.Canvas, j * 32, i * 32);
-      end;
-      k := DTA.ReadWord;
-      if k <> $FFFF then
-      begin
-        DTA.tiles[k] := true;
-        GetTile(dta, k, bmp);
-        CopyFrame(MapImage.Canvas, j * 32, i * 32);
-      end;
-    end;
-    Application.ProcessMessages;
-    if MapSaveCheckBox.Checked and save then
-      MapImage.Picture.SaveToFile(opath + 'Maps\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
-    if MapFlagSaveCheckBox.Checked and save then
-    begin
-      s := opath + 'MapsByFlags\' + IntToBin(flag);
-      CreateDir(s);
-      MapImage.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
-    end;
-    if MapPlanetSaveCheckBox.Checked and save then
-    begin
-      s := opath + 'MapsByPlanetType\' + planets[planet];
-      CreateDir(s);
-      MapImage.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
-    end;
 
+  if MapSaveCheckBox.Checked or MapFlagSaveCheckBox.Checked or MapPlanetSaveCheckBox.Checked then
+  begin
+    MapImage.Width := w * 32;
+    MapImage.Height := h * 32;
+    MapImage.Picture.Bitmap.Width := w * 32;
+    MapImage.Picture.Bitmap.Height := h * 32;
+
+    MapImage.Picture.bitmap.Canvas.Pen.Color := $010101;
+    MapImage.Picture.bitmap.Canvas.Brush.Color := $010101;
+    MapImage.picture.Bitmap.canvas.Rectangle(0, 0, MapImage.picture.bitmap.width, MapImage.picture.bitmap.height);
+    MapImage.Canvas.Brush.Style := bsClear;
+
+    for i:=0 to h-1 do
+    begin
+      for j:=0 to w-1 do
+      begin          //W*H*6 bytes: map data
+        k := DTA.ReadWord;
+        if k <> $FFFF then
+        begin
+          DTA.tiles[k] := true;
+          GetTile(dta, k, bmp);
+          CopyFrame(MapImage.Canvas, j * 32, i * 32);
+        end;
+        k := DTA.ReadWord;
+        if k <> $FFFF then
+        begin
+          DTA.tiles[k] := true;
+          GetTile(dta, k, bmp);
+          CopyFrame(MapImage.Canvas, j * 32, i * 32);
+        end;
+        k := DTA.ReadWord;
+        if k <> $FFFF then
+        begin
+          DTA.tiles[k] := true;
+          GetTile(dta, k, bmp);
+          CopyFrame(MapImage.Canvas, j * 32, i * 32);
+        end;
+      end;
+      Application.ProcessMessages;
+      if MapSaveCheckBox.Checked and save then
+        MapImage.Picture.SaveToFile(opath + 'Maps\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
+      if MapFlagSaveCheckBox.Checked and save then
+      begin
+        s := opath + 'MapsByFlags\' + IntToBin(flag);
+        CreateDir(s);
+        MapImage.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
+      end;
+      if MapPlanetSaveCheckBox.Checked and save then
+      begin
+        s := opath + 'MapsByPlanetType\' + planets[planet];
+        CreateDir(s);
+        MapImage.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
+      end;
+    end;
 
     MapProgressBar.Position := id;
     MapProgressLabel.Caption := Format('%.2f %%', [((id + 1)/ DTA.mapsCount) * 100]);
@@ -683,7 +694,7 @@ begin
   //k:=DTA.ReadWord;                             //2 bytes: object info entry count (X)
   //DTA.MoveIndex(k * 12);                       //X*12 bytes: object info data
 
-  if ActionsCheckBox.Checked then
+  if ActionsCheckBox.Checked or CheckBox2.Checked then
   begin
    //ReadOIE(id);
    ReadIZAX(id);
@@ -745,18 +756,48 @@ begin
   k := 0;
   DTA.SetIndex(TMap(DTA.maps.Objects[id]).iactOffset);
 
-  while DTA.ReadString(4) <> 'IACT' do
+  while DTA.ReadString(4) = 'IACT' do
   begin
     inc(k);
-       HEX.SetSelStart(DTA.GetIndex);
-  HEX.SetSelEnd(DTA.GetIndex + 3);
-  HEX.CenterCursorPosition;
-  Application.ProcessMessages;
-  showmessage('sdfsdf');
+//    HEX.SetSelStart(DTA.GetIndex);
+//    HEX.SetSelEnd(DTA.GetIndex + 3);
+//    HEX.CenterCursorPosition;
+//    Application.ProcessMessages;
     size := DTA.ReadLongWord;  //4 bytes: length (X)
-    DumpText(DTA.GetIndex, size, id, k);
-    DumpData(opath + 'IACT\' + rightstr('000' + inttostr(id), 3) + '-'+rightstr('00'+inttostr(k),2), DTA.GetIndex, size);
+    if CheckBox2.Checked then DumpText(DTA.GetIndex, size, id, k);
+    if ActionsCheckBox.Checked then
+       DumpData(opath + 'IACT\' + rightstr('000' + inttostr(id), 3) + '-'+rightstr('00'+inttostr(k),2), DTA.GetIndex, size)
+       else DTA.MoveIndex(size);
   end;
+end;
+
+function idDeprecatedWords(text: String): Boolean;
+const arr: Array[1..100] of String = (
+'el:', 'ckup L', 'MS S', 'ÄŒΩ', 'n 2', 'Redra', 'Remov', 'Redr', 'plac', 'Sho',
+'Show', 'opI', 'ne ', 'Red', 'Set', 'wRandN', 'up L', 'Remove~', 'ng, ', 'opIt',
+'Redraw', 'ckup', 'Y: 12 ', 'Bump', 'Pick', 'Bum', 'Has', 'ê0n', 'Pickup L', 'SetHer',
+'BumpTi', 'Repla', 'MS San', 'Remove,', 'd my j', 'WaitF', 'SetH', 'SetHe', 'RandNu', 'eIte',
+'n 1 an', 'úúû', 'L˜Ω', '6,12', '0, 1', 'Door', 'aySo', 'c X:', 'Game', '–©µ',
+'Remove', 'a l', 'ndNu', 'PlayS', 'Force ', ' Lev', 'ter:', 'ter:F', 'Ä€π', 'o Na',
+'tï±', '4kﬂ', 'w on o', 'ndN', 'HotS', 'Ä”¥', 'perial', '12 Y', 'Name', 'sta',
+'Wait', 'securi', '''s don', 'cku', 'ƒF¬', 'rTim', 'Wai', '¯Ì±', 'Backgr', 'e''s',
+'MS ', ' íµ', 'h th', 'n''t th', 'u ta', 's! What ', 'Pic', '§Ká', 'Wait', 'Coun',
+'#####', '¥˙m', 'up ', 'Sav', 'ˇˇˇˇˇˇˇˇ', 'Rep', '∏D¥', '!!!', 'Ù$Ç', 'Coun'
+);
+var i: byte;
+begin
+  result := false;
+  for i := 1 to Length(arr) do
+    if arr[i] = text then result := true;
+  if not result then result := AnsiStartsStr('ShowT', text);
+  if not result then result := AnsiStartsStr('awArea', text);
+  if not result then result := AnsiStartsStr('HasI', text);
+  if not result then result := AnsiStartsStr('ZX', text);
+  if not result then result := AnsiStartsStr(' X:', text);
+  if not result then result := AnsiStartsStr(',', text);
+
+  if text[1] = ',' then result := true;
+  if text[1] = ':' then result := true;
 end;
 
 procedure TMainForm.DumpText(index: Cardinal; size: Word; mapID: Word; iactID: Byte);
@@ -766,38 +807,61 @@ var idx, tempIndex: Cardinal;
   s: String;
 begin
   idx := index;
-  phase := 0;
-
-  while index < idx + size - 2 do
+  phase := 1;
+  //Log.NewLine;
+  while DTA.GetIndex < idx + size - 2 do
   begin
-    tempIndex := index;
+    //Log.Debug('Start new scan: ' + IntToHex(DTA.GetIndex, 6));
+    tempIndex := DTA.GetIndex;
     sz := DTA.ReadWord;
-    HEX.SetSelStart(DTA.GetIndex);
-    Application.ProcessMessages;
-    ShowMessage(inttohex(size, 4));
-    if sz < $0200 then            // correct max size
+    //Log.Debug('Size: ' + IntToHex(sz, 4));
+    if (sz < $0300) and (sz > $0002) then            // correct max size
     begin
+      //Log.Debug('phase2');
       phase := 2;                 // size correct, maybe text?
-      if index + size < idx + size -2 then
+      //HEX.SetSelStart(DTA.GetIndex - 2);
+      //HEX.SetSelEnd(DTA.GetIndex - 1);
+      Application.ProcessMessages;
+      //ShowMessage(inttohex(sz, 4));
+
+      //Log.Debug('Test for crazy symbols: ' + IntToHex(DTA.GetIndex, 6) + ':' + IntToHex(DTA.GetIndex + sz - 1, 6));
+      s := '';
+      //Log.Debug('DTA.index + sz: ' + IntToHex(DTA.GetIndex + sz, 6) + ':' + IntToHex(idx + size, 6));
+      if DTA.GetIndex + sz <= idx + size + 4 then
         for j := 1 to sz do
         begin
           b := DTA.ReadByte;
+          s := s + inttohex(b,2) + ' ';
           if (b < $20) and (b <> $0D) and (b <> $0A) then phase := 1;
-        end;
+          if (b = ord('\')) or (b = ord('@')) or (b = ord('^')) or (b = ord('∂')) or (b = ord('<')) or (b = ord('ª'))  or (b = ord('(')) or (b = ord(')')) then phase := 1;
+        end
+      else phase := 1;
+      //Log.Debug('Bytes:  ' + s);
+      //Log.Debug('Phase:  ' + IntToHex(phase, 1));
       if phase = 2 then
       begin
         s := '';
-        DTA.SetIndex(tempindex + 2);
+        DTA.SetIndex(tempIndex + 2);
+        //Log.Debug('String: ' + IntToHex(DTA.GetIndex, 6) + ':' + IntToHex(DTA.GetIndex + sz - 1, 6));
         for j := 1 to sz do
         begin
           b := DTA.ReadByte;
           s := s + chr(b);
         end;
-        Showmessage(s);
-        tempIndex := DTA.GetIndex - 1;
+        s := AnsiReplaceStr(s, chr($0D) + chr($0A), '[CR]');
+        s := AnsiReplaceStr(s, '[CR][CR]', '[CR2]');
+        s := AnsiReplaceStr(s, chr($A5), '_');
+        if not idDeprecatedWords(s) then
+        begin
+         texts.Add(s);
+        //Log.Debug(s);
+//        Showmessage(s);
+         tempIndex := DTA.GetIndex;
+        end;
+        phase := 1;
       end;
-    end;
-    index := tempIndex + 1;
+    end; // else Log.Debug('Size don"t match');
+    DTA.SetIndex(tempIndex + 1);
   end;
 
   DTA.SetIndex(idx);
