@@ -153,7 +153,7 @@ type
     procedure ReadTNAM;
     procedure ReadTGEN;
     procedure DumpData(fileName: String; offset, size: Cardinal);
-    procedure DumpText(id: Word; k: Byte);
+    procedure DumpText(index: Cardinal; size: Word; mapID: Word; iactID: Byte);
 
     procedure ShowHEXCaretIndex;
 
@@ -744,18 +744,63 @@ k: Byte;
 begin
   k := 0;
   DTA.SetIndex(TMap(DTA.maps.Objects[id]).iactOffset);
+
   while DTA.ReadString(4) <> 'IACT' do
   begin
     inc(k);
+       HEX.SetSelStart(DTA.GetIndex);
+  HEX.SetSelEnd(DTA.GetIndex + 3);
+  HEX.CenterCursorPosition;
+  Application.ProcessMessages;
+  showmessage('sdfsdf');
     size := DTA.ReadLongWord;  //4 bytes: length (X)
+    DumpText(DTA.GetIndex, size, id, k);
     DumpData(opath + 'IACT\' + rightstr('000' + inttostr(id), 3) + '-'+rightstr('00'+inttostr(k),2), DTA.GetIndex, size);
-    DumpText(id, k);
   end;
 end;
 
-procedure TMainForm.DumpText(id: Word; k: Byte);
+procedure TMainForm.DumpText(index: Cardinal; size: Word; mapID: Word; iactID: Byte);
+var idx, tempIndex: Cardinal;
+  sz, i, j: Word;
+  phase, b: Byte;
+  s: String;
 begin
-        ///
+  idx := index;
+  phase := 0;
+
+  while index < idx + size - 2 do
+  begin
+    tempIndex := index;
+    sz := DTA.ReadWord;
+    HEX.SetSelStart(DTA.GetIndex);
+    Application.ProcessMessages;
+    ShowMessage(inttohex(size, 4));
+    if sz < $0200 then            // correct max size
+    begin
+      phase := 2;                 // size correct, maybe text?
+      if index + size < idx + size -2 then
+        for j := 1 to sz do
+        begin
+          b := DTA.ReadByte;
+          if (b < $20) and (b <> $0D) and (b <> $0A) then phase := 1;
+        end;
+      if phase = 2 then
+      begin
+        s := '';
+        DTA.SetIndex(tempindex + 2);
+        for j := 1 to sz do
+        begin
+          b := DTA.ReadByte;
+          s := s + chr(b);
+        end;
+        Showmessage(s);
+        tempIndex := DTA.GetIndex - 1;
+      end;
+    end;
+    index := tempIndex + 1;
+  end;
+
+  DTA.SetIndex(idx);
 end;
 
 

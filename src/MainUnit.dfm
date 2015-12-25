@@ -17,7 +17,7 @@ object MainForm: TMainForm
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 0
-    Top = 452
+    Top = 252
     Width = 1111
     Height = 12
     Cursor = crVSplit
@@ -37,7 +37,7 @@ object MainForm: TMainForm
     Left = 0
     Top = 0
     Width = 1111
-    Height = 452
+    Height = 252
     ActivePage = TabSheet5
     Align = alClient
     MultiLine = True
@@ -673,9 +673,9 @@ object MainForm: TMainForm
   end
   object BottomPageControl: TPageControl
     Left = 0
-    Top = 464
+    Top = 264
     Width = 1111
-    Height = 300
+    Height = 500
     ActivePage = TabSheet9
     Align = alBottom
     TabIndex = 1
@@ -699,7 +699,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 1103
-        Height = 272
+        Height = 472
         Cursor = crIBeam
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
