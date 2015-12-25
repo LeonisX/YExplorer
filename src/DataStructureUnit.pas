@@ -521,7 +521,7 @@ var sz: Cardinal;
 i: Word;
 begin
   sz:=ReadLongWord;             //4 bytes - length of section TILE
-  Add(sectionName, sz - 4, sz + 4 + 4, index + 4, index - 4 - 4);
+  Add(sectionName, sz, sz + 4 + 4, index, index - 4 - 4);
   MoveIndex(sz);
   tilesCount := sz div $404;
   SetLength(tiles, tilesCount);

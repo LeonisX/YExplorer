@@ -153,6 +153,7 @@ type
     procedure ReadTNAM;
     procedure ReadTGEN;
     procedure DumpData(fileName: String; offset, size: Cardinal);
+    procedure DumpText(id: Word; k: Byte);
 
     procedure ShowHEXCaretIndex;
 
@@ -708,7 +709,6 @@ begin
     begin
       b := DTA.ReadByte;
       Write(f, b);
-      //DTA.MoveIndex(1);
     end;
   CloseFile(f);
 end;
@@ -739,24 +739,25 @@ begin
 end;
 
 procedure TMainForm.ReadIACT(id: Word);
-label l1, l2;
-var s: String;
-size, idx: Longword;
-k: Integer;
+var size: Longword;
+k: Byte;
 begin
   k := 0;
   DTA.SetIndex(TMap(DTA.maps.Objects[id]).iactOffset);
-l1:
-  if DTA.ReadString(4) <> 'IACT' then goto l2;
-  inc(k);
-  size := DTA.ReadLongWord;  //4 bytes: length (X)
-  DumpData(opath + 'IACT\' + rightstr('000' + inttostr(id), 3) + '-'+rightstr('00'+inttostr(k),2), DTA.GetIndex, size);
-  goto l1;
-l2:
-  //seek(SrcFile,filepos(SrcFile)-4);
-//  showmessage(inttohex(filepos(SrcFile),4));
-//  showmessage('IACTs all');
+  while DTA.ReadString(4) <> 'IACT' do
+  begin
+    inc(k);
+    size := DTA.ReadLongWord;  //4 bytes: length (X)
+    DumpData(opath + 'IACT\' + rightstr('000' + inttostr(id), 3) + '-'+rightstr('00'+inttostr(k),2), DTA.GetIndex, size);
+    DumpText(id, k);
+  end;
 end;
+
+procedure TMainForm.DumpText(id: Word; k: Byte);
+begin
+        ///
+end;
+
 
 procedure TMainForm.HEXMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
@@ -1009,7 +1010,7 @@ begin
       p := ClipboardImage.Picture.Bitmap.ScanLine[i + selectedTileY];
       for j := 0 to 31 do
         begin
-          DTA.dta[DTA.GetDataOffset(knownSections[4]) + selectedCell * $404 + i * 32 + j] := p[j + selectedTileX];
+          DTA.dta[DTA.GetDataOffset(knownSections[4]) + selectedCell * $404 + 4 + i * 32 + j] := p[j + selectedTileX];
         end;
     end;
     TilesDrawGrid.Repaint;

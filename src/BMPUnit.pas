@@ -255,7 +255,7 @@ procedure GetTile(section: TSection; id: Word; bmp: TBitmap);
 var i, j, index2: Cardinal;
   p: PByteArray;
 begin
-  index2 := section.GetDataOffset(knownSections[4]) + id * $404;
+  index2 := section.GetDataOffset(knownSections[4]) + id * $404 + 4;
   for i := 0 to bmp.Height - 1 do
   begin
     p := bmp.ScanLine[i];
