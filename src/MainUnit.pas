@@ -76,21 +76,7 @@ type
     TitleImage: TImage;
     TileImage: TImage;
     MapImage: TImage;
-    GroupBox11: TGroupBox;
-    TGENCB: TCheckBox;
-    GroupBox10: TGroupBox;
-    TNAMCB: TCheckBox;
-    CTCB: TCheckBox;
-    GroupBox9: TGroupBox;
-    CAUXCB: TCheckBox;
-    GroupBox8: TGroupBox;
-    CHWPCB: TCheckBox;
-    GroupBox7: TGroupBox;
-    CHARCB: TCheckBox;
-    GroupBox6: TGroupBox;
-    PUZ2CB: TCheckBox;
     Button2: TButton;
-    Button1: TButton;
     Splitter1: TSplitter;
     MapsStringGrid: TStringGrid;
     TilesDrawGrid: TDrawGrid;
@@ -110,7 +96,9 @@ type
     Edit1: TEdit;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
-    procedure Button1Click(Sender: TObject);
+    Button9: TButton;
+    Button10: TButton;
+    Button11: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -138,6 +126,9 @@ type
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
     procedure Button8Click(Sender: TObject);
+    procedure Button9Click(Sender: TObject);
+    procedure Button10Click(Sender: TObject);
+    procedure Button11Click(Sender: TObject);
   private
     texts: TStringList;
   public
@@ -155,7 +146,7 @@ type
     procedure ReadTNAM;
     procedure ReadTGEN;
     procedure DumpData(fileName: String; offset, size: Cardinal);
-    procedure DumpText(index: Cardinal; size: Word; mapID: Word; iactID: Byte);
+    procedure DumpText(index: Cardinal; size: Word);
 
     procedure ShowHEXCaretIndex;
 
@@ -174,142 +165,6 @@ var
 implementation
 
 {$R *.dfm}
-
-
-
-
-
-procedure TMainForm.Button1Click(Sender: TObject);
-var keepReading:boolean;
-s:string;
-begin
-  log.Clear;
-
-  CreateDir('output');
-  assignfile(SrcFile, 'input\Yodesk.dta');
-  Reset(SrcFile,1);
-
-  keepReading:=true;
-  while (keepReading) do
-    begin
-      s := DTA.ReadString(4);
-      case DTA.ChunkIndex(s) of
-       6: ReadPUZ2; //ещё диалоги
-       7: ReadCHAR; //персонажи?
-       8: ReadCHWP; //персонажи?????
-       9: ReadCAUX; //персонажи?????
-       10: ReadTNAM; //названия+тайлы
-       11: ReadTGEN; //встречается в германском образе. Что такое - не знаю.
-       12: keepReading:=false;
-      else
-       begin
-        showmessage('Неизвестная секция: '+s);
-        keepReading:=false;
-       end;
-      end;
-  end;
-  closefile(SrcFile);
-  LOG.debug('всё...');
-end;
-
-procedure TMainForm.ReadTGEN;
-var size:longword;
-begin
-  size := DTA.ReadLongWord;
-  LOG.debug('TGEN: '+inttohex(size,4)); //4 байта - длина блока TGEN
-  if TGENCB.Checked then
-    begin
-    //надо расшифровать
-    showmessage('Обработка tGEN пока не поддерживается!!!');
-    seek(SrcFile,filepos(SrcFile) + size);
-    end else
-       seek(SrcFile,filepos(SrcFile) + size);
-end;
-
-procedure TMainForm.ReadTNAM;
-var size:longword;
-k:word;
-s:string;
-begin
-  size:=DTA.ReadLongWord;
-  LOG.debug('TNAM: '+inttohex(size,4)); //4 байта - длина блока TNAM
-  if TNAMCB.Checked then
-    begin
-      CreateDir('output/Names');
-      repeat
-         k:=DTA.ReadWord; //2 байта - номер персонажа (тайла)
-         if k=$FFFF then break;
-         s:=DTA.ReadString(24); //24 байта - длина до конца текущего имени
-         s:=leftstr(s,pos(chr(0),s)-1);
-         if CTCB.Checked then CopyFile(pchar('output/Tiles/'+rightstr('000'+inttostr(k),4)+'.bmp'),
-                                 pchar('output/Names/'+s+'.bmp'),false);
-         LOG.debug(s);
-//         showmessage(s);
-      until false;
-    end else
-       seek(SrcFile,filepos(SrcFile)+size);
-end;
-
-procedure TMainForm.ReadCAUX;
-var size:longword;
-begin
-  size:=DTA.ReadLongWord;
-  LOG.debug('CAUX: '+inttohex(size,4)); //4 байта - длина блока CAUX
-  if CAUXCB.Checked then
-    begin
-    //надо расшифровать
-    showmessage('Обработка CAUX пока не поддерживается!!!');
-    seek(SrcFile,filepos(SrcFile)+size);
-    end else
-       seek(SrcFile,filepos(SrcFile)+size);
-end;
-
-procedure TMainForm.ReadCHWP;
-var size:longword;
-begin
-  size:=DTA.ReadLongWord;
-  LOG.debug('CHWP: '+inttohex(size,4)); //4 байта - длина блока CHWP
-  if CHWPCB.Checked then
-    begin
-    //надо расшифровать
-    showmessage('Обработка CHWP пока не поддерживается!!!');
-    seek(SrcFile,filepos(SrcFile)+size);
-    end else
-       seek(SrcFile,filepos(SrcFile)+size);
-end;
-
-procedure TMainForm.ReadCHAR;
-var size:longword;
-begin
-  size:=DTA.ReadLongWord;
-  LOG.debug('CHAR: '+inttohex(size,4)); //4 байта - длина блока CHAR
-  if CHARCB.Checked then
-    begin
-    //2 байта - номер персонажа
-    //4 байта ICHA
-    //4 байта - длина до конца текущего
-    showmessage('Обработка CHAR пока не поддерживается!!!');
-    seek(SrcFile,filepos(SrcFile)+size);
-    end else
-       seek(SrcFile,filepos(SrcFile)+size);
-end;
-
-procedure TMainForm.ReadPUZ2;
-var size:longword;
-begin
-  size:=DTA.ReadLongWord;
-  LOG.debug('PUZ2: '+inttohex(size,4)); //4 байта - длина блока PUZ2
-  if PUZ2CB.Checked then
-    begin
-    //2 байта - не используется (00 00)
-    //2 байта - номер паззла
-    //4 байта IPUZ
-    //2 байта - длина паззла (до конца текущего)
-    showmessage('Обработка PUZ2 пока не поддерживается!!!');
-    seek(SrcFile,filepos(SrcFile)+size);
-    end else
-       seek(SrcFile,filepos(SrcFile)+size);
-end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
@@ -477,7 +332,7 @@ begin
 end;
 
 procedure TMainForm.ListSNDSButtonClick(Sender: TObject);
-var sz, msz, i: Integer;
+var msz, i: Integer;
   title: String;
 begin
   Log.Clear;
@@ -513,7 +368,7 @@ end;
 
 procedure TMainForm.SaveTilesButtonClick(Sender: TObject);
 var tilesPath, hexPath, attrPath, attrFullPath, title: String;
-attr, sz, i: Cardinal;
+attr, i: Cardinal;
 begin
   TilesProgressBar.Position := 0;
   TilesProgressBar.Max := DTA.tilesCount;
@@ -614,14 +469,13 @@ end;
 
 procedure TMainForm.ReadIZON(id: Word; save: Boolean);
 var s: String;
-size: Longword;
-k, w, h, p, i, j, flag, planet: Word;
+k, w, h, i, j, flag, planet: Word;
 begin
   DTA.SetIndex(TMap(DTA.maps.Objects[id]).mapOffset);   // go to map data
   pn := DTA.ReadWord;               // number:word; //2 bytes - serial number of the map starting with 0
   if pn <> id then ShowMessage(IntToStr(pn) + ' <> ' + IntToStr(id));
   DTA.ReadString(4);                // izon:string[4]; //4 bytes: "IZON"
-  size := DTA.ReadLongWord;         // longword; //4 bytes - size of block IZON (include 'IZON') until object info entry count
+  DTA.ReadLongWord;                 // longword; //4 bytes - size of block IZON (include 'IZON') until object info entry count
 
   Application.ProcessMessages;
 
@@ -764,7 +618,7 @@ begin
 //    HEX.CenterCursorPosition;
 //    Application.ProcessMessages;
     size := DTA.ReadLongWord;  //4 bytes: length (X)
-    if CheckBox2.Checked then DumpText(DTA.GetIndex, size, id, k);
+    if CheckBox2.Checked then DumpText(DTA.GetIndex, size);
     if ActionsCheckBox.Checked then
        DumpData(opath + 'IACT\' + rightstr('000' + inttostr(id), 3) + '-'+rightstr('00'+inttostr(k),2), DTA.GetIndex, size)
        else DTA.MoveIndex(size);
@@ -800,15 +654,14 @@ begin
   if text[1] = ':' then result := true;
 end;
 
-procedure TMainForm.DumpText(index: Cardinal; size: Word; mapID: Word; iactID: Byte);
+procedure TMainForm.DumpText(index: Cardinal; size: Word);
 var idx, tempIndex: Cardinal;
-  sz, i, j: Word;
+  sz, j: Word;
   phase, b: Byte;
   s: String;
 begin
   idx := index;
-  phase := 1;
-  //Log.NewLine;
+  //phase := 1;
   while DTA.GetIndex < idx + size - 2 do
   begin
     //Log.Debug('Start new scan: ' + IntToHex(DTA.GetIndex, 6));
@@ -817,16 +670,9 @@ begin
     //Log.Debug('Size: ' + IntToHex(sz, 4));
     if (sz < $0300) and (sz > $0002) then            // correct max size
     begin
-      //Log.Debug('phase2');
       phase := 2;                 // size correct, maybe text?
-      //HEX.SetSelStart(DTA.GetIndex - 2);
-      //HEX.SetSelEnd(DTA.GetIndex - 1);
       Application.ProcessMessages;
-      //ShowMessage(inttohex(sz, 4));
-
-      //Log.Debug('Test for crazy symbols: ' + IntToHex(DTA.GetIndex, 6) + ':' + IntToHex(DTA.GetIndex + sz - 1, 6));
       s := '';
-      //Log.Debug('DTA.index + sz: ' + IntToHex(DTA.GetIndex + sz, 6) + ':' + IntToHex(idx + size, 6));
       if DTA.GetIndex + sz <= idx + size + 4 then
         for j := 1 to sz do
         begin
@@ -836,13 +682,10 @@ begin
           if (b = ord('\')) or (b = ord('@')) or (b = ord('^')) or (b = ord('¶')) or (b = ord('<')) or (b = ord('»'))  or (b = ord('(')) or (b = ord(')')) then phase := 1;
         end
       else phase := 1;
-      //Log.Debug('Bytes:  ' + s);
-      //Log.Debug('Phase:  ' + IntToHex(phase, 1));
       if phase = 2 then
       begin
         s := '';
         DTA.SetIndex(tempIndex + 2);
-        //Log.Debug('String: ' + IntToHex(DTA.GetIndex, 6) + ':' + IntToHex(DTA.GetIndex + sz - 1, 6));
         for j := 1 to sz do
         begin
           b := DTA.ReadByte;
@@ -854,13 +697,11 @@ begin
         if not idDeprecatedWords(s) then
         begin
          texts.Add(s);
-        //Log.Debug(s);
-//        Showmessage(s);
-         tempIndex := DTA.GetIndex;
+         tempIndex := DTA.GetIndex - 1;
         end;
-        phase := 1;
+        //phase := 1;
       end;
-    end; // else Log.Debug('Size don"t match');
+    end;
     DTA.SetIndex(tempIndex + 1);
   end;
 
@@ -902,48 +743,48 @@ begin
 end;
 
 procedure TMainForm.MapsStringGridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
-var pos: Cardinal;
+var pos: Integer;
 begin
   case ACol of
     0..2: begin
             pos := StrToInt(MapsStringGrid.Cells[1, ARow]);
             HEX.SetSelStart(pos);
-            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[2, ARow]) -1);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[2, ARow]) - 1);
           end;
     3, 4: begin
             pos := StrToInt(MapsStringGrid.Cells[3, ARow]);
             HEX.SetSelStart(pos);
-            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[4, ARow]) -1);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[4, ARow]) - 1);
           end;
     5..7: begin
             pos := StrToInt(MapsStringGrid.Cells[5, ARow]);
             HEX.SetSelStart(pos);
-            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[6, ARow]) -1);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[6, ARow]) - 1);
           end;
     8, 9: begin
             pos := StrToInt(MapsStringGrid.Cells[8, ARow]);
             HEX.SetSelStart(pos);
-            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[9, ARow]) -1);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[9, ARow]) - 1);
           end;
     10, 11: begin
             pos := StrToInt(MapsStringGrid.Cells[10, ARow]);
             HEX.SetSelStart(pos);
-            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[11, ARow]) -1);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[11, ARow]) - 1);
           end;
     12, 13: begin
             pos := StrToInt(MapsStringGrid.Cells[12, ARow]);
             HEX.SetSelStart(pos);
-            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[13, ARow]) -1);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[13, ARow]) - 1);
           end;
     14, 15: begin
             pos := StrToInt(MapsStringGrid.Cells[14, ARow]);
             HEX.SetSelStart(pos);
-            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[15, ARow]) -1);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[15, ARow]) - 1);
           end;
     16, 17: begin
             pos := StrToInt(MapsStringGrid.Cells[16, ARow]);
             HEX.SetSelStart(pos);
-            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[17, ARow]) -1);
+            HEX.SetSelEnd(pos + StrToInt(MapsStringGrid.Cells[17, ARow]) - 1);
           end;
   end;
   HEX.CenterCursorPosition;
@@ -1150,8 +991,7 @@ begin
 end;
 
 procedure TMainForm.Button8Click(Sender: TObject);
-var w, h, left, top, i, j, k, l: Word;
-p: PByteArray;
+var w, h, i, j: Word;
 begin
   w := StrToInt(Edit1.text);
   h := DTA.tilesCount div w + 1;
@@ -1174,6 +1014,183 @@ begin
                end;
 
   BMP2.SaveToFile(opath + 'tiles' + inttostr(w) +'x' + inttostr(h) + '.bmp');
+end;
+
+procedure TMainForm.Button9Click(Sender: TObject);
+var i: Word;
+begin
+  CreateDir(opath);
+  CreateDir(opath + 'PUZ2');
+  Log.Clear;
+  Log.Debug('Puzzles (2):');
+  Log.NewLine;
+  Log.Debug('Total count: ' + IntToStr(DTA.puzzlesCount));
+  Log.NewLine;
+  texts.Clear;
+  DTA.SetIndex(DTA.GetDataOffset(knownSections[6]));            // PUZ2
+  for i:=0 to DTA.puzzlesCount - 1 do ReadPUZ2;
+  texts.SaveToFile(opath + 'puz2.txt');
+end;
+
+
+procedure TMainForm.ReadPUZ2;
+var pz: Word;
+psz: LongWord;
+begin
+  pz := DTA.ReadWord;             //2 bytes - index of puzzle (from 0)
+  DTA.ReadString(4);              //4 bytes - 'IPUZ'
+  psz := DTA.ReadLongWord;        //4 bytes - rest of current puzzle length
+  DumpText(DTA.GetIndex, psz);
+  Log.Debug('Puzzle #' + IntToStr(pz) + '; Size: $' + IntToHex(psz, 4));
+  DumpData(opath + 'PUZ2\' + rightstr('000' + inttostr(pz), 4), DTA.GetIndex, psz);
+end;
+
+
+procedure TMainForm.Button10Click(Sender: TObject);
+var i: Word;
+begin
+  CreateDir(opath);
+  CreateDir(opath + 'CHAR');
+  CreateDir(opath + 'Characters');
+  CreateDir(opath + 'CAUX');
+  CreateDir(opath + 'CHWP');
+  Log.Clear;
+  Log.Debug('Characters:');
+  Log.NewLine;
+  Log.Debug('Total count: ' + IntToStr(DTA.charsCount));
+  Log.NewLine;
+  texts.Clear;
+  DTA.SetIndex(DTA.GetDataOffset(knownSections[7]));            // CHAR
+  for i:=0 to DTA.charsCount - 1 do ReadCHAR;
+  DTA.SetIndex(DTA.GetDataOffset(knownSections[8]));            // CHWP
+  for i:=0 to DTA.charsCount - 1 do ReadCHWP;
+  DTA.SetIndex(DTA.GetDataOffset(knownSections[9]));            // CAUX
+  //incorrect CAUX offset!!!!!!!!!!!!!!
+  //Showmessage(inttohex(DTA.GetIndex,6));
+  for i:=0 to DTA.charsCount - 1 do ReadCAUX;
+  texts.SaveToFile(opath + 'chars.txt');
+end;
+
+
+procedure TMainForm.ReadCHAR;
+var csz, idx: Longword;
+ch, tl: Word;
+name, seq: String;
+k, n: Byte;
+begin
+  ch := DTA.ReadWord;             //2 bytes - index of character
+  DTA.ReadString(4);              //4 bytes - 'ICHA'
+  csz := DTA.ReadLongWord;        //4 bytes - rest of current character length; always 74
+  idx := DTA.GetIndex;
+  // тут сделать обработку текста, спрайтиков
+  name := '';
+  k := DTA.ReadByte;
+  while k <> 0 do
+  begin
+    name := name + chr(k);              // Character name, ended with $00 <= 16
+    k := DTA.ReadByte;
+  end;
+  seq := '';
+  if Length(name) mod 2 = 0 then seq := seq + IntToHex(DTA.ReadByte, 2) + ' ';
+  k := DTA.ReadByte;
+  n := DTA.ReadByte;
+  while (k <> $FF) and (n <> $FF) do    // unknown data 2 bytes * x, ended with $FF FF
+  begin
+    seq := seq + IntToHex(k, 2) + ' ' + IntToHex(n, 2) + ' ';
+    k := DTA.ReadByte;
+    n := DTA.ReadByte;
+  end;
+  DTA.ReadLongWord;                     // 4 bytes 00 00 00 00
+  while DTA.GetIndex < idx + csz do
+  begin
+    tl := DTA.ReadWord;                 // REST - sequence of tiles # (2 bytes), or $FF FF
+    if tl <> $FFFF then
+    begin
+      CreateDir(opath + 'Characters\' + name);
+      GetTile(dta, tl, bmp);
+      bmp.SaveToFile(opath + 'Characters\' + name + '\' + rightstr('000' + inttostr(tl), 4) + eBMP);
+    end;
+  end;
+  //ReadString(csz);
+  Log.Debug(seq + '      : ' + name);
+  DTA.SetIndex(idx);
+  DumpData(opath + 'CHAR\' + rightstr('00' + inttostr(ch), 3), DTA.GetIndex, csz);
+end;
+
+procedure TMainForm.ReadCHWP;
+var //size:longword;
+ch: Word;
+begin
+//  size := DTA.ReadLongWord;
+  ch := DTA.ReadWord;
+  DumpData(opath + 'CHWP\' + rightstr('00' + inttostr(ch), 3), DTA.GetIndex, 4);
+end;
+
+procedure TMainForm.ReadCAUX;
+var //size:longword;
+ch: Word;
+begin
+//  size:=DTA.ReadLongWord;
+  ch := DTA.ReadWord;
+  DumpData(opath + 'CAUX\' + rightstr('00' + inttostr(ch), 3), DTA.GetIndex, 2);
+end;
+
+function GetFileName(name: String): String;
+var s: String;
+b: Byte;
+begin
+  if not FileExists(opath + 'Names\' + name  + eBMP) then  result := ''
+  else begin
+    b := 2;
+    while FileExists(opath + 'Names\' + name + ' (' + inttostr(b) + ')' + eBMP) do inc(b);
+    s := ' (' + inttostr(b) + ')';
+  end;
+  result := opath + 'Names\' + name + s + eBMP;
+end;
+
+
+procedure TMainForm.ReadTNAM;
+var k: Word;
+s: String;
+begin
+  Log.Clear;
+  Log.Debug('Names:');
+  Log.NewLine;
+  Log.Debug('Total count: ' + IntToStr(DTA.namesCount));
+  Log.NewLine;
+  texts.Clear;
+  DTA.SetIndex(DTA.GetDataOffset(knownSections[10]));            // TNAM
+  BMP.Width := TileSize;
+  BMP.Height := TileSize;
+  CreateDir(opath);
+  CreateDir(opath + 'Names');
+  repeat
+    k := DTA.ReadWord; //2 байта - номер персонажа (тайла)
+    if k = $FFFF then break;
+    s := DTA.ReadString(24); //24 байта - длина до конца текущего имени
+    s := leftstr(s, pos(chr(0), s) - 1);
+    texts.Add(s);
+    GetTile(dta, k, bmp);
+    bmp.SaveToFile(GetFileName(s));
+//        bmp.SaveToFile(opath + 'Names\' + s + eBMP);
+  until false;
+  texts.SaveToFile(opath + 'names.txt');
+end;
+
+procedure TMainForm.ReadTGEN;
+var size: Integer;
+begin
+  size := DTA.ReadLongWord;
+  LOG.debug('TGEN: '+inttohex(size,4)); //4 байта - длина блока TGEN
+  //надо расшифровать
+  showmessage('Обработка tGEN пока не поддерживается!!!');
+  seek(SrcFile,filepos(SrcFile) + size);
+end;
+
+
+procedure TMainForm.Button11Click(Sender: TObject);
+begin
+  ReadTNAM;
 end;
 
 end.

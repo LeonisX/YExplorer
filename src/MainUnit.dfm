@@ -1,8 +1,8 @@
 object MainForm: TMainForm
   Left = 192
   Top = 114
-  Width = 626
-  Height = 817
+  Width = 1203
+  Height = 847
   Caption = 'Yoda Stories Explorer'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,8 +17,8 @@ object MainForm: TMainForm
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 0
-    Top = 348
-    Width = 618
+    Top = 378
+    Width = 1195
     Height = 12
     Cursor = crVSplit
     Align = alBottom
@@ -36,12 +36,12 @@ object MainForm: TMainForm
   object PageControl: TPageControl
     Left = 0
     Top = 0
-    Width = 618
-    Height = 348
-    ActivePage = TabSheet5
+    Width = 1195
+    Height = 378
+    ActivePage = TabSheet10
     Align = alClient
     MultiLine = True
-    TabIndex = 4
+    TabIndex = 7
     TabOrder = 1
     Visible = False
     object TabSheet1: TTabSheet
@@ -108,127 +108,14 @@ object MainForm: TMainForm
         TabOrder = 0
         OnSelectCell = SectionsStringGridSelectCell
       end
-      object GroupBox11: TGroupBox
-        Left = 694
-        Top = 283
-        Width = 106
-        Height = 34
-        Caption = ' TGEN '
-        TabOrder = 1
-        object TGENCB: TCheckBox
-          Left = 14
-          Top = 13
-          Width = 87
-          Height = 17
-          Caption = 'Process TGEN'
-          TabOrder = 0
-        end
-      end
-      object GroupBox10: TGroupBox
-        Left = 655
-        Top = 258
-        Width = 145
-        Height = 59
-        Caption = ' TNAM '
-        TabOrder = 2
-        object TNAMCB: TCheckBox
-          Left = 14
-          Top = 13
-          Width = 107
-          Height = 17
-          Caption = 'Process TNAM'
-          TabOrder = 0
-        end
-        object CTCB: TCheckBox
-          Left = 14
-          Top = 29
-          Width = 87
-          Height = 17
-          Caption = 'Copy tiles'
-          TabOrder = 1
-        end
-      end
-      object GroupBox9: TGroupBox
-        Left = 600
-        Top = 283
-        Width = 106
-        Height = 34
-        Caption = ' CAUX '
-        TabOrder = 3
-        object CAUXCB: TCheckBox
-          Left = 14
-          Top = 13
-          Width = 87
-          Height = 17
-          Caption = 'Process CAUX'
-          TabOrder = 0
-        end
-      end
-      object GroupBox8: TGroupBox
-        Left = 560
-        Top = 283
-        Width = 106
-        Height = 34
-        Caption = ' CHWP '
-        TabOrder = 4
-        object CHWPCB: TCheckBox
-          Left = 14
-          Top = 13
-          Width = 87
-          Height = 17
-          Caption = 'Process CHWP'
-          TabOrder = 0
-        end
-      end
-      object GroupBox7: TGroupBox
-        Left = 448
-        Top = 283
-        Width = 106
-        Height = 34
-        Caption = ' CHAR '
-        TabOrder = 5
-        object CHARCB: TCheckBox
-          Left = 14
-          Top = 13
-          Width = 87
-          Height = 17
-          Caption = 'Process CHAR'
-          TabOrder = 0
-        end
-      end
-      object GroupBox6: TGroupBox
-        Left = 336
-        Top = 283
-        Width = 106
-        Height = 34
-        Caption = ' PUZ2 '
-        TabOrder = 6
-        object PUZ2CB: TCheckBox
-          Left = 14
-          Top = 13
-          Width = 87
-          Height = 17
-          Caption = 'Process PUZ2'
-          TabOrder = 0
-        end
-      end
       object Button2: TButton
         Left = 80
         Top = 292
         Width = 75
         Height = 25
         Caption = 'LoadBMP'
-        TabOrder = 7
+        TabOrder = 1
         OnClick = Button2Click
-      end
-      object Button1: TButton
-        Left = -8
-        Top = 292
-        Width = 75
-        Height = 25
-        Caption = 'Process DTA'
-        TabOrder = 8
-        OnClick = Button1Click
       end
       object Button6: TButton
         Left = 16
@@ -236,7 +123,7 @@ object MainForm: TMainForm
         Width = 75
         Height = 25
         Caption = 'Save DTA'
-        TabOrder = 9
+        TabOrder = 2
         OnClick = Button6Click
       end
     end
@@ -635,6 +522,15 @@ object MainForm: TMainForm
         Width = 3
         Height = 13
       end
+      object Button9: TButton
+        Left = 6
+        Top = 32
+        Width = 107
+        Height = 25
+        Caption = 'Save puzzles to files'
+        TabOrder = 0
+        OnClick = Button9Click
+      end
     end
     object TabSheet7: TTabSheet
       Caption = 'Characters'
@@ -651,6 +547,15 @@ object MainForm: TMainForm
         Top = 8
         Width = 3
         Height = 13
+      end
+      object Button10: TButton
+        Left = 6
+        Top = 32
+        Width = 123
+        Height = 25
+        Caption = 'Save characters to files'
+        TabOrder = 0
+        OnClick = Button10Click
       end
     end
     object TabSheet10: TTabSheet
@@ -669,12 +574,21 @@ object MainForm: TMainForm
         Width = 3
         Height = 13
       end
+      object Button11: TButton
+        Left = 6
+        Top = 32
+        Width = 123
+        Height = 25
+        Caption = 'Save names to files'
+        TabOrder = 0
+        OnClick = Button11Click
+      end
     end
   end
   object BottomPageControl: TPageControl
     Left = 0
-    Top = 360
-    Width = 618
+    Top = 390
+    Width = 1195
     Height = 404
     ActivePage = TabSheet9
     Align = alBottom
@@ -698,7 +612,7 @@ object MainForm: TMainForm
       object HEX: TMPHexEditor
         Left = 0
         Top = 0
-        Width = 610
+        Width = 1187
         Height = 376
         Cursor = crIBeam
         Align = alClient
@@ -738,8 +652,8 @@ object MainForm: TMainForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 764
-    Width = 618
+    Top = 794
+    Width = 1195
     Height = 19
     Panels = <
       item

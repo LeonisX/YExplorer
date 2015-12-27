@@ -50,10 +50,10 @@ type
     procedure AddMap(id: Word);
 
     procedure Add(section: String; dataSize, fullSize, dataOffset, startOffset: Cardinal);
-    function GetStartOffset(section: String): Integer;
-    function GetDataOffset(section: String): Integer;
-    function GetDataSize(section: String): Integer;
-    function GetFullSize(section: String): Integer;
+    function GetStartOffset(section: String): Cardinal;
+    function GetDataOffset(section: String): Cardinal;
+    function GetDataSize(section: String): Cardinal;
+    function GetFullSize(section: String): Cardinal;
     function Have(section: String): Boolean;
 
     procedure ReadDTAMetricks(fileName: String);
@@ -65,7 +65,7 @@ type
     procedure MoveIndex(offset: Integer);
     function GetIndex: Cardinal;
 
-    function ReadString(size: Integer): String;
+    function ReadString(size: Cardinal): String;
     function ReadByte: Byte;
     //так как следующие данные по 2-4 байта, надо по необходимости преобразовывать их
     //в читабельный вариант
@@ -155,22 +155,22 @@ begin
   sections.AddObject(section, TSectionMetricks.Create(dataSize, fullSize, dataOffset, startOffset))
 end;
 
-function TSection.GetStartOffset(section: String): integer;
+function TSection.GetStartOffset(section: String): Cardinal;
 begin
   result := TSectionMetricks(sections.Objects[sections.IndexOf(section)]).startOffset;
 end;
 
-function TSection.GetDataOffset(section: String): integer;
+function TSection.GetDataOffset(section: String): Cardinal;
 begin
   result := TSectionMetricks(sections.Objects[sections.IndexOf(section)]).dataOffset;
 end;
 
-function TSection.GetDataSize(section: String): integer;
+function TSection.GetDataSize(section: String): Cardinal;
 begin
   result := TSectionMetricks(sections.Objects[sections.IndexOf(section)]).dataSize;
 end;
 
-function TSection.GetFullSize(section: String): integer;
+function TSection.GetFullSize(section: String): Cardinal;
 begin
   result := TSectionMetricks(sections.Objects[sections.IndexOf(section)]).fullSize;
 end;
@@ -217,7 +217,7 @@ end;
 procedure TSection.readDTAMetricks(fileName: String);
 var keepReading:boolean;
 s: String;
-i, k: Integer;
+i: Integer;
 begin
   Log.Debug('DTA file internal structure');
   Log.Debug('===========================');
@@ -264,7 +264,6 @@ begin
   Log.Debug(Format('%7s %12s %11s %12s %11s', ['Section', 'Data offset', 'Data size', 'Start offset', 'Full size']));
   for i := 0 to sections.Count - 1 do
     begin
-    if k < 0 then k := 0;
      Log.Debug(Format('%7s %12x %11d %12x %11d',
        [sections[i],
         TSectionMetricks(sections.Objects[i]).dataOffset,
@@ -319,6 +318,7 @@ begin
     ReadString(24);             //24 bytes - rest of current name length
     inc(count);
   end;
+  namesCount := count;
   Log.Debug(sectionName + ': ' + InttoStr(count));
 end;
 
@@ -388,7 +388,7 @@ end;
 procedure TSection.ScanZONE(sectionName: String);
 var sz: Longword;
 i: Word;
-ind: Integer;
+ind: Cardinal;
 begin
   //Signature: String[4];       // 4 bytes: "ZONE" - уже прочитано
   ind := index;
@@ -653,8 +653,8 @@ begin
   MoveIndex(4);
 end;
 
-function TSection.ReadString(size: integer):string;
-var i:integer;
+function TSection.ReadString(size: Cardinal):string;
+var i: Cardinal;
 begin
   result := '';
   for i := 0 to size - 1 do result := result + chr(dta[index + i]);
