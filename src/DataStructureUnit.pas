@@ -74,6 +74,8 @@ type
     function ReadRWord: Word;  //читает обратный порядок, little-endian, преобразует в нормальное число
     function ReadRLongWord: Longword; //читает обратный порядок, little-endian, преобразует в нормальное число
 
+    procedure WriteLongWord(lw: Longword);
+
     constructor Create;
     destructor Destroy; override;
 
@@ -98,6 +100,9 @@ type
 
     function ChunkIndex(s: String): Byte;
     function InBound(section: String): Boolean;
+
+    function GetTileFlag(id: Word): Cardinal;
+    procedure SetTileFlag(id: Word; flag: Cardinal);
   end;
 
   var DTA: TSection;
@@ -131,6 +136,18 @@ begin
   Self.fullSize := fullSize;
   Self.startOffset := startOffset;
   Self.dataOffset := dataOffset;
+end;
+
+function TSection.GetTileFlag(id: Word): Cardinal;
+begin
+  SetIndex(GetDataOffset(knownSections[4]) + id * $404);
+  result := ReadLongWord;
+end;
+
+procedure TSection.SetTileFlag(id: Word; flag: Cardinal);
+begin
+  SetIndex(GetDataOffset(knownSections[4]) + id * $404);
+  WriteLongWord(flag);
 end;
 
 procedure TSection.Clear;
@@ -622,6 +639,14 @@ begin
   result := index;
 end;
 
+procedure TSection.WriteLongWord(lw: Longword);
+begin
+  dta[index]     := lw and $000000FF;
+  dta[index + 1] := (lw and $0000FF00) shr 8;
+  dta[index + 2] := (lw and $00FF0000) shr 16;
+  dta[index + 3] := (lw and $FF000000) shr 24;
+  MoveIndex(4);
+end;
 
 function TSection.ReadByte: byte;
 begin

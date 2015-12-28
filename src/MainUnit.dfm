@@ -1,7 +1,7 @@
 object MainForm: TMainForm
   Left = 192
   Top = 114
-  Width = 1203
+  Width = 861
   Height = 847
   Caption = 'Yoda Stories Explorer'
   Color = clBtnFace
@@ -10,6 +10,7 @@ object MainForm: TMainForm
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
+  Menu = MainMenu1
   OldCreateOrder = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -17,8 +18,8 @@ object MainForm: TMainForm
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 0
-    Top = 378
-    Width = 1195
+    Top = 444
+    Width = 853
     Height = 12
     Cursor = crVSplit
     Align = alBottom
@@ -36,12 +37,12 @@ object MainForm: TMainForm
   object PageControl: TPageControl
     Left = 0
     Top = 0
-    Width = 1195
-    Height = 378
-    ActivePage = TabSheet10
+    Width = 853
+    Height = 444
+    ActivePage = TabSheet4
     Align = alClient
     MultiLine = True
-    TabIndex = 7
+    TabIndex = 3
     TabOrder = 1
     Visible = False
     object TabSheet1: TTabSheet
@@ -185,21 +186,21 @@ object MainForm: TMainForm
       Caption = 'Tiles, sprites'
       ImageIndex = 3
       object TilesLabel: TLabel
-        Left = 592
+        Left = 296
         Top = 4
         Width = 3
         Height = 13
       end
       object LabelTiles: TLabel
-        Left = 512
+        Left = 224
         Top = 4
         Width = 55
         Height = 13
         Caption = 'Tiles count:'
       end
       object TilesProgressLabel: TLabel
-        Left = 216
-        Top = 32
+        Left = 8
+        Top = 136
         Width = 193
         Height = 13
         Alignment = taCenter
@@ -212,29 +213,29 @@ object MainForm: TMainForm
         Height = 32
       end
       object Label1: TLabel
-        Left = 216
-        Top = 350
+        Left = 816
+        Top = 4
         Width = 75
         Height = 13
         Caption = 'Clipboard image'
       end
       object Label2: TLabel
         Left = 8
-        Top = 256
+        Top = 216
         Width = 71
         Height = 13
         Caption = 'Tiles in a row:  '
       end
       object TilesProgressBar: TProgressBar
-        Left = 216
-        Top = 8
+        Left = 8
+        Top = 112
         Width = 193
         Height = 17
         Min = 0
         Max = 100
         Smooth = True
         Step = 1
-        TabOrder = 8
+        TabOrder = 4
       end
       object SaveTilesButton: TButton
         Left = 6
@@ -275,46 +276,8 @@ object MainForm: TMainForm
         State = cbChecked
         TabOrder = 3
       end
-      object ZeroColorRG: TRadioGroup
-        Left = 4
-        Top = 112
-        Width = 201
-        Height = 105
-        Caption = ' "Zero" color '
-        ItemIndex = 2
-        Items.Strings = (
-          'Black (original)'
-          'White'
-          'Fuchsia (transparent)')
-        TabOrder = 4
-        OnClick = ZeroColorRGClick
-      end
-      object Panel1: TPanel
-        Left = 142
-        Top = 126
-        Width = 48
-        Height = 22
-        Color = clBlack
-        TabOrder = 5
-      end
-      object Panel2: TPanel
-        Left = 142
-        Top = 156
-        Width = 48
-        Height = 22
-        Color = clWhite
-        TabOrder = 6
-      end
-      object Panel3: TPanel
-        Left = 142
-        Top = 185
-        Width = 48
-        Height = 22
-        Color = clFuchsia
-        TabOrder = 7
-      end
       object TilesDrawGrid: TDrawGrid
-        Left = 512
+        Left = 224
         Top = 24
         Width = 585
         Height = 385
@@ -325,19 +288,25 @@ object MainForm: TMainForm
         FixedCols = 0
         FixedRows = 0
         Options = [goVertLine, goHorzLine, goDrawFocusSelected]
-        TabOrder = 9
+        TabOrder = 5
         OnDragDrop = TilesDrawGridDragDrop
         OnDragOver = TilesDrawGridDragOver
         OnDrawCell = TilesDrawGridDrawCell
+        OnKeyDown = TilesDrawGridKeyUp
+        OnKeyUp = TilesDrawGridKeyUp
         OnMouseDown = TilesDrawGridMouseDown
+        OnMouseUp = TilesDrawGridMouseUp
+        OnMouseWheelDown = TilesDrawGridMouseWheelDown
+        OnMouseWheelUp = TilesDrawGridMouseWheelUp
+        OnSelectCell = TilesDrawGridSelectCell
       end
       object Panel4: TPanel
-        Left = 214
-        Top = 48
+        Left = 814
+        Top = 24
         Width = 288
         Height = 288
         BevelOuter = bvLowered
-        TabOrder = 10
+        TabOrder = 6
         object ClipboardImage: TImage
           Left = 0
           Top = 0
@@ -349,47 +318,47 @@ object MainForm: TMainForm
         end
       end
       object Button3: TButton
-        Left = 304
-        Top = 344
+        Left = 864
+        Top = 320
         Width = 57
         Height = 25
         Caption = 'Save'
-        TabOrder = 11
+        TabOrder = 7
         OnClick = Button3Click
       end
       object Button4: TButton
-        Left = 368
-        Top = 344
+        Left = 928
+        Top = 320
         Width = 57
         Height = 25
         Caption = 'Load'
-        TabOrder = 12
+        TabOrder = 8
         OnClick = Button4Click
       end
       object Button5: TButton
-        Left = 432
-        Top = 344
+        Left = 992
+        Top = 320
         Width = 57
         Height = 25
         Caption = 'Clear'
-        TabOrder = 13
+        TabOrder = 9
         OnClick = Button5Click
       end
       object Button8: TButton
         Left = 6
-        Top = 224
+        Top = 184
         Width = 163
         Height = 25
         Caption = 'Save tiles to one file'
-        TabOrder = 14
+        TabOrder = 10
         OnClick = Button8Click
       end
       object Edit1: TEdit
         Left = 80
-        Top = 253
+        Top = 213
         Width = 41
         Height = 21
-        TabOrder = 15
+        TabOrder = 11
         Text = '16'
       end
     end
@@ -587,9 +556,9 @@ object MainForm: TMainForm
   end
   object BottomPageControl: TPageControl
     Left = 0
-    Top = 390
-    Width = 1195
-    Height = 404
+    Top = 456
+    Width = 853
+    Height = 318
     ActivePage = TabSheet9
     Align = alBottom
     TabIndex = 1
@@ -612,8 +581,8 @@ object MainForm: TMainForm
       object HEX: TMPHexEditor
         Left = 0
         Top = 0
-        Width = 1187
-        Height = 376
+        Width = 845
+        Height = 290
         Cursor = crIBeam
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
@@ -652,8 +621,8 @@ object MainForm: TMainForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 794
-    Width = 1195
+    Top = 774
+    Width = 853
     Height = 19
     Panels = <
       item
@@ -685,5 +654,398 @@ object MainForm: TMainForm
     Filter = 'Desktop Adventures|*.dta|All files|*.*'
     Left = 832
     Top = 144
+  end
+  object MainMenu1: TMainMenu
+    Left = 248
+    Top = 24
+    object File1: TMenuItem
+      Caption = 'File'
+      object Exit1: TMenuItem
+        Caption = 'Exit'
+      end
+    end
+    object Settings1: TMenuItem
+      Caption = 'Settings'
+      object TransparentColorMenuItem: TMenuItem
+        Caption = 'Transparent color'
+        GroupIndex = 13
+        object FuchsiaMenuItem: TMenuItem
+          Tag = 16646398
+          AutoCheck = True
+          Bitmap.Data = {
+            F6000000424DF600000000000000760000002800000010000000100000000100
+            0400000000008000000000000000000000001000000000000000000000000000
+            8000008000000080800080000000800080008080000080808000C0C0C0000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00DDDDDDDDDDDD
+            DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+            DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+            DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+            DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD}
+          Caption = 'Fuchsia'
+          Checked = True
+          Default = True
+          GroupIndex = 13
+          ImageIndex = 1
+          RadioItem = True
+          OnClick = WhiteMenuItemClick
+        end
+        object BlackMenuItem: TMenuItem
+          Tag = 65793
+          AutoCheck = True
+          Bitmap.Data = {
+            F6000000424DF600000000000000760000002800000010000000100000000100
+            0400000000008000000000000000000000001000000000000000000000000000
+            8000008000000080800080000000800080008080000080808000C0C0C0000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000}
+          Caption = 'Black'
+          GroupIndex = 13
+          ImageIndex = 2
+          RadioItem = True
+          OnClick = WhiteMenuItemClick
+        end
+        object WhiteMenuItem: TMenuItem
+          Tag = 16711422
+          AutoCheck = True
+          Bitmap.Data = {
+            F6000000424DF600000000000000760000002800000010000000100000000100
+            0400000000008000000000000000000000001000000000000000000000000000
+            8000008000000080800080000000800080008080000080808000C0C0C0000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00888888888888
+            88888FFFFFFFFFFFFFF88FFFFFFFFFFFFFF88FFFFFFFFFFFFFF88FFFFFFFFFFF
+            FFF88FFFFFFFFFFFFFF88FFFFFFFFFFFFFF88FFFFFFFFFFFFFF88FFFFFFFFFFF
+            FFF88FFFFFFFFFFFFFF88FFFFFFFFFFFFFF88FFFFFFFFFFFFFF88FFFFFFFFFFF
+            FFF88FFFFFFFFFFFFFF88FFFFFFFFFFFFFF88888888888888888}
+          Caption = 'White'
+          GroupIndex = 13
+          RadioItem = True
+          OnClick = WhiteMenuItemClick
+        end
+      end
+    end
+    object Operations1: TMenuItem
+      Caption = 'Operations'
+      object AddTiles: TMenuItem
+        Caption = 'Add tile(s)'
+      end
+    end
+    object Help1: TMenuItem
+      Caption = 'Help'
+      object Howto1: TMenuItem
+        Caption = 'How to...'
+      end
+      object About1: TMenuItem
+        Caption = 'About...'
+      end
+    end
+  end
+  object TilesPopupMenu: TPopupMenu
+    Left = 296
+    Top = 264
+    object Adddtiles1: TMenuItem
+      Caption = 'Add tile(s)'
+    end
+    object Setflag1: TMenuItem
+      Caption = 'Set flag'
+      object Bottomlayer1: TMenuItem
+        Tag = 2
+        AutoCheck = True
+        Caption = 'Bottom layer'
+        GroupIndex = 7
+        RadioItem = True
+        OnClick = Bottomlayer1Click
+      end
+      object Middlelayer1: TMenuItem
+        Tag = 4
+        AutoCheck = True
+        Caption = 'Middle layer'
+        GroupIndex = 7
+        RadioItem = True
+        OnClick = Bottomlayer1Click
+      end
+      object Middlelayertransparent1: TMenuItem
+        Tag = 5
+        AutoCheck = True
+        Caption = 'Middle layer (transparent)'
+        GroupIndex = 7
+        RadioItem = True
+        OnClick = Bottomlayer1Click
+      end
+      object Pushpullblock1: TMenuItem
+        Tag = 13
+        AutoCheck = True
+        Caption = 'Push/pull block'
+        GroupIndex = 7
+        RadioItem = True
+        OnClick = Bottomlayer1Click
+      end
+      object oplayer1: TMenuItem
+        Tag = 16
+        AutoCheck = True
+        Caption = 'Top layer'
+        GroupIndex = 7
+        RadioItem = True
+        OnClick = Bottomlayer1Click
+      end
+      object oplayertransparent1: TMenuItem
+        Tag = 17
+        AutoCheck = True
+        Caption = 'Top layer (transparent)'
+        GroupIndex = 7
+        RadioItem = True
+        OnClick = Bottomlayer1Click
+      end
+      object Weapons1: TMenuItem
+        Caption = 'Weapons'
+        GroupIndex = 7
+        object LightBlaster1: TMenuItem
+          Tag = 65601
+          AutoCheck = True
+          Caption = 'Light Blaster'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object HeavyBlasterThermalDetonator1: TMenuItem
+          Tag = 131137
+          AutoCheck = True
+          Caption = 'Heavy Blaster, Thermal Detonator'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Lightsaber1: TMenuItem
+          Tag = 262209
+          AutoCheck = True
+          Caption = 'Lightsaber'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object heForce1: TMenuItem
+          Tag = 524353
+          AutoCheck = True
+          Caption = 'The Force'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+      end
+      object Items1: TMenuItem
+        Caption = 'Items'
+        GroupIndex = 7
+        object Keycard1: TMenuItem
+          Tag = 65665
+          AutoCheck = True
+          Caption = 'Keycard'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Itemforuse1: TMenuItem
+          Tag = 131201
+          AutoCheck = True
+          Caption = 'Item (for use)'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Itempartof1: TMenuItem
+          Tag = 262273
+          AutoCheck = True
+          Caption = 'Item (part of)'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Itemtotrade1: TMenuItem
+          Tag = 524417
+          AutoCheck = True
+          Caption = 'Item (to trade)'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Locator1: TMenuItem
+          Tag = 1048705
+          AutoCheck = True
+          Caption = 'Locator'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Healthpack1: TMenuItem
+          Tag = 4194433
+          AutoCheck = True
+          Caption = 'Health pack'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+      end
+      object Characters1: TMenuItem
+        Caption = 'Characters'
+        GroupIndex = 7
+        object Player1: TMenuItem
+          Tag = 65793
+          AutoCheck = True
+          Caption = 'Player'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Enemy1: TMenuItem
+          Tag = 131329
+          AutoCheck = True
+          Caption = 'Enemy'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Friendly1: TMenuItem
+          Tag = 262401
+          AutoCheck = True
+          Caption = 'Friendly'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+      end
+      object Doorpassageladder1: TMenuItem
+        Tag = 65538
+        AutoCheck = True
+        Caption = 'Door, passage, ladder'
+        GroupIndex = 7
+        RadioItem = True
+        OnClick = Bottomlayer1Click
+      end
+      object Minimap1: TMenuItem
+        Caption = 'Mini map'
+        GroupIndex = 7
+        object Home1: TMenuItem
+          Tag = 131104
+          AutoCheck = True
+          Caption = 'Home'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Puzzle1: TMenuItem
+          Tag = 262176
+          AutoCheck = True
+          Caption = 'Puzzle'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Puzzlesolved1: TMenuItem
+          Tag = 524320
+          AutoCheck = True
+          Caption = 'Puzzle (solved)'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Gateway1: TMenuItem
+          Tag = 1048608
+          AutoCheck = True
+          Caption = 'Gateway'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Gatewaysolved1: TMenuItem
+          Tag = 2097184
+          AutoCheck = True
+          Caption = 'Gateway (solved)'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Upwalllocked1: TMenuItem
+          Tag = 4194336
+          AutoCheck = True
+          Caption = 'Up wall (locked)'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Downwalllocked1: TMenuItem
+          Tag = 8388640
+          AutoCheck = True
+          Caption = 'Down wall (locked)'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Leftwalllocked1: TMenuItem
+          Tag = 16777248
+          AutoCheck = True
+          Caption = 'Left wall (locked)'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Rightwalllocked1: TMenuItem
+          Tag = 33554464
+          AutoCheck = True
+          Caption = 'Right wall (locked)'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Upwall1: TMenuItem
+          Tag = 67108896
+          AutoCheck = True
+          Caption = 'Up wall'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Downwall1: TMenuItem
+          Tag = 134217760
+          AutoCheck = True
+          Caption = 'Down wall'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Leftwall1: TMenuItem
+          Tag = 268435488
+          AutoCheck = True
+          Caption = 'Left wall'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Rightwall1: TMenuItem
+          Tag = 536870944
+          AutoCheck = True
+          Caption = 'Right wall'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Objective1: TMenuItem
+          Tag = 1073741856
+          AutoCheck = True
+          Caption = 'Objective'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+        object Currentposition1: TMenuItem
+          Tag = 2000000000
+          AutoCheck = True
+          Caption = 'Current position'
+          GroupIndex = 7
+          RadioItem = True
+          OnClick = Bottomlayer1Click
+        end
+      end
+    end
   end
 end

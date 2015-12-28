@@ -7,7 +7,7 @@ interface
 
 uses
   Windows, Forms, BMPUnit, DataStructureUnit, LoggerUnit, StdCtrls, Controls, Classes, ExtCtrls, SysUtils, StrUtils, Graphics, dialogs,
-  ComCtrls, Grids, MPHexEditor;
+  ComCtrls, Grids, MPHexEditor, Menus, ImgList;
 
 const
   OUTPUT = 'output';
@@ -53,10 +53,6 @@ type
     DecimalCheckBox: TCheckBox;
     HexCheckBox: TCheckBox;
     AttrCheckBox: TCheckBox;
-    ZeroColorRG: TRadioGroup;
-    Panel1: TPanel;
-    Panel2: TPanel;
-    Panel3: TPanel;
     TilesProgressBar: TProgressBar;
     TilesProgressLabel: TLabel;
     SaveMapsButton: TButton;
@@ -99,6 +95,61 @@ type
     Button9: TButton;
     Button10: TButton;
     Button11: TButton;
+    MainMenu1: TMainMenu;
+    File1: TMenuItem;
+    Settings1: TMenuItem;
+    Help1: TMenuItem;
+    Exit1: TMenuItem;
+    About1: TMenuItem;
+    Howto1: TMenuItem;
+    FuchsiaMenuItem: TMenuItem;
+    BlackMenuItem: TMenuItem;
+    WhiteMenuItem: TMenuItem;
+    TransparentColorMenuItem: TMenuItem;
+    TilesPopupMenu: TPopupMenu;
+    Operations1: TMenuItem;
+    AddTiles: TMenuItem;
+    Adddtiles1: TMenuItem;
+    Setflag1: TMenuItem;
+    Bottomlayer1: TMenuItem;
+    Middlelayer1: TMenuItem;
+    Middlelayertransparent1: TMenuItem;
+    Pushpullblock1: TMenuItem;
+    oplayer1: TMenuItem;
+    oplayertransparent1: TMenuItem;
+    LightBlaster1: TMenuItem;
+    HeavyBlasterThermalDetonator1: TMenuItem;
+    Lightsaber1: TMenuItem;
+    heForce1: TMenuItem;
+    Keycard1: TMenuItem;
+    Itemforuse1: TMenuItem;
+    Itempartof1: TMenuItem;
+    Itemtotrade1: TMenuItem;
+    Locator1: TMenuItem;
+    Healthpack1: TMenuItem;
+    Weapons1: TMenuItem;
+    Items1: TMenuItem;
+    Characters1: TMenuItem;
+    Player1: TMenuItem;
+    Enemy1: TMenuItem;
+    Friendly1: TMenuItem;
+    Doorpassageladder1: TMenuItem;
+    Minimap1: TMenuItem;
+    Home1: TMenuItem;
+    Puzzle1: TMenuItem;
+    Puzzlesolved1: TMenuItem;
+    Gateway1: TMenuItem;
+    Gatewaysolved1: TMenuItem;
+    Upwalllocked1: TMenuItem;
+    Upwall1: TMenuItem;
+    Downwalllocked1: TMenuItem;
+    Downwall1: TMenuItem;
+    Leftwalllocked1: TMenuItem;
+    Leftwall1: TMenuItem;
+    Rightwalllocked1: TMenuItem;
+    Rightwall1: TMenuItem;
+    Objective1: TMenuItem;
+    Currentposition1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -113,7 +164,6 @@ type
     procedure SectionsStringGridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
     procedure MapsStringGridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
     procedure TilesDrawGridDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
-    procedure ZeroColorRGClick(Sender: TObject);
     procedure ClipboardImageDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure ClipboardImageDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
     procedure TilesDrawGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -129,6 +179,13 @@ type
     procedure Button9Click(Sender: TObject);
     procedure Button10Click(Sender: TObject);
     procedure Button11Click(Sender: TObject);
+    procedure WhiteMenuItemClick(Sender: TObject);
+    procedure TilesDrawGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure TilesDrawGridMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+    procedure TilesDrawGridKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TilesDrawGridMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+    procedure TilesDrawGridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+    procedure Bottomlayer1Click(Sender: TObject);
   private
     texts: TStringList;
   public
@@ -153,6 +210,10 @@ type
     procedure DrawTitleImage;
 
     procedure ZeroColorRGDo(remember: Boolean);
+
+    procedure ShowTileStatus;
+    function GetFlagDescription(flag: Cardinal): String;
+    procedure SetFlagMenuItem(flag: Cardinal);
   end;
 
 var
@@ -178,12 +239,16 @@ begin
   ClipboardImage.Picture.Bitmap.Width := ClipboardImage.Width;
   ClipboardImage.Picture.Bitmap.Height := ClipboardImage.Height;
   ClipboardImage.Picture.Bitmap.PixelFormat := pf8bit;
+  currentFillColor := FuchsiaMenuItem.Tag;
   ZeroColorRGDo(false);
   FillInternalPalette(TitleImage.Picture.Bitmap, 0);
   FillInternalPalette(MapImage.Picture.Bitmap, 0);
   OpenDTADialog.InitialDir := '.\';
   texts := TStringList.Create;
   log.SetOutput(LogMemo.lines);
+  FuchsiaMenuItem.Bitmap.Transparent := false;
+  BlackMenuItem.Bitmap.Transparent := false;
+  WhiteMenuItem.Bitmap.Transparent := false;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -380,11 +445,8 @@ begin
   if DecimalCheckBox.Checked then CreateDir(tilesPath);
   if HexCheckBox.Checked then CreateDir(hexPath);
   if AttrCheckBox.Checked then CreateDir(attrPath);
-  case ZeroColorRG.ItemIndex of
-       0: FillInternalPalette(BMP, $010101);
-       1: FillInternalPalette(BMP, $FEFEFE);
-       2: FillInternalPalette(BMP, $FE00FE);
-  end;
+
+  FillInternalPalette(BMP, currentFillColor);
   BMP.Width := TileSize;
   BMP.Height := TileSize;
   title := knownSections[4]; // TILE
@@ -400,7 +462,7 @@ begin
       SaveBMP(tilesPath + '\' + rightstr('000' + inttostr(i) ,4) + eBMP, bmp);
     if AttrCheckBox.Checked then
     begin
-      attrFullPath := attrPath + '\' + IntToBin(attr);
+      attrFullPath := attrPath + '\' + IntToBin(attr) + ' (' + IntToStr(attr) + ')';
       CreateDir(attrFullPath);
       SaveBMP(attrFullPath + '\' + rightstr('000' + inttostr(i) ,4) + eBMP, bmp);
     end;
@@ -806,18 +868,9 @@ begin
     bmp.PixelFormat := pf8bit;
     bmp.Width := TileSize;
     bmp.Height := TileSize;
-    case ZeroColorRG.ItemIndex of
-       0: FillInternalPalette(BMP, $010101);
-       1: FillInternalPalette(BMP, $FEFEFE);
-       2: FillInternalPalette(BMP, $FE00FE);
-    end;
+    FillInternalPalette(BMP, currentFillColor);
 
-    case ZeroColorRG.ItemIndex of
-       0: TilesDrawGrid.Canvas.Brush.Color := $010101;
-       1: TilesDrawGrid.Canvas.Brush.Color := $FEFEFE;
-       2: TilesDrawGrid.Canvas.Brush.Color := $FE00FE;
-    end;
-
+    TilesDrawGrid.Canvas.Brush.Color := currentFillColor;
     TilesDrawGrid.Canvas.Brush.Style := bsSolid;
     GetTile(dta, id, bmp);
     CopyFrame(TilesDrawGrid.Canvas, Rect.Left, Rect.Top);
@@ -828,47 +881,7 @@ begin
   end;
 end;
 
-procedure TMainForm.ZeroColorRGClick(Sender: TObject);
-begin
-  ZeroColorRGDo(true);
-end;
 
-
-procedure TMainForm.ZeroColorRGDo(remember: Boolean);
-var
-  i,j: word;
-  arr: Array[0..287, 0..287] of Byte;
-  p: PByteArray;
-begin
-
-  case ZeroColorRG.ItemIndex of
-    0: currentFillColor := $010101;
-    1: currentFillColor := $FEFEFE;
-    2: currentFillColor := $FE00FE;
-  end;
-
-  for i := 0 to ClipboardImage.Height - 1 do
-  begin
-    p := ClipboardImage.Picture.Bitmap.ScanLine[i];
-    for j := 0 to ClipboardImage.Width - 1 do arr[i][j] := p[j];
-  end;
-
-  FillInternalPalette(TileImage.Picture.Bitmap, currentFillColor);
-  FillInternalPalette(ClipboardImage.Picture.Bitmap, currentFillColor);
-
-  Button5.Click;
-
-  if remember then
-    for i := 0 to ClipboardImage.Height - 1 do
-    begin
-      p := ClipboardImage.Picture.Bitmap.ScanLine[i];
-      for j := 0 to ClipboardImage.Width - 1 do p[j] := arr[i][j];
-    end;
-
-  TileImage.Repaint;
-  ClipboardImage.Repaint;
-  TilesDrawGrid.Repaint;
-end;
 
 procedure TMainForm.ClipboardImageDragDrop(Sender, Source: TObject; X, Y: Integer);
 var left, top: Word;
@@ -878,17 +891,9 @@ begin
     bmp.PixelFormat := pf8bit;
     bmp.Width := TileSize;
     bmp.Height := TileSize;
-    case ZeroColorRG.ItemIndex of
-       0: FillInternalPalette(BMP, $010101);
-       1: FillInternalPalette(BMP, $FEFEFE);
-       2: FillInternalPalette(BMP, $FE00FE);
-    end;
-    case ZeroColorRG.ItemIndex of
-       0: FillInternalPalette(ClipboardImage.Picture.Bitmap, $010101);
-       1: FillInternalPalette(ClipboardImage.Picture.Bitmap, $FEFEFE);
-       2: FillInternalPalette(ClipboardImage.Picture.Bitmap, $FE00FE);
-    end;
+    FillInternalPalette(BMP, currentFillColor);
 
+    FillInternalPalette(ClipboardImage.Picture.Bitmap, currentFillColor);
     left := x div 32 * 32;
     top := y div 32 * 32;
     GetTile(dta, selectedCell, bmp);
@@ -904,10 +909,18 @@ end;
 
 procedure TMainForm.TilesDrawGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var ACol, ARow: Integer;
+canSel: Boolean;
 begin
   TilesDrawGrid.MouseToCell(x, y, ACol, ARow);
   selectedCell := ACol + ARow * 16;
-  TilesDrawGrid.BeginDrag(false, 8);
+  if Button = mbLeft then TilesDrawGrid.BeginDrag(false, 8) else
+    begin
+      TilesDrawGrid.Row := ARow;
+      TilesDrawGrid.Col := ACol;
+      TilesDrawGridSelectCell(Sender, ARow, ACol, canSel);
+      TilesDrawGrid.SetFocus;
+      ShowTileStatus;
+    end;
 end;
 
 procedure TMainForm.Button3Click(Sender: TObject);
@@ -997,11 +1010,7 @@ begin
   h := DTA.tilesCount div w + 1;
   BMP2 := TBitmap.Create;
   BMP2.PixelFormat := pf8bit;
-  case ZeroColorRG.ItemIndex of
-       0: FillInternalPalette(BMP2, $010101);
-       1: FillInternalPalette(BMP2, $FEFEFE);
-       2: FillInternalPalette(BMP2, $FE00FE);
-  end;
+  FillInternalPalette(BMP2, currentFillColor);
   BMP2.Width := w * 32;
   BMP2.Height := h * 32;
 
@@ -1191,6 +1200,132 @@ end;
 procedure TMainForm.Button11Click(Sender: TObject);
 begin
   ReadTNAM;
+end;
+
+procedure TMainForm.WhiteMenuItemClick(Sender: TObject);
+begin
+  currentFillColor := TMenuItem(Sender).Tag;
+  ZeroColorRGDo(true);
+end;
+
+procedure TMainForm.ZeroColorRGDo(remember: Boolean);
+var
+  i,j: word;
+  arr: Array[0..287, 0..287] of Byte;
+  p: PByteArray;
+begin
+  for i := 0 to ClipboardImage.Height - 1 do
+  begin
+    p := ClipboardImage.Picture.Bitmap.ScanLine[i];
+    for j := 0 to ClipboardImage.Width - 1 do arr[i][j] := p[j];
+  end;
+
+  FillInternalPalette(TileImage.Picture.Bitmap, currentFillColor);
+  FillInternalPalette(ClipboardImage.Picture.Bitmap, currentFillColor);
+
+  // Clear ClipboardImage
+  Button5.Click;
+
+  if remember then
+    for i := 0 to ClipboardImage.Height - 1 do
+    begin
+      p := ClipboardImage.Picture.Bitmap.ScanLine[i];
+      for j := 0 to ClipboardImage.Width - 1 do p[j] := arr[i][j];
+    end;
+
+  TileImage.Repaint;
+  ClipboardImage.Repaint;
+  TilesDrawGrid.Repaint;
+end;
+
+procedure TMainForm.TilesDrawGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var pnt: TPoint;
+begin
+  if (Button = mbRight) and GetCursorPos(pnt) then TilesPopupMenu.Popup(pnt.X - 7, pnt.Y - 10)
+  else ShowTileStatus;
+end;
+
+function TMainForm.GetFlagDescription(flag: Cardinal): String;
+var i: Word;
+m: TMenuItem;
+begin
+  result := '';
+  for i := 0 to ComponentCount - 1 do
+    if Components[i] is TMenuItem then
+    begin
+      m := Components[i] as TMenuItem;
+      if m.GroupIndex = 7 then
+      begin
+        if m.Tag = flag then
+          begin
+            result := AnsiReplaceStr(m.Caption, '&', '');
+            Break;
+          end;
+        if (flag = 2147483680) and (m.Tag = 2000000000) then
+          begin
+            result := AnsiReplaceStr(m.Caption, '&', '');
+            Break;
+          end;
+      end;
+    end;
+end;
+
+procedure TMainForm.SetFlagMenuItem(flag: Cardinal);
+var i: Word;
+m: TMenuItem;
+begin
+  for i := 0 to ComponentCount - 1 do
+    if Components[i] is TMenuItem then
+    begin
+      m := Components[i] as TMenuItem;
+      if m.GroupIndex = 7 then
+      begin
+        m.Checked := false;
+        if m.Tag = flag then m.Checked := true;
+        if (flag = 2147483680) and (m.Tag = 2000000000) then m.Checked := true;
+      end;
+    end;
+end;
+
+procedure TMainForm.ShowTileStatus;
+var flag: Cardinal;
+begin
+  selectedCell := TilesDrawGrid.Col + TilesDrawGrid.Row * 16;
+  flag := DTA.GetTileFlag(selectedCell);
+  SetFlagMenuItem(flag);
+  StatusBar.Panels[0].Text := 'Tile #' + IntToStr(selectedCell) + ': ' + GetFlagDescription(flag);
+end;
+
+procedure TMainForm.TilesDrawGridMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+  ShowTileStatus;
+  Handled:= false;
+end;
+
+procedure TMainForm.TilesDrawGridKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  ShowTileStatus;
+end;
+
+procedure TMainForm.TilesDrawGridMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+  ShowTileStatus;
+end;
+
+procedure TMainForm.TilesDrawGridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+begin
+  //break;
+end;
+
+procedure TMainForm.Bottomlayer1Click(Sender: TObject);
+var flag: Cardinal;
+begin
+  flag := TMenuItem(Sender).Tag;
+  if (flag = 2000000000) then flag := 2147483680;
+  DTA.SetTileFlag(selectedCell, flag);
+  ShowTileStatus;
+  flag := DTA.GetTileFlag(selectedCell);
+  Showmessage(inttohex(flag,4));
 end;
 
 end.
