@@ -361,7 +361,7 @@ const
     // mac to ansi
     (#$00, #$01, #$02, #$03, #$04, #$05, #$06, #$07, 
      #$08, #$09, #$0A, #$0B, #$0C, #$0D, #$0E, #$0F,
-     #$10, #$11, #$12, #$13, #$14, #$15, #$16, #$17, 
+     #$10, #$11, #$12, #$13, #$14, #$15, #$16, #$17,
      #$18, #$19, #$1A, #$1B, #$1C, #$1D, #$1E, #$1F,
      #$20, #$21, #$22, #$23, #$24, #$25, #$26, #$27, 
      #$28, #$29, #$2A, #$2B, #$2C, #$2D, #$2E, #$2F,
@@ -395,72 +395,40 @@ const
   // ebcdic cp38..ms ansi conversion
   MPH_CCONV_BCD38: TMPHCharConv = (
     //ansi to bcd (taken from recode 3.5)
-    (#$00, #$01, #$02, #$03, #$37, #$2D, #$2E, #$2F, #$16, #$05, #$25, #$0B,
-    #$0C, #$0D, #$0E, #$0F,
-    #$10, #$11, #$12, #$13, #$3C, #$3D, #$32, #$26, #$18, #$19, #$3F, #$27,
-    #$1C, #$1D, #$1E, #$1F,
-    #$40, #$4F, #$7F, #$7B, #$5B, #$6C, #$50, #$7D, #$4D, #$5D, #$5C, #$4E,
-    #$6B, #$60, #$4B, #$61,
-    #$F0, #$F1, #$F2, #$F3, #$F4, #$F5, #$F6, #$F7, #$F8, #$F9, #$7A, #$5E,
-    #$4C, #$7E, #$6E, #$6F,
-    #$7C, #$C1, #$C2, #$C3, #$C4, #$C5, #$C6, #$C7, #$C8, #$C9, #$D1, #$D2,
-    #$D3, #$D4, #$D5, #$D6,
-    #$D7, #$D8, #$D9, #$E2, #$E3, #$E4, #$E5, #$E6, #$E7, #$E8, #$E9, #$4A,
-    #$E0, #$5A, #$5F, #$6D,
-    #$79, #$81, #$82, #$83, #$84, #$85, #$86, #$87, #$88, #$89, #$91, #$92,
-    #$93, #$94, #$95, #$96,
-    #$97, #$98, #$99, #$A2, #$A3, #$A4, #$A5, #$A6, #$A7, #$A8, #$A9, #$C0,
-    #$20, #$D0, #$A1, #$07,
-    #$80, #$22, #$62, #$63, #$64, #$65, #$66, #$67, #$68, #$69, #$8A, #$8B,
-    #$8C, #$8D, #$8E, #$8F,
-    #$90, #$77, #$2C, #$0A, #$3B, #$3E, #$1A, #$70, #$71, #$72, #$9A, #$9B,
-    #$9C, #$9D, #$9E, #$9F,
-    #$A0, #$15, #$73, #$74, #$75, #$76, #$6A, #$78, #$09, #$3A, #$AA, #$AB,
-    #$AC, #$AD, #$AE, #$AF,
-    #$B0, #$B1, #$B2, #$B3, #$B4, #$B5, #$B6, #$B7, #$B8, #$B9, #$BA, #$BB,
-    #$BC, #$BD, #$BE, #$BF,
-    #$23, #$41, #$42, #$43, #$44, #$45, #$46, #$47, #$48, #$49, #$CA, #$CB,
-    #$CC, #$CD, #$CE, #$CF,
-    #$1B, #$24, #$06, #$14, #$28, #$2B, #$21, #$17, #$51, #$52, #$DA, #$DB,
-    #$DC, #$DD, #$DE, #$DF,
-    #$2A, #$E1, #$53, #$54, #$55, #$56, #$57, #$58, #$59, #$29, #$EA, #$EB,
-    #$EC, #$ED, #$EE, #$EF,
-    #$30, #$31, #$08, #$33, #$34, #$35, #$36, #$04, #$38, #$39, #$FA, #$FB,
-    #$FC, #$FD, #$FE, #$FF
+    (#$00, #$01, #$02, #$03, #$37, #$2D, #$2E, #$2F, #$16, #$05, #$25, #$0B, #$0C, #$0D, #$0E, #$0F,
+    #$10, #$11, #$12, #$13, #$3C, #$3D, #$32, #$26, #$18, #$19, #$3F, #$27, #$1C, #$1D, #$1E, #$1F,
+    #$40, #$4F, #$7F, #$7B, #$5B, #$6C, #$50, #$7D, #$4D, #$5D, #$5C, #$4E, #$6B, #$60, #$4B, #$61,
+    #$F0, #$F1, #$F2, #$F3, #$F4, #$F5, #$F6, #$F7, #$F8, #$F9, #$7A, #$5E, #$4C, #$7E, #$6E, #$6F,
+    #$7C, #$C1, #$C2, #$C3, #$C4, #$C5, #$C6, #$C7, #$C8, #$C9, #$D1, #$D2, #$D3, #$D4, #$D5, #$D6,
+    #$D7, #$D8, #$D9, #$E2, #$E3, #$E4, #$E5, #$E6, #$E7, #$E8, #$E9, #$4A, #$E0, #$5A, #$5F, #$6D,
+    #$79, #$81, #$82, #$83, #$84, #$85, #$86, #$87, #$88, #$89, #$91, #$92, #$93, #$94, #$95, #$96,
+    #$97, #$98, #$99, #$A2, #$A3, #$A4, #$A5, #$A6, #$A7, #$A8, #$A9, #$C0, #$20, #$D0, #$A1, #$07,
+    #$80, #$22, #$62, #$63, #$64, #$65, #$66, #$67, #$68, #$69, #$8A, #$8B, #$8C, #$8D, #$8E, #$8F,
+    #$90, #$77, #$2C, #$0A, #$3B, #$3E, #$1A, #$70, #$71, #$72, #$9A, #$9B, #$9C, #$9D, #$9E, #$9F,
+    #$A0, #$15, #$73, #$74, #$75, #$76, #$6A, #$78, #$09, #$3A, #$AA, #$AB, #$AC, #$AD, #$AE, #$AF,
+    #$B0, #$B1, #$B2, #$B3, #$B4, #$B5, #$B6, #$B7, #$B8, #$B9, #$BA, #$BB, #$BC, #$BD, #$BE, #$BF,
+    #$23, #$41, #$42, #$43, #$44, #$45, #$46, #$47, #$48, #$49, #$CA, #$CB, #$CC, #$CD, #$CE, #$CF,
+    #$1B, #$24, #$06, #$14, #$28, #$2B, #$21, #$17, #$51, #$52, #$DA, #$DB, #$DC, #$DD, #$DE, #$DF,
+    #$2A, #$E1, #$53, #$54, #$55, #$56, #$57, #$58, #$59, #$29, #$EA, #$EB, #$EC, #$ED, #$EE, #$EF,
+    #$30, #$31, #$08, #$33, #$34, #$35, #$36, #$04, #$38, #$39, #$FA, #$FB, #$FC, #$FD, #$FE, #$FF
     ),
     // bcd to ansi (taken from recode 3.5)
-    (#$00, #$01, #$02, #$03, #$F7, #$09, #$D2, #$7F, #$F2, #$A8, #$93, #$0B,
-    #$0C, #$0D, #$0E, #$0F,
-    #$10, #$11, #$12, #$13, #$D3, #$A1, #$08, #$D7, #$18, #$19, #$96, #$D0,
-    #$1C, #$1D, #$1E, #$1F,
-    #$7C, #$D6, #$81, #$C0, #$D1, #$0A, #$17, #$1B, #$D4, #$E9, #$E0, #$D5,
-    #$92, #$05, #$06, #$07,
-    #$F0, #$F1, #$16, #$F3, #$F4, #$F5, #$F6, #$04, #$F8, #$F9, #$A9, #$94,
-    #$14, #$15, #$95, #$1A,
-    #$20, #$C1, #$C2, #$C3, #$C4, #$C5, #$C6, #$C7, #$C8, #$C9, #$5B, #$2E,
-    #$3C, #$28, #$2B, #$21,
-    #$26, #$D8, #$D9, #$E2, #$E3, #$E4, #$E5, #$E6, #$E7, #$E8, #$5D, #$24,
-    #$2A, #$29, #$3B, #$5E,
-    #$2D, #$2F, #$82, #$83, #$84, #$85, #$86, #$87, #$88, #$89, #$A6, #$2C,
-    #$25, #$5F, #$3E, #$3F,
-    #$97, #$98, #$99, #$A2, #$A3, #$A4, #$A5, #$91, #$A7, #$60, #$3A, #$23,
-    #$40, #$27, #$3D, #$22,
-    #$80, #$61, #$62, #$63, #$64, #$65, #$66, #$67, #$68, #$69, #$8A, #$8B,
-    #$8C, #$8D, #$8E, #$8F,
-    #$90, #$6A, #$6B, #$6C, #$6D, #$6E, #$6F, #$70, #$71, #$72, #$9A, #$9B,
-    #$9C, #$9D, #$9E, #$9F,
-    #$A0, #$7E, #$73, #$74, #$75, #$76, #$77, #$78, #$79, #$7A, #$AA, #$AB,
-    #$AC, #$AD, #$AE, #$AF,
-    #$B0, #$B1, #$B2, #$B3, #$B4, #$B5, #$B6, #$B7, #$B8, #$B9, #$BA, #$BB,
-    #$BC, #$BD, #$BE, #$BF,
-    #$7B, #$41, #$42, #$43, #$44, #$45, #$46, #$47, #$48, #$49, #$CA, #$CB,
-    #$CC, #$CD, #$CE, #$CF,
-    #$7D, #$4A, #$4B, #$4C, #$4D, #$4E, #$4F, #$50, #$51, #$52, #$DA, #$DB,
-    #$DC, #$DD, #$DE, #$DF,
-    #$5C, #$E1, #$53, #$54, #$55, #$56, #$57, #$58, #$59, #$5A, #$EA, #$EB,
-    #$EC, #$ED, #$EE, #$EF,
-    #$30, #$31, #$32, #$33, #$34, #$35, #$36, #$37, #$38, #$39, #$FA, #$FB,
-    #$FC, #$FD, #$FE, #$FF
+    (#$00, #$01, #$02, #$03, #$F7, #$09, #$D2, #$7F, #$F2, #$A8, #$93, #$0B, #$0C, #$0D, #$0E, #$0F,
+    #$10, #$11, #$12, #$13, #$D3, #$A1, #$08, #$D7, #$18, #$19, #$96, #$D0, #$1C, #$1D, #$1E, #$1F,
+    #$7C, #$D6, #$81, #$C0, #$D1, #$0A, #$17, #$1B, #$D4, #$E9, #$E0, #$D5, #$92, #$05, #$06, #$07,
+    #$F0, #$F1, #$16, #$F3, #$F4, #$F5, #$F6, #$04, #$F8, #$F9, #$A9, #$94, #$14, #$15, #$95, #$1A,
+    #$20, #$C1, #$C2, #$C3, #$C4, #$C5, #$C6, #$C7, #$C8, #$C9, #$5B, #$2E, #$3C, #$28, #$2B, #$21,
+    #$26, #$D8, #$D9, #$E2, #$E3, #$E4, #$E5, #$E6, #$E7, #$E8, #$5D, #$24, #$2A, #$29, #$3B, #$5E,
+    #$2D, #$2F, #$82, #$83, #$84, #$85, #$86, #$87, #$88, #$89, #$A6, #$2C, #$25, #$5F, #$3E, #$3F,
+    #$97, #$98, #$99, #$A2, #$A3, #$A4, #$A5, #$91, #$A7, #$60, #$3A, #$23, #$40, #$27, #$3D, #$22,
+    #$80, #$61, #$62, #$63, #$64, #$65, #$66, #$67, #$68, #$69, #$8A, #$8B, #$8C, #$8D, #$8E, #$8F,
+    #$90, #$6A, #$6B, #$6C, #$6D, #$6E, #$6F, #$70, #$71, #$72, #$9A, #$9B, #$9C, #$9D, #$9E, #$9F,
+    #$A0, #$7E, #$73, #$74, #$75, #$76, #$77, #$78, #$79, #$7A, #$AA, #$AB, #$AC, #$AD, #$AE, #$AF,
+    #$B0, #$B1, #$B2, #$B3, #$B4, #$B5, #$B6, #$B7, #$B8, #$B9, #$BA, #$BB, #$BC, #$BD, #$BE, #$BF,
+    #$7B, #$41, #$42, #$43, #$44, #$45, #$46, #$47, #$48, #$49, #$CA, #$CB, #$CC, #$CD, #$CE, #$CF,
+    #$7D, #$4A, #$4B, #$4C, #$4D, #$4E, #$4F, #$50, #$51, #$52, #$DA, #$DB, #$DC, #$DD, #$DE, #$DF,
+    #$5C, #$E1, #$53, #$54, #$55, #$56, #$57, #$58, #$59, #$5A, #$EA, #$EB, #$EC, #$ED, #$EE, #$EF,
+    #$30, #$31, #$32, #$33, #$34, #$35, #$36, #$37, #$38, #$39, #$FA, #$FB, #$FC, #$FD, #$FE, #$FF
     )
     );
 
@@ -507,10 +475,8 @@ type
     tkDos8,
     tkASCII,
     tkMac,
-    tkBCD
-
-    , tkCustom
-
+    tkBCD,
+    tkCustom
     );
 
   (* action indicator used in @link(OnProgress) event handler:<br>
@@ -669,7 +635,6 @@ type
     // background color of the active field (hex/chars)
     property ActiveFieldBackground: TColor read FActiveFieldBackground write
       SetActiveFieldBackground;
-
   end;
 
   // @exclude(stream class for internal storage/undo)
@@ -687,12 +652,9 @@ type
     procedure ReadBufferAt(var Buffer; const APosition, ACount: Integer);
     procedure WriteBufferAt(const Buffer; const APosition, ACount: Integer);
     procedure Move(const AFromPos, AToPos, ACount: Integer);
-    procedure TranslateToAnsi(const FromTranslation: TMPHTranslationKind; const
-      APosition, ACount: integer);
-    procedure TranslateFromAnsi(const ToTranslation: TMPHTranslationKind; const
-      APosition, ACount: integer);
-    function GetAsHex(const APosition, ACount: integer; const SwapNibbles:
-      Boolean): string;
+    procedure TranslateToAnsi(const FromTranslation: TMPHTranslationKind; const APosition, ACount: integer);
+    procedure TranslateFromAnsi(const ToTranslation: TMPHTranslationKind; const APosition, ACount: integer);
+    function GetAsHex(const APosition, ACount: integer; const SwapNibbles: Boolean): string;
   end;
 
   //@exclude
@@ -845,8 +807,7 @@ type
 
     procedure RecalcBytesPerRow;
     function IsFileSizeFixed: boolean;
-    procedure InternalErase(const KeyWasBackspace: boolean; const UndoDesc:
-      string = '');
+    procedure InternalErase(const KeyWasBackspace: boolean; const UndoDesc: string = '');
     procedure SetReadOnlyView(const Value: boolean);
     procedure SetCaretKind(const Value: TMPHCaretKind);
     procedure SetFocusFrame(const Value: boolean);
@@ -902,8 +863,7 @@ type
     // is the caret in the char field ?
     function GetInCharField: boolean;
     // insert a buffer (internal)
-    procedure InternalInsertBuffer(Buffer: PChar; const Size, Position:
-      integer);
+    procedure InternalInsertBuffer(Buffer: PChar; const Size, Position: integer);
     // append some data (int)
     procedure InternalAppendBuffer(Buffer: PChar; const Size: integer);
     // store the caret properties
@@ -911,23 +871,18 @@ type
     // delete data
     procedure InternalDelete(StartPos, EndPos, ACol, ARow: integer);
     // delete one half byte
-    function InternalDeleteNibble(const Pos: integer;
-      const HighNibble: boolean): boolean;
+    function InternalDeleteNibble(const Pos: integer; const HighNibble: boolean): boolean;
     // insert half byte
-    function InternalInsertNibble(const Pos: integer; const HighNibble:
-      boolean): boolean;
+    function InternalInsertNibble(const Pos: integer; const HighNibble: boolean): boolean;
     // used by nibble functions
-    function CreateShift4BitStream(const StartPos: integer; var FName:
-      TFileName): TFileStream;
+    function CreateShift4BitStream(const StartPos: integer; var FName: TFileName): TFileStream;
     // convert a given amount of data from ansi to something different and vice versa
-    procedure InternalConvertRange(const aFrom, aTo: integer; const aTransFrom,
-      aTransTo: TMPHTranslationKind);
+    procedure InternalConvertRange(const aFrom, aTo: integer; const aTransFrom, aTransTo: TMPHTranslationKind);
     // move data in buffer to a different position
     procedure MoveFileMem(const aFrom, aTo, aCount: integer);
     function GetBookmark(Index: byte): TMPHBookmark;
     procedure SetBookmark(Index: byte; const Value: TMPHBookmark);
-    procedure SetBookmarkVals(const Index: byte; const Position: integer; const
-      InCharField: boolean);
+    procedure SetBookmarkVals(const Index: byte; const Position: integer; const InCharField: boolean);
     procedure SetDrawGridLines(const Value: boolean);
     procedure SetGutterWidth(const Value: integer);
     // images have changed
@@ -995,8 +950,7 @@ type
     // @exclude(True: cells are currently to be selected)
     property IsSelecting: boolean read FIsSelecting;
     // @exclude(True: MouseUp resets selection)
-    property MouseUpCanResetSel: boolean read FMouseUpCanResetSel write
-      FMouseUpCanResetSel;
+    property MouseUpCanResetSel: boolean read FMouseUpCanResetSel write FMouseUpCanResetSel;
     // @exclude(memory stream which contains the undo/redo data)
     property UndoStorage: TMPHUndoStorage read FUndoStorage;
     // @exclude(stream that contains the data)
@@ -1014,8 +968,7 @@ type
     // returns the drop file position after a drag'n'drop operation
     function DropPosition: integer;
     // copy a stream to a second one and fire the OnProgress handler
-    procedure Stream2Stream(strFrom, strTo: TStream; const Operation:
-      TMPHProgressKind; const Count: integer = -1);
+    procedure Stream2Stream(strFrom, strTo: TStream; const Operation: TMPHProgressKind; const Count: integer = -1);
     (* allows descendants to take special action if contents are to be saved
      to the file from where the data was load *)
     procedure PrepareOverwriteDiskFile; virtual;
@@ -1036,8 +989,7 @@ type
     // @exclude(get the data position depending on col and row)
     function GetPosAtCursor(const aCol, aRow: integer): integer;
     // @exclude(vice versa)
-    function GetCursorAtPos(const aPos: integer; const aChars: boolean):
-      TGridCoord;
+    function GetCursorAtPos(const aPos: integer; const aChars: boolean): TGridCoord;
     // @exclude(get the column of the other field (hex<->char))
     function GetOtherFieldCol(const aCol: integer): integer;
     // @exclude(get the column of the other field (hex<->char))
@@ -1051,18 +1003,15 @@ type
     // @exclude(posted message to update the caret position)
     procedure CMINTUPDATECARET(var Msg: TMessage); message CM_INTUPDATECARET;
     // @exclude(posted message to fire an OnSelectionChanged event)
-    procedure CMSelectionChanged(var Msg: TMessage); message
-      CM_SELECTIONCHANGED;
+    procedure CMSelectionChanged(var Msg: TMessage); message CM_SELECTIONCHANGED;
     // @exclude(for shortcuts)
     procedure WMGetDlgCode(var Msg: TWMGetDlgCode); message WM_GETDLGCODE;
     // @exclude(readjust grid sizes after font has changed)
     procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
     // @exclude(change a byte at the given position)
-    procedure IntChangeByte(const aOldByte, aNewByte: byte;
-      aPos, aCol, aRow: integer; const UndoDesc: string = '');
+    procedure IntChangeByte(const aOldByte, aNewByte: byte; aPos, aCol, aRow: integer; const UndoDesc: string = '');
     // @exclude(change two bytes at the given position)
-    procedure IntChangeWideChar(const aOldChar, aNewChar: WideChar; aPos, aCol,
-      aRow: integer; const UndoDesc: string = '');
+    procedure IntChangeWideChar(const aOldChar, aNewChar: WideChar; aPos, aCol, aRow: integer; const UndoDesc: string = '');
     // @exclude(keydown handler)
     procedure KeyDown(var Key: word; Shift: TShiftState); override;
     // @exclude(keyup handler)
@@ -1072,8 +1021,7 @@ type
     // @exclude(make a selection)
     procedure Select(const aCurCol, aCurRow, aNewCol, aNewRow: integer);
     // @exclude(mouse down handler)
-    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y:
-      integer); override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
     // @exclude(mouse move handler)
     procedure MouseMove(Shift: TShiftState; X, Y: integer); override;
     // @exclude(mouse up handler)
@@ -1109,8 +1057,7 @@ type
     // number of bytes to show in each row
     property BytesPerRow: integer read FBytesPerRow write SetBytesPerRow;
     // if set to True, the find* routines also fire OnProgress events (default is False)
-    property FindProgress: boolean read FFindProgress write SetFindProgress
-      default False;
+    property FindProgress: boolean read FFindProgress write SetFindProgress default False;
     // number of bytes to show in each column
     property BytesPerColumn: integer read GetBytesPerColumn write
       SetBytesPerColumn default 2;
@@ -1165,22 +1112,18 @@ type
     (* if this handler is assigned, the @link(OffsetFormat) is not used to
        create "line numbers", but the application tells the editor how to format the offset text
     *)
-    property OnGetOffsetText: TMPHGetOffsetTextEvent read FOnGetOffsetText write
-      FOnGetOffsetText;
+    property OnGetOffsetText: TMPHGetOffsetTextEvent read FOnGetOffsetText write FOnGetOffsetText;
 
     (* how many bytes form one block in a row? blocks are separated by a one character wide blank.
        -1 means no block separation (see also @link(SeparateBlocksInCharField)) *)
-    property BytesPerBlock: Integer read FBlockSize write SetBlockSize default
-      -1;
+    property BytesPerBlock: Integer read FBlockSize write SetBlockSize default -1;
 
     (* if @link(BytesPerBlock) is used, this property tells the editor whether it should
        separate blocks of bytes in the character pane too or not *)
-    property SeparateBlocksInCharField: boolean read FSepCharBlocks write
-      SetSepCharBlocks default True;
+    property SeparateBlocksInCharField: boolean read FSepCharBlocks write SetSepCharBlocks default True;
 
     // look of the editor's caret (see @link(TMPHCaretKind))
-    property CaretKind: TMPHCaretKind read FCaretKind write SetCaretKind default
-      ckAuto;
+    property CaretKind: TMPHCaretKind read FCaretKind write SetCaretKind default ckAuto;
     // colors to display (see @link(TMPHColors))
     property Colors: TMPHColors read FColors write SetColors;
     (* if FocusFrame is set to True, the current caret position will be displayed in the
@@ -1193,51 +1136,42 @@ type
        0C). if set to False, hex values will be displayed in usual order. this
        setting also affects hex data input and hex-string conversions
     *)
-    property SwapNibbles: boolean read GetSwapNibbles write SetSwapNibbles
-      default False;
+    property SwapNibbles: boolean read GetSwapNibbles write SetSwapNibbles default False;
     // replace @link(MaskedChars) with the following character in the character pane
-    property MaskChar: char read FReplaceUnprintableCharsBy write SetMaskChar
-      stored False;
+    property MaskChar: char read FReplaceUnprintableCharsBy write SetMaskChar stored False;
     (* if set to True, the data size is readonly, e.g. no data may be appended, deleted
        or inserted, just overwriting is allowed. this also affects @link(InsertMode).
     *)
-    property NoSizeChange: boolean read FFixedFileSize write SetFixedFileSize
-      default False;
+    property NoSizeChange: boolean read FFixedFileSize write SetFixedFileSize default False;
     (* if set to False, switching between overwrite and insert mode is not allowed
        (see also @link(InsertMode) and @link(NoSizeChange))
     *)
-    property AllowInsertMode: boolean read FAllowInsertMode write
-      SetAllowInsertMode default True;
+    property AllowInsertMode: boolean read FAllowInsertMode write SetAllowInsertMode default True;
     (* if set to True, the Tab key is used to switch the caret between hex and character pane.
        if set to False, the Tab key can be used to switch between controls. then the
        combination CTRL+T is used to switch the panes
     *)
     property WantTabs: boolean read FWantTabs write SetWantTabs default True;
     // if set to True, the data can not be edited, just cursor movement is allowed ("Hex Viewer" mode)
-    property ReadOnlyView: boolean read FReadOnlyView write SetReadOnlyView
-      default False;
+    property ReadOnlyView: boolean read FReadOnlyView write SetReadOnlyView default False;
     // hide the current selection when the hex editor looses focus (see also @link(GraySelectionIfNotFocused))
-    property HideSelection: boolean read FHideSelection write SetHideSelection
-      default False;
+    property HideSelection: boolean read FHideSelection write SetHideSelection default False;
     (* if set to True and @link(HideSelection) is False, then the current selection will be
        grayed when the hex editor looses focus (the values from the @link(Colors) property will
        be converted to grayscale colors)
     *)
-    property GraySelectionIfNotFocused: boolean read FGraySelOnLostFocus write
-      SetGraySelectionIfNotFocused default False;
+    property GraySelectionIfNotFocused: boolean read FGraySelOnLostFocus write SetGraySelectionIfNotFocused default False;
     (* this event is called in @link(LoadFromFile), @link(SaveToFile), @link(Find) and
        @link(FindWithWildcard) routines, so a progress indicator may be updated
        (see also @link(TMPHProgressEvent), @link(FindProgress))
     *)
-    property OnProgress: TMPHProgressEvent read FOnProgress write
-      FOnProgress;
+    property OnProgress: TMPHProgressEvent read FOnProgress write FOnProgress;
     (* this event is fired if an invalid character has been typed (like non-hex characters
        in the hex pane)
     *)
     property OnInvalidKey: TNotifyEvent read FOnInvalidKey write FOnInvalidKey;
     // this event is fired if the first visible row or column have been changed (e.g. on scrolling)
-    property OnTopLeftChanged: TNotifyEvent read FOnTopLeftChanged write
-      FOnTopLeftChanged;
+    property OnTopLeftChanged: TNotifyEvent read FOnTopLeftChanged write FOnTopLeftChanged;
     // returns the current selection in hex format ('00010203...') as string, uses @link(SwapNibbles)
     function GetSelectionAsHex: string;
     (* replace the current selection by a string containing data in hex format ('00 01 02 03' or similar),
@@ -1251,15 +1185,13 @@ type
     // if set to True, a grid is drawn
     property DrawGridLines: boolean read FDrawGridLines write SetDrawGridLines;
     // width of the offset display gutter, if set to -1, automatically adjust the gutter's width
-    property GutterWidth: integer read FGutterWidth write SetGutterWidth default
-      -1;
+    property GutterWidth: integer read FGutterWidth write SetGutterWidth default -1;
     (* bitmap containing 20 10x10 pixels pictures for bokkmarks (they are displayed in the offset
       gutter), the first ten pictures represent the bookmarks 0(10)..9, if they are set in the
       hexpane, the last 10 pics are shown if bookmarks are set in the character pane (see also
       @link(TMPHBookMark))
     *)
-    property BookmarkBitmap: TBitmap read FBookmarkBitmap write SetBookmarkBitmap
-      stored HasCustomBookmarkBitmap;
+    property BookmarkBitmap: TBitmap read FBookmarkBitmap write SetBookmarkBitmap stored HasCustomBookmarkBitmap;
 
     // current version of the hex editor component (returns the build data), readonly
     property Version: string read GetVersion write SetVersion stored True;
@@ -1270,24 +1202,19 @@ type
        overwrite mode (typed characters replace values at the current position), see also
        @link(AllowInsertMode), @link(NoSizeChange) and @link(ReadOnlyView)
     *)
-    property InsertMode: boolean read GetInsertMode write SetInsertMode default
-      False;
+    property InsertMode: boolean read GetInsertMode write SetInsertMode default False;
     // if set to True, hex data and hex offsets are displayed in lower case
-    property HexLowerCase: boolean read FHexLowerCase write SetHexLowerCase
-      default False;
+    property HexLowerCase: boolean read FHexLowerCase write SetHexLowerCase default False;
     // this event is called on every data change (load/empty/undo/redo)
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     // if set to True, a 3d line is drawn at the right of the offset gutter
-    property DrawGutter3D: boolean read FDrawGutter3D write SetDrawGutter3D
-      default True;
+    property DrawGutter3D: boolean read FDrawGutter3D write SetDrawGutter3D default True;
     // if set to True, a ruler is shown above the first row
-    property ShowRuler: boolean read FShowRuler write SetShowRuler default
-      False;
+    property ShowRuler: boolean read FShowRuler write SetShowRuler default False;
     (* number base (i.e. radix) for the ruler display (2-16), tells the component
        which number format to use when drawing the ruler
     *)
-    property RulerNumberBase: byte read FRulerNumberBase write SetRulerNumberBase
-      default 16;
+    property RulerNumberBase: byte read FRulerNumberBase write SetRulerNumberBase default 16;
     (* setting this property changes the way how mouse/keyboard selection
        works:<br>
        e.g. if set to two, two bytes will be treated as a unit, that means you
@@ -1295,35 +1222,29 @@ type
        also drag/drop and clipboard pasting is affected (data size
        is always a multiple of BytesPerUnit). See also @link(RulerBytesPerUnit)
     *)
-    property BytesPerUnit: integer read FBytesPerUnit write SetBytesPerUnit
-      default 1;
+    property BytesPerUnit: integer read FBytesPerUnit write SetBytesPerUnit default 1;
     (* setting this property affects the offset/ruler drawing:<br>
        e.g. if set to two, two bytes will be treated as a unit, that means the
        offset and ruler values will step by one each two bytes.
        if this property is set to -1, it will use the value of the
        @link(BytesPerUnit) property
     *)
-    property RulerBytesPerUnit: integer read FRulerBytesPerUnit write
-      SetRulerBytesPerUnit default -1;
+    property RulerBytesPerUnit: integer read FRulerBytesPerUnit write SetRulerBytesPerUnit default -1;
     // mark the current position even if the editor is not focused
-    property ShowPositionIfNotFocused: Boolean read FShowPositionIfNotFocused
-      write SetShowPositionIfNotFocused default False;
+    property ShowPositionIfNotFocused: Boolean read FShowPositionIfNotFocused write SetShowPositionIfNotFocused default False;
     (* if set to True, the character pane displays unicode characters
        and the @link(BytesPerUnit) property is set to 2. @link(Translation) is
        set to tkAsIs. @link(BytesPerRow) and @link(BytesPerColumn) must be a
        multiple of two to be able to use the unicode mode.
        see also @link(UnicodeBigEndian)
     *)
-    property UnicodeChars: Boolean read FUnicodeCharacters write
-      SetUnicodeCharacters default False;
+    property UnicodeChars: Boolean read FUnicodeCharacters write SetUnicodeCharacters default False;
     (* if set to True, big endian unicode mode is used if @link(UnicodeChars) is
        enabled
     *)
-    property UnicodeBigEndian: Boolean read FUnicodeBigEndian write
-      SetUnicodeBigEndian default False;
+    property UnicodeBigEndian: Boolean read FUnicodeBigEndian write SetUnicodeBigEndian default False;
     // this event is fired when the selection/caret position has changed
-    property OnSelectionChanged: TNotifyEvent read FOnSelectionChanged write
-      FOnSelectionChanged;
+    property OnSelectionChanged: TNotifyEvent read FOnSelectionChanged write FOnSelectionChanged;
 
     // use this event to implement owner drawing. see also @link(TMPHDrawCellEvent)
     property OnDrawCell: TMPHDrawCellEvent read FOnDrawCell write FOnDrawCell;
@@ -1401,16 +1322,13 @@ type
     // is the given position part of the selection?
     function IsSelected(const APosition: integer): boolean;
     // calculate a data position from a col/row pair
-    property PositionAtCursor[const ACol, ARow: integer]: integer read
-    GetPositionAtCursor;
+    property PositionAtCursor[const ACol, ARow: integer]: integer read GetPositionAtCursor;
     // is the given col in the hex or the character pane?
-    property IsCharFieldCol[const ACol: integer]: Boolean read
-    GetIsCharFieldCol;
+    property IsCharFieldCol[const ACol: integer]: Boolean read GetIsCharFieldCol;
 {$IFDEF FASTACCESS}
     // this byte value is used to fill the data when setting @link(DataSize)
     // enlarges the stream
-    property SetDataSizeFillByte: Byte read FSetDataSizeFillByte write
-      FSetDataSizeFillByte;
+    property SetDataSizeFillByte: Byte read FSetDataSizeFillByte write FSetDataSizeFillByte;
 {$ENDIF}
     // has data been load from/saved to a file (or is the filename valid)
     property HasFile: boolean read FHasFile write FHasFile;
@@ -1427,11 +1345,9 @@ type
     // remove selection state from all data
     procedure ResetSelection(const aDraw: boolean);
     // see @link(GetSelectionAsHex) and @link(SetSelectionAsHex)
-    property SelectionAsHex: string read GetSelectionAsHex write
-      SetSelectionAsHex;
+    property SelectionAsHex: string read GetSelectionAsHex write SetSelectionAsHex;
     // see @link(GetSelectionAsText) and @link(SetSelectionAsText)
-    property SelectionAsText: string read GetSelectionAsText write
-      SetSelectionAsText;
+    property SelectionAsText: string read GetSelectionAsText write SetSelectionAsText;
 {$IFNDEF BCB}
     (* precompiled character comparison table for custom find routines, see also
      @link(FindTableI), @link(OnFind), @link(OnWildcardFind), case sensitive, not
@@ -1450,8 +1366,7 @@ type
     property OnFind: TMPHFindEvent read FOnFind write FOnFind;
     // implement your custom @link(FindWithWildcard) routine by assigning a method
     // to this handler, see also @link(OnFind)
-    property OnWildcardFind: TMPHFindEvent read FOnWildcardFind
-      write FOnWildcardFind;
+    property OnWildcardFind: TMPHFindEvent read FOnWildcardFind write FOnWildcardFind;
     (* returns the given position as it would be drawn in the offset gutter,
       see also @link(OffsetFormat)
     *)
@@ -1476,8 +1391,7 @@ type
        - SearchText: if True, the current @link(Translation) is taken into account when searching textual data<br><br>
        NOTE: call @link(PrepareFindReplaceData) before the first Find call
     *)
-    function Find(aBuffer: PChar; aCount: integer; const aStart, aEnd: integer;
-      const IgnoreCase: boolean): integer;
+    function Find(aBuffer: PChar; aCount: integer; const aStart, aEnd: integer; const IgnoreCase: boolean): integer;
     (* searches for text or data in the data buffer using a wildcard character
        returns the find position (-1, if data have not been found):<br><br>
        - aBuffer: data to search for<br>
@@ -1489,8 +1403,7 @@ type
        - Wildcard: this character is a placeholder for any character<br><br>
        NOTE: call @link(PrepareFindReplaceData) before the first FindWithWildcard call
     *)
-    function FindWithWildcard(aBuffer: PChar; aCount: integer; const aStart,
-      aEnd: integer;
+    function FindWithWildcard(aBuffer: PChar; aCount: integer; const aStart, aEnd: integer;
       const IgnoreCase: boolean; const Wildcard: char): integer;
     (* convert a buffer for @link(Find)/@link(FindWithWildcard)/replace operation depending on
        unicode mode. sets the string to lower case if IgnoreCase is True. if in unicode mode,
@@ -1501,8 +1414,7 @@ type
       @link(Undo). this can be useful e.g. to show position of replaced data
     *)
     procedure AddSelectionUndo(const AStart, ACount: integer);
-    function PrepareFindReplaceData(StrData: string; const IgnoreCase, IsText:
-      boolean): string;
+    function PrepareFindReplaceData(StrData: string; const IgnoreCase, IsText: boolean): string;
     // read data into a buffer
     procedure ReadBuffer(var Buffer; const Index, Count: Integer);
     // write a buffer to the file data
@@ -1516,11 +1428,9 @@ type
     // save the contents of the data buffer into a stream
     procedure SaveToStream(Strm: TStream);
     // save the contents of the data buffer to a file
-    procedure SaveToFile(const Filename: string;
-      const aUnModify: boolean = True);
+    procedure SaveToFile(const Filename: string; const aUnModify: boolean = True);
     // save a range of bytes to a stream
-    procedure SaveRangeToStream(Strm: TStream; const APosition, ACount:
-      integer);
+    procedure SaveRangeToStream(Strm: TStream; const APosition, ACount: integer);
     // undo the last modification, multiple undos are possible
     function Undo: boolean;
     // discard the last undo action (only one single redo is possible)
@@ -1532,29 +1442,21 @@ type
     *)
     function BufferFromFile(const aPos: integer; var aCount: integer): PChar;
     // insert some data at the specified position into the data buffer
-    procedure InsertBuffer(aBuffer: PChar; const aSize, aPos: integer; const
-      UndoDesc: string = ''; const MoveCursor: Boolean = True);
+    procedure InsertBuffer(aBuffer: PChar; const aSize, aPos: integer; const UndoDesc: string = ''; const MoveCursor: Boolean = True);
     // append some data at the end of the data buffer
-    procedure AppendBuffer(aBuffer: PChar; const aSize: integer; const UndoDesc:
-      string = ''; const MoveCursor: Boolean = True);
+    procedure AppendBuffer(aBuffer: PChar; const aSize: integer; const UndoDesc: string = ''; const MoveCursor: Boolean = True);
     // replace the currently selected data with some other data
-    procedure ReplaceSelection(aBuffer: PChar; aSize: integer; const UndoDesc:
-      string = ''; const MoveCursor: Boolean = True);
+    procedure ReplaceSelection(aBuffer: PChar; aSize: integer; const UndoDesc: string = ''; const MoveCursor: Boolean = True);
     // replace some amount of data
-    function Replace(aBuffer: PChar; aPosition, aOldCount, aNewCount: integer;
-      const UndoDesc:
-      string = ''; const MoveCursor: Boolean = False): integer;
+    function Replace(aBuffer: PChar; aPosition, aOldCount, aNewCount: integer; const UndoDesc: string = ''; const MoveCursor: Boolean = False): integer;
     // get the current data position (depending on the cursor/caret)
     function GetCursorPos: integer;
     // delete 4 bits (=half byte = nibble) from the data buffer (see also @link(InsertNibble))
-    function DeleteNibble(const aPos: integer; const HighNibble: boolean; const
-      UndoDesc: string = ''): boolean;
+    function DeleteNibble(const aPos: integer; const HighNibble: boolean; const UndoDesc: string = ''): boolean;
     // insert 4 bits (0000) into the data buffer (see also @link(DeleteNibble))
-    function InsertNibble(const aPos: integer; const HighNibble: boolean; const
-      UndoDesc: string = ''): boolean;
+    function InsertNibble(const aPos: integer; const HighNibble: boolean; const UndoDesc: string = ''): boolean;
     // convert a part of the data buffer's content from one character table to a different one
-    procedure ConvertRange(const aFrom, aTo: integer; const aTransFrom,
-      aTransTo: TMPHTranslationKind; const UndoDesc: string = '');
+    procedure ConvertRange(const aFrom, aTo: integer; const aTransFrom, aTransTo: TMPHTranslationKind; const UndoDesc: string = '');
     (* returns the data position of the top left cell and also whether the caret is in the
        character pane, see also @link(SetTopLeftPosition)
     *)
@@ -1562,8 +1464,7 @@ type
     (* set top left cell to the given data position and also whether the caret is in the
        character pane (see also @link(GetTopLeftPosition))
     *)
-    procedure SetTopLeftPosition(const aPosition: integer; const aInCharField:
-      boolean);
+    procedure SetTopLeftPosition(const aPosition: integer; const aInCharField: boolean);
     (* show a drop position marker on the cell at the given mouse cursor position
       (see also @link(HideDragCell))
     *)
@@ -1611,11 +1512,9 @@ type
     // name of the file that has been loaded into the data buffer
     property Filename: string read FFileName;
     // retrieve or set bookmarks programmatically (see also @link(TMPHBookmark))
-    property Bookmark[Index: byte]: TMPHBookmark read GetBookmark write
-    SetBookmark;
+    property Bookmark[Index: byte]: TMPHBookmark read GetBookmark write SetBookmark;
     // has the byte at the given position been modified ? (only in overwrite mode)
-    property ByteChanged[index: integer]: boolean read HasChanged write
-    SetChanged;
+    property ByteChanged[index: integer]: boolean read HasChanged write SetChanged;
     // retrieves the number of columns (grid columns)
     property ColCountRO: integer read GetPropColCount;
     // retrieves the number of rows (grid rows)
@@ -1643,8 +1542,7 @@ type
     // first visible row (grid row)
     property TopRow;
     // this event is fired when a bookmark is added/modifed/removed
-    property OnBookmarkChanged: TNotifyEvent read FOnBookmarkChanged write
-      FOnBookmarkChanged;
+    property OnBookmarkChanged: TNotifyEvent read FOnBookmarkChanged write FOnBookmarkChanged;
     // call this procedure to navigate to a bookmarked position
     function GotoBookmark(const Index: integer): boolean;
     // call this function if the external offset formatting changed (see @link(OnGetOffsetText))
@@ -4658,8 +4556,7 @@ begin
   Changed;
 end;
 
-procedure TCustomMPHexEditor.InternalDelete(StartPos, EndPos, ACol, ARow:
-  integer);
+procedure TCustomMPHexEditor.InternalDelete(StartPos, EndPos, ACol, ARow: integer);
 var
   LgrdEndPos: TGridCoord;
   LIntNewCol: integer;
@@ -8848,8 +8745,7 @@ begin
 end;
 {$ENDIF}
 
-function TMPHMemoryStream.GetAsHex(const APosition, ACount: integer;
-  const SwapNibbles: Boolean): string;
+function TMPHMemoryStream.GetAsHex(const APosition, ACount: integer; const SwapNibbles: Boolean): string;
 begin
   SetLength(Result, ACount * 2);
   if ACount > 0 then
@@ -8866,14 +8762,12 @@ begin
   Result := GetAddress(APosition, ACount);
 end;
 
-procedure TMPHMemoryStream.ReadBufferAt(var Buffer; const APosition,
-  ACount: Integer);
+procedure TMPHMemoryStream.ReadBufferAt(var Buffer; const APosition, ACount: Integer);
 begin
   System.Move(GetAddress(APosition, ACount)^, Buffer, ACount);
 end;
 
-procedure TMPHMemoryStream.TranslateFromAnsi(const ToTranslation:
-  TMPHTranslationKind; const APosition, ACount: integer);
+procedure TMPHMemoryStream.TranslateFromAnsi(const ToTranslation: TMPHTranslationKind; const APosition, ACount: integer);
 begin
   if ToTranslation = tkAsIs then
     Exit; // no translation needed
@@ -8882,8 +8776,7 @@ begin
       PointerAt(APosition, ACount), ACount);
 end;
 
-procedure TMPHMemoryStream.TranslateToAnsi(const FromTranslation:
-  TMPHTranslationKind; const APosition, ACount: integer);
+procedure TMPHMemoryStream.TranslateToAnsi(const FromTranslation: TMPHTranslationKind; const APosition, ACount: integer);
 begin
   if FromTranslation = tkAsIs then
     Exit; // no translation needed
@@ -8892,8 +8785,7 @@ begin
       PointerAt(APosition, ACount), ACount);
 end;
 
-procedure TMPHMemoryStream.WriteBufferAt(const Buffer; const APosition,
-  ACount: Integer);
+procedure TMPHMemoryStream.WriteBufferAt(const Buffer; const APosition, ACount: Integer);
 begin
   System.Move(Buffer, GetAddress(APosition, ACount)^, ACount);
 end;
