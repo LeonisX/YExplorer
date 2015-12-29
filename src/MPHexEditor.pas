@@ -5556,8 +5556,7 @@ begin
     if LIntPos = 0 then
       Exit; // Can't delete at offset -1
 
-    CreateUndo(ufKindByteRemoved, LIntPos - LIntCount, LIntCount,
-      0, UndoDesc);
+    CreateUndo(ufKindByteRemoved, LIntPos - LIntCount, LIntCount, 0, UndoDesc);
 
     InternalDelete(LIntPos - LIntCount, LIntPos, Col, Row);
     if LIntSavePos = LIntPos then
@@ -5584,8 +5583,7 @@ end;
 procedure TCustomMPHexEditor.WMGetDlgCode(var Msg: TWMGetDlgCode);
 begin
   inherited;
-  Msg.Result := Msg.Result or DLGC_WANTARROWS or DLGC_WANTCHARS or
-    DLGC_WANTALLKEYS;
+  Msg.Result := Msg.Result or DLGC_WANTARROWS or DLGC_WANTCHARS or DLGC_WANTALLKEYS;
   if FWantTabs then
     Msg.Result := Msg.Result or DLGC_WANTTAB
   else

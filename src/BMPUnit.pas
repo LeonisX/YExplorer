@@ -242,7 +242,7 @@ procedure ReadPicture(section: TSection; offset: Cardinal);
 var i, j: Word;
 p: PByteArray;
 begin
-  if Offset > 0 then section.setIndex(offset);
+  if Offset > 0 then section.SetPosition(offset);
   for i := 0 to BMP.Height - 1 do
     for j := 0 to BMP.Width - 1 do
     begin
@@ -252,19 +252,17 @@ begin
 end;
 
 procedure GetTile(section: TSection; id: Word; bmp: TBitmap);
-var i, j, index2: Cardinal;
+var i, j, index: Cardinal;
   p: PByteArray;
 begin
-  index2 := section.GetDataOffset(knownSections[4]) + id * $404 + 4;
+  index := section.GetPosition;
+  section.SetPosition(section.GetDataOffset(knownSections[4]) + id * $404 + 4);
   for i := 0 to bmp.Height - 1 do
   begin
     p := bmp.ScanLine[i];
-    for j := 0 to bmp.Width - 1 do
-    begin
-      p[j] := section.dta[index2];
-      inc(index2);
-    end;
+    for j := 0 to bmp.Width - 1 do p[j] := section.ReadByte;
   end;
+  section.SetPosition(index);
 end;
 
 procedure DrawBMP(destBMP: TBitmap; x, y: Word; bmp: TBitmap);

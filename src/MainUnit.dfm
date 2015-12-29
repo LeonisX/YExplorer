@@ -1,8 +1,8 @@
 object MainForm: TMainForm
-  Left = 192
-  Top = 114
-  Width = 861
-  Height = 847
+  Left = 193
+  Top = 118
+  Width = 995
+  Height = 807
   Caption = 'Yoda Stories Explorer'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,8 +18,8 @@ object MainForm: TMainForm
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 0
-    Top = 444
-    Width = 853
+    Top = 404
+    Width = 987
     Height = 12
     Cursor = crVSplit
     Align = alBottom
@@ -37,12 +37,12 @@ object MainForm: TMainForm
   object PageControl: TPageControl
     Left = 0
     Top = 0
-    Width = 853
-    Height = 444
-    ActivePage = TabSheet4
+    Width = 987
+    Height = 404
+    ActivePage = TabSheet5
     Align = alClient
     MultiLine = True
-    TabIndex = 3
+    TabIndex = 4
     TabOrder = 1
     Visible = False
     object TabSheet1: TTabSheet
@@ -365,114 +365,224 @@ object MainForm: TMainForm
     object TabSheet5: TTabSheet
       Caption = 'Zones (maps)'
       ImageIndex = 4
-      object LabelMaps: TLabel
-        Left = 8
-        Top = 8
-        Width = 59
-        Height = 13
-        Caption = 'Maps count:'
-      end
-      object MapsLabel: TLabel
-        Left = 88
-        Top = 8
-        Width = 3
-        Height = 13
-      end
-      object MapProgressLabel: TLabel
-        Left = 16
-        Top = 240
-        Width = 193
-        Height = 13
-        Alignment = taCenter
-        AutoSize = False
-      end
-      object MapImage: TImage
-        Left = 216
-        Top = 7
-        Width = 288
-        Height = 288
-      end
-      object SaveMapsButton: TButton
-        Left = 6
-        Top = 32
-        Width = 99
-        Height = 25
-        Caption = 'Save maps to files'
+      object PageControl1: TPageControl
+        Left = 0
+        Top = 0
+        Width = 979
+        Height = 376
+        ActivePage = TabSheet13
+        Align = alClient
+        MultiLine = True
+        Style = tsFlatButtons
+        TabIndex = 2
         TabOrder = 0
-        OnClick = SaveMapsButtonClick
-      end
-      object MapProgressBar: TProgressBar
-        Left = 16
-        Top = 216
-        Width = 193
-        Height = 17
-        Min = 0
-        Max = 100
-        Smooth = True
-        Step = 1
-        TabOrder = 1
-      end
-      object MapPlanetSaveCheckBox: TCheckBox
-        Left = 16
-        Top = 112
-        Width = 153
-        Height = 17
-        Caption = 'Group by planet type'
-        TabOrder = 2
-      end
-      object MapFlagSaveCheckBox: TCheckBox
-        Left = 16
-        Top = 88
-        Width = 145
-        Height = 17
-        Caption = 'Group by flags'
-        TabOrder = 3
-      end
-      object MapSaveCheckBox: TCheckBox
-        Left = 16
-        Top = 64
-        Width = 145
-        Height = 17
-        Caption = 'Normal save'
-        TabOrder = 4
-      end
-      object ActionsCheckBox: TCheckBox
-        Left = 16
-        Top = 136
-        Width = 145
-        Height = 17
-        Caption = 'Dump actions'
-        TabOrder = 5
-      end
-      object MapsStringGrid: TStringGrid
-        Left = 232
-        Top = 112
-        Width = 1089
-        Height = 249
-        ColCount = 18
-        DefaultColWidth = 58
-        DefaultRowHeight = 18
-        RowCount = 2
-        TabOrder = 6
-        OnSelectCell = MapsStringGridSelectCell
-      end
-      object CheckBox1: TCheckBox
-        Left = 16
-        Top = 184
-        Width = 145
-        Height = 17
-        Caption = 'Save unused tiles'
-        TabOrder = 7
-      end
-      object CheckBox2: TCheckBox
-        Left = 16
-        Top = 160
-        Width = 145
-        Height = 17
-        Caption = 'Dump text'
-        Checked = True
-        State = cbChecked
-        TabOrder = 8
+        object TabSheet11: TTabSheet
+          Caption = 'General information'
+          object MapProgressLabel: TLabel
+            Left = 16
+            Top = 240
+            Width = 193
+            Height = 13
+            Alignment = taCenter
+            AutoSize = False
+          end
+          object LabelMaps: TLabel
+            Left = 8
+            Top = 8
+            Width = 59
+            Height = 13
+            Caption = 'Maps count:'
+          end
+          object MapsLabel: TLabel
+            Left = 88
+            Top = 8
+            Width = 3
+            Height = 13
+          end
+          object MapImage: TImage
+            Left = 320
+            Top = 7
+            Width = 288
+            Height = 288
+          end
+          object MapProgressBar: TProgressBar
+            Left = 16
+            Top = 216
+            Width = 193
+            Height = 17
+            Min = 0
+            Max = 100
+            Smooth = True
+            Step = 1
+            TabOrder = 0
+          end
+          object CheckBox1: TCheckBox
+            Left = 16
+            Top = 184
+            Width = 145
+            Height = 17
+            Caption = 'Save unused tiles'
+            TabOrder = 1
+          end
+          object CheckBox2: TCheckBox
+            Left = 16
+            Top = 160
+            Width = 145
+            Height = 17
+            Caption = 'Dump text'
+            Checked = True
+            State = cbChecked
+            TabOrder = 2
+          end
+          object ActionsCheckBox: TCheckBox
+            Left = 16
+            Top = 136
+            Width = 145
+            Height = 17
+            Caption = 'Dump actions'
+            TabOrder = 3
+          end
+          object MapPlanetSaveCheckBox: TCheckBox
+            Left = 16
+            Top = 112
+            Width = 153
+            Height = 17
+            Caption = 'Group by planet type'
+            TabOrder = 4
+          end
+          object MapFlagSaveCheckBox: TCheckBox
+            Left = 16
+            Top = 88
+            Width = 145
+            Height = 17
+            Caption = 'Group by flags'
+            TabOrder = 5
+          end
+          object MapSaveCheckBox: TCheckBox
+            Left = 16
+            Top = 64
+            Width = 145
+            Height = 17
+            Caption = 'Normal save'
+            TabOrder = 6
+          end
+          object SaveMapsButton: TButton
+            Left = 6
+            Top = 32
+            Width = 99
+            Height = 25
+            Caption = 'Save maps to files'
+            TabOrder = 7
+            OnClick = SaveMapsButtonClick
+          end
+          object MapsListStringGrid: TStringGrid
+            Left = 224
+            Top = 8
+            Width = 89
+            Height = 289
+            ColCount = 1
+            DefaultRowHeight = 18
+            FixedCols = 0
+            FixedRows = 0
+            TabOrder = 8
+            OnSelectCell = MapsListStringGridSelectCell
+          end
+        end
+        object TabSheet12: TTabSheet
+          Caption = 'HEX offsets'
+          ImageIndex = 1
+          object MapsStringGrid: TStringGrid
+            Left = 0
+            Top = 0
+            Width = 971
+            Height = 345
+            Align = alClient
+            ColCount = 18
+            DefaultColWidth = 58
+            DefaultRowHeight = 18
+            RowCount = 2
+            TabOrder = 0
+            OnSelectCell = MapsStringGridSelectCell
+          end
+        end
+        object TabSheet13: TTabSheet
+          Caption = 'Text translation'
+          ImageIndex = 2
+          object Panel1: TPanel
+            Left = 0
+            Top = 0
+            Width = 971
+            Height = 41
+            Align = alTop
+            TabOrder = 0
+            object Button1: TButton
+              Left = 8
+              Top = 8
+              Width = 75
+              Height = 25
+              Caption = 'Get original'
+              TabOrder = 0
+              OnClick = Button1Click
+            end
+            object Button12: TButton
+              Left = 88
+              Top = 8
+              Width = 75
+              Height = 25
+              Caption = 'Get translated'
+              TabOrder = 1
+              OnClick = Button12Click
+            end
+            object Button13: TButton
+              Left = 168
+              Top = 8
+              Width = 75
+              Height = 25
+              Caption = 'Check original'
+              TabOrder = 2
+              OnClick = Button13Click
+            end
+            object Button14: TButton
+              Left = 480
+              Top = 8
+              Width = 75
+              Height = 25
+              Caption = 'Replace text'
+              TabOrder = 3
+            end
+            object Button15: TButton
+              Left = 248
+              Top = 8
+              Width = 75
+              Height = 25
+              Caption = 'Check equality'
+              TabOrder = 4
+              OnClick = Button15Click
+            end
+          end
+          object Panel2: TPanel
+            Left = 0
+            Top = 41
+            Width = 971
+            Height = 304
+            Align = alClient
+            TabOrder = 1
+            object StringGrid1: TStringGrid
+              Left = 1
+              Top = 1
+              Width = 969
+              Height = 302
+              Align = alClient
+              ColCount = 4
+              Ctl3D = False
+              DefaultRowHeight = 18
+              FixedCols = 0
+              ParentCtl3D = False
+              TabOrder = 0
+              OnDrawCell = StringGrid1DrawCell
+            end
+          end
+        end
       end
     end
     object TabSheet6: TTabSheet
@@ -556,8 +666,8 @@ object MainForm: TMainForm
   end
   object BottomPageControl: TPageControl
     Left = 0
-    Top = 456
-    Width = 853
+    Top = 416
+    Width = 987
     Height = 318
     ActivePage = TabSheet9
     Align = alBottom
@@ -578,12 +688,23 @@ object MainForm: TMainForm
     object TabSheet9: TTabSheet
       Caption = 'HEX viewer'
       ImageIndex = 1
-      object HEX: TMPHexEditor
+      object Hex: TMPHexEditorEx
         Left = 0
         Top = 0
-        Width = 845
+        Width = 979
         Height = 290
         Cursor = crIBeam
+        BackupExtension = '.bak'
+        PrintOptions.MarginLeft = 20
+        PrintOptions.MarginTop = 15
+        PrintOptions.MarginRight = 25
+        PrintOptions.MarginBottom = 25
+        PrintOptions.Flags = [pfSelectionBold, pfMonochrome]
+        PrintFont.Charset = DEFAULT_CHARSET
+        PrintFont.Color = clWindowText
+        PrintFont.Height = -15
+        PrintFont.Name = 'Courier New'
+        PrintFont.Style = []
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -593,6 +714,8 @@ object MainForm: TMainForm
         OnKeyUp = HEXKeyUp
         OnMouseUp = HEXMouseUp
         ParentFont = False
+        ParentShowHint = False
+        ShowHint = False
         TabOrder = 0
         BytesPerRow = 16
         Translation = tkAsIs
@@ -621,8 +744,8 @@ object MainForm: TMainForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 774
-    Width = 853
+    Top = 734
+    Width = 987
     Height = 19
     Panels = <
       item
@@ -656,8 +779,8 @@ object MainForm: TMainForm
     Top = 144
   end
   object MainMenu1: TMainMenu
-    Left = 248
-    Top = 24
+    Left = 872
+    Top = 144
     object File1: TMenuItem
       Caption = 'File'
       object Exit1: TMenuItem
@@ -745,9 +868,6 @@ object MainForm: TMainForm
   object TilesPopupMenu: TPopupMenu
     Left = 296
     Top = 264
-    object Adddtiles1: TMenuItem
-      Caption = 'Add tile(s)'
-    end
     object Setflag1: TMenuItem
       Caption = 'Set flag'
       object Bottomlayer1: TMenuItem
@@ -1047,5 +1167,18 @@ object MainForm: TMainForm
         end
       end
     end
+    object Adddtiles1: TMenuItem
+      Caption = 'Add tile(s)'
+      OnClick = Adddtiles1Click
+    end
+    object Deletetile1: TMenuItem
+      Caption = 'Delete tile'
+      OnClick = Deletetile1Click
+    end
+  end
+  object OpenDialog1: TOpenDialog
+    Filter = 'All files|*.*'
+    Left = 912
+    Top = 144
   end
 end

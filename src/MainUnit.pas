@@ -7,7 +7,7 @@ interface
 
 uses
   Windows, Forms, BMPUnit, DataStructureUnit, LoggerUnit, StdCtrls, Controls, Classes, ExtCtrls, SysUtils, StrUtils, Graphics, dialogs,
-  ComCtrls, Grids, MPHexEditor, Menus, ImgList;
+  ComCtrls, Grids, MPHexEditor, Menus, ImgList, MPHexEditorEx;
 
 const
   OUTPUT = 'output';
@@ -42,8 +42,6 @@ type
     SaveTilesButton: TButton;
     LabelSounds: TLabel;
     SoundsLabel: TLabel;
-    LabelMaps: TLabel;
-    MapsLabel: TLabel;
     LabelPuzzles: TLabel;
     PuzzlesLabel: TLabel;
     LabelChars: TLabel;
@@ -55,26 +53,16 @@ type
     AttrCheckBox: TCheckBox;
     TilesProgressBar: TProgressBar;
     TilesProgressLabel: TLabel;
-    SaveMapsButton: TButton;
-    MapProgressBar: TProgressBar;
-    MapPlanetSaveCheckBox: TCheckBox;
-    MapFlagSaveCheckBox: TCheckBox;
-    MapSaveCheckBox: TCheckBox;
-    MapProgressLabel: TLabel;
-    ActionsCheckBox: TCheckBox;
     BottomPageControl: TPageControl;
     TabSheet8: TTabSheet;
     TabSheet9: TTabSheet;
     LogMemo: TMemo;
-    HEX: TMPHexEditor;
     StatusBar: TStatusBar;
     SectionsStringGrid: TStringGrid;
     TitleImage: TImage;
     TileImage: TImage;
-    MapImage: TImage;
     Button2: TButton;
     Splitter1: TSplitter;
-    MapsStringGrid: TStringGrid;
     TilesDrawGrid: TDrawGrid;
     Panel4: TPanel;
     ClipboardImage: TImage;
@@ -90,8 +78,6 @@ type
     Button8: TButton;
     Label2: TLabel;
     Edit1: TEdit;
-    CheckBox1: TCheckBox;
-    CheckBox2: TCheckBox;
     Button9: TButton;
     Button10: TButton;
     Button11: TButton;
@@ -150,6 +136,35 @@ type
     Rightwall1: TMenuItem;
     Objective1: TMenuItem;
     Currentposition1: TMenuItem;
+    Hex: TMPHexEditorEx;
+    Deletetile1: TMenuItem;
+    PageControl1: TPageControl;
+    TabSheet11: TTabSheet;
+    TabSheet12: TTabSheet;
+    TabSheet13: TTabSheet;
+    MapsStringGrid: TStringGrid;
+    MapProgressLabel: TLabel;
+    MapProgressBar: TProgressBar;
+    CheckBox1: TCheckBox;
+    CheckBox2: TCheckBox;
+    ActionsCheckBox: TCheckBox;
+    MapPlanetSaveCheckBox: TCheckBox;
+    MapFlagSaveCheckBox: TCheckBox;
+    MapSaveCheckBox: TCheckBox;
+    SaveMapsButton: TButton;
+    LabelMaps: TLabel;
+    MapsLabel: TLabel;
+    MapImage: TImage;
+    MapsListStringGrid: TStringGrid;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    Button1: TButton;
+    Button12: TButton;
+    Button13: TButton;
+    Button14: TButton;
+    Button15: TButton;
+    StringGrid1: TStringGrid;
+    OpenDialog1: TOpenDialog;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -186,6 +201,16 @@ type
     procedure TilesDrawGridMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure TilesDrawGridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
     procedure Bottomlayer1Click(Sender: TObject);
+    procedure Adddtiles1Click(Sender: TObject);
+    procedure Deletetile1Click(Sender: TObject);
+    procedure MapsListStringGridSelectCell(Sender: TObject; ACol,
+      ARow: Integer; var CanSelect: Boolean);
+    procedure Button1Click(Sender: TObject);
+    procedure Button12Click(Sender: TObject);
+    procedure Button13Click(Sender: TObject);
+    procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer;
+      Rect: TRect; State: TGridDrawState);
+    procedure Button15Click(Sender: TObject);
   private
     texts: TStringList;
   public
@@ -214,6 +239,15 @@ type
     procedure ShowTileStatus;
     function GetFlagDescription(flag: Cardinal): String;
     procedure SetFlagMenuItem(flag: Cardinal);
+
+    procedure ScanFileAndUpdate;
+
+    procedure ReadMap(id: Word; show, save: Boolean);
+    procedure ViewMap(id: Word);
+
+    procedure ReadColumn(c:byte);
+    function FilePosStr(s:string; var ps:longword):boolean;
+
   end;
 
 var
@@ -222,12 +256,19 @@ var
   spath, opath: String;
   selectedCell, selectedTileX, selectedTileY: Word;
   currentFillColor: TColor;
+
+  // Insert text
+    ck:array[0..1] of word;
+  fx:file;
+  ts,ts2:TStringList;
+
   
 implementation
 
 {$R *.dfm}
 
 procedure TMainForm.FormCreate(Sender: TObject);
+var k: Word;
 begin
   spath := ExtractFilePath(paramstr(0));
   opath := spath + OUTPUT + '\';
@@ -249,6 +290,24 @@ begin
   FuchsiaMenuItem.Bitmap.Transparent := false;
   BlackMenuItem.Bitmap.Transparent := false;
   WhiteMenuItem.Bitmap.Transparent := false;
+
+  // insert text
+   ts:=TStringList.Create;
+ ts2:=TStringList.Create;
+
+ StringGrid1.Cells[0,0]:='Original';
+ StringGrid1.Cells[1,0]:='Translated';
+ StringGrid1.Cells[2,0]:='+/- size';
+ StringGrid1.Cells[3,0]:='Position';
+// StringGrid1.RowHeights[0]:=18;
+ k:=(StringGrid1.Width-128) div 2 - StringGrid1.GridLineWidth*StringGrid1.ColCount -8;
+ StringGrid1.ColWidths[0]:=k;
+ StringGrid1.ColWidths[1]:=k;
+
+ Opendialog1.InitialDir:=ExtractFilePath(ParamStr(0))+'\';
+
+ ck[0]:=0;
+ ck[1]:=0;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -256,6 +315,10 @@ begin
   BMP.Free;
   BMP2.Free;
   texts.Free;
+
+  // insert text
+  ts.Free;
+  ts2.Free;
 end;
 
 procedure TMainForm.Button2Click(Sender: TObject);
@@ -266,15 +329,26 @@ end;
 
 
 procedure TMainForm.OpenDTAButtonClick(Sender: TObject);
-var i: Word;
 begin
   if OpenDTADialog.Execute then
     begin
       log.Clear;
-      DTA.readDTAMetricks(OpenDTADialog.FileName);
-      HEX.LoadFromFile(OpenDTADialog.FileName);
+      DTA.LoadFileToArray(OpenDTADialog.FileName);
+
+      ScanFileAndUpdate;
+
+      Log.SaveToFile(opath, 'Structure');
+    end;
+end;
+
+procedure TMainForm.ScanFileAndUpdate;
+var i: Word;
+begin
+  DTA.Clear;
+      DTA.readDTAMetricks;
+      HEX.LoadFromStream(DTA.data);
       VersionLabel.Caption := DTA.version;
-      SizeLabel.Caption := IntToStr(DTA.size);
+      SizeLabel.Caption := IntToStr(DTA.data.Size);
       CRC32Label.Caption := DTA.crc32;
       NameLabel.Caption := DTA.dtaRevision;
 
@@ -291,8 +365,6 @@ begin
       CharsLabel.Caption := IntToStr(DTA.charsCount);
 
       NamesLabel.Caption := IntToStr(DTA.namesCount);
-
-      Log.SaveToFile(opath, 'Structure');
 
 
       // refactor
@@ -371,10 +443,18 @@ begin
         MapsStringGrid.Cells[17, i + 1] := IntToStr(TMap(DTA.maps.Objects[i]).iactSize);
       end;
 
+      MapsListStringGrid.RowCount := DTA.mapsCount;
+      for i := 0 to DTA.mapsCount - 1 do
+      begin
+        MapsListStringGrid.Cells[0, i] := 'Map #' + IntToStr(i);
+      end;
+      MapsListStringGrid.Row := 0;
+      ViewMap(0);
+
       TilesDrawGrid.RowCount := DTA.tilesCount div 16 + 1;
+      TilesDrawGrid.Repaint;
 
       PageControl.Visible := true;
-    end;
 end;
 
 
@@ -404,7 +484,7 @@ begin
   Log.Debug('Sounds & melodies:');
   Log.Debug('');
   title := knownSections[3]; // SNDS
-  DTA.SetIndex(title);
+  DTA.SetPosition(title);
   Log.Debug('Unknown value: ' + inttohex(DTA.ReadWord, 4)); // C0 FF ??????
   i := 0;
   while DTA.InBound(title) do
@@ -450,7 +530,7 @@ begin
   BMP.Width := TileSize;
   BMP.Height := TileSize;
   title := knownSections[4]; // TILE
-  DTA.SetIndex(title);
+  DTA.SetPosition(title);
   for i := 0 to DTA.tilesCount - 1 do
   begin
     attr := DTA.ReadLongWord; // attributes
@@ -529,11 +609,11 @@ begin
   if CheckBox2.Checked then texts.SaveToFile(opath + 'iact.txt');
 end;
 
-procedure TMainForm.ReadIZON(id: Word; save: Boolean);
+procedure TMainForm.ReadMap(id: Word; show, save: Boolean);
 var s: String;
 k, w, h, i, j, flag, planet: Word;
 begin
-  DTA.SetIndex(TMap(DTA.maps.Objects[id]).mapOffset);   // go to map data
+  DTA.SetPosition(TMap(DTA.maps.Objects[id]).mapOffset);   // go to map data
   pn := DTA.ReadWord;               // number:word; //2 bytes - serial number of the map starting with 0
   if pn <> id then ShowMessage(IntToStr(pn) + ' <> ' + IntToStr(id));
   DTA.ReadString(4);                // izon:string[4]; //4 bytes: "IZON"
@@ -546,9 +626,10 @@ begin
   flag := DTA.ReadWord;             // flags:word; //2 byte: map flags (unknown meanings)* добавил байт снизу
   DTA.ReadLongWord;                 // unused:longword; //5 bytes: unused (same values for every map)
   planet := DTA.ReadWord;           // planet:word; //1 byte: planet (0x01 = desert, 0x02 = snow, 0x03 = forest, 0x05 = swamp)* добавил следующий байт
-  Log.Debug('Map #' + inttostr(pn) + ' offset: ' + inttohex(DTA.GetIndex, 8));
+  Log.Debug('Map #' + inttostr(pn) + ' offset: ' + inttohex(DTA.GetPosition, 8));
+  StatusBar.Panels[0].Text := 'Map: ' + IntToStr(pn) + ' (' + planets[planet] +')';
 
-  if MapSaveCheckBox.Checked or MapFlagSaveCheckBox.Checked or MapPlanetSaveCheckBox.Checked then
+  if show then
   begin
     MapImage.Width := w * 32;
     MapImage.Height := h * 32;
@@ -561,7 +642,6 @@ begin
     MapImage.Canvas.Brush.Style := bsClear;
 
     for i:=0 to h-1 do
-    begin
       for j:=0 to w-1 do
       begin          //W*H*6 bytes: map data
         k := DTA.ReadWord;
@@ -587,26 +667,34 @@ begin
         end;
       end;
       Application.ProcessMessages;
+
       if MapSaveCheckBox.Checked and save then
-        MapImage.Picture.SaveToFile(opath + 'Maps\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
+        MapImage.Picture.SaveToFile(opath + 'Maps\' + rightstr('000' + inttostr(id), 3) + '.bmp');
+
       if MapFlagSaveCheckBox.Checked and save then
       begin
         s := opath + 'MapsByFlags\' + IntToBin(flag);
         CreateDir(s);
-        MapImage.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
+        MapImage.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(id), 3) + '.bmp');
       end;
+
       if MapPlanetSaveCheckBox.Checked and save then
       begin
         s := opath + 'MapsByPlanetType\' + planets[planet];
         CreateDir(s);
-        MapImage.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(pn), 3) + '.bmp');
+        MapImage.Picture.SaveToFile(s + '\' + rightstr('000' + inttostr(id), 3) + '.bmp');
       end;
-    end;
-
-    MapProgressBar.Position := id;
-    MapProgressLabel.Caption := Format('%.2f %%', [((id + 1)/ DTA.mapsCount) * 100]);
-    Application.ProcessMessages;
   end;
+end;
+
+procedure TMainForm.ReadIZON(id: Word; save: Boolean);
+begin
+  ReadMap(id, MapSaveCheckBox.Checked or MapFlagSaveCheckBox.Checked or MapPlanetSaveCheckBox.Checked, save);
+
+  MapProgressBar.Position := id;
+  MapProgressLabel.Caption := Format('%.2f %%', [((id + 1)/ DTA.mapsCount) * 100]);
+  Application.ProcessMessages;
+
   //k:=DTA.ReadWord;                             //2 bytes: object info entry count (X)
   //DTA.MoveIndex(k * 12);                       //X*12 bytes: object info data
 
@@ -628,7 +716,7 @@ var f: File of Byte;
 i: Cardinal;
 b: Byte;
 begin
-  DTA.SetIndex(offset);
+  DTA.SetPosition(offset);
   AssignFile(f, fileName);
   Rewrite(f);
   if size > 0 then
@@ -670,7 +758,7 @@ var size: Longword;
 k: Byte;
 begin
   k := 0;
-  DTA.SetIndex(TMap(DTA.maps.Objects[id]).iactOffset);
+  DTA.SetPosition(TMap(DTA.maps.Objects[id]).iactOffset);
 
   while DTA.ReadString(4) = 'IACT' do
   begin
@@ -680,10 +768,10 @@ begin
 //    HEX.CenterCursorPosition;
 //    Application.ProcessMessages;
     size := DTA.ReadLongWord;  //4 bytes: length (X)
-    if CheckBox2.Checked then DumpText(DTA.GetIndex, size);
+    if CheckBox2.Checked then DumpText(DTA.GetPosition, size);
     if ActionsCheckBox.Checked then
-       DumpData(opath + 'IACT\' + rightstr('000' + inttostr(id), 3) + '-'+rightstr('00'+inttostr(k),2), DTA.GetIndex, size)
-       else DTA.MoveIndex(size);
+       DumpData(opath + 'IACT\' + rightstr('000' + inttostr(id), 3) + '-'+rightstr('00'+inttostr(k),2), DTA.GetPosition, size)
+       else DTA.MovePosition(size);
   end;
 end;
 
@@ -724,10 +812,10 @@ var idx, tempIndex: Cardinal;
 begin
   idx := index;
   //phase := 1;
-  while DTA.GetIndex < idx + size - 2 do
+  while DTA.GetPosition < idx + size - 2 do
   begin
     //Log.Debug('Start new scan: ' + IntToHex(DTA.GetIndex, 6));
-    tempIndex := DTA.GetIndex;
+    tempIndex := DTA.GetPosition;
     sz := DTA.ReadWord;
     //Log.Debug('Size: ' + IntToHex(sz, 4));
     if (sz < $0300) and (sz > $0002) then            // correct max size
@@ -735,7 +823,7 @@ begin
       phase := 2;                 // size correct, maybe text?
       Application.ProcessMessages;
       s := '';
-      if DTA.GetIndex + sz <= idx + size + 4 then
+      if DTA.GetPosition + sz <= idx + size + 4 then
         for j := 1 to sz do
         begin
           b := DTA.ReadByte;
@@ -747,7 +835,7 @@ begin
       if phase = 2 then
       begin
         s := '';
-        DTA.SetIndex(tempIndex + 2);
+        DTA.SetPosition(tempIndex + 2);
         for j := 1 to sz do
         begin
           b := DTA.ReadByte;
@@ -759,15 +847,15 @@ begin
         if not idDeprecatedWords(s) then
         begin
          texts.Add(s);
-         tempIndex := DTA.GetIndex - 1;
+         tempIndex := DTA.GetPosition - 1;
         end;
         //phase := 1;
       end;
     end;
-    DTA.SetIndex(tempIndex + 1);
+    DTA.SetPosition(tempIndex + 1);
   end;
 
-  DTA.SetIndex(idx);
+  DTA.SetPosition(idx);
 end;
 
 
@@ -913,14 +1001,18 @@ canSel: Boolean;
 begin
   TilesDrawGrid.MouseToCell(x, y, ACol, ARow);
   selectedCell := ACol + ARow * 16;
-  if Button = mbLeft then TilesDrawGrid.BeginDrag(false, 8) else
-    begin
-      TilesDrawGrid.Row := ARow;
-      TilesDrawGrid.Col := ACol;
-      TilesDrawGridSelectCell(Sender, ARow, ACol, canSel);
-      TilesDrawGrid.SetFocus;
-      ShowTileStatus;
-    end;
+  if selectedCell < DTA.tilesCount then
+  begin
+
+    if Button = mbLeft then TilesDrawGrid.BeginDrag(false, 8) else
+      begin
+        TilesDrawGrid.Row := ARow;
+        TilesDrawGrid.Col := ACol;
+        TilesDrawGridSelectCell(Sender, ARow, ACol, canSel);
+        TilesDrawGrid.SetFocus;
+        ShowTileStatus;
+      end;
+  end;
 end;
 
 procedure TMainForm.Button3Click(Sender: TObject);
@@ -973,7 +1065,8 @@ begin
       p := ClipboardImage.Picture.Bitmap.ScanLine[i + selectedTileY];
       for j := 0 to 31 do
         begin
-          DTA.dta[DTA.GetDataOffset(knownSections[4]) + selectedCell * $404 + 4 + i * 32 + j] := p[j + selectedTileX];
+          DTA.SetPosition(DTA.GetDataOffset(knownSections[4]) + selectedCell * $404 + 4 + i * 32 + j);
+          DTA.WriteByte(p[j + selectedTileX]);
         end;
     end;
     TilesDrawGrid.Repaint;
@@ -997,7 +1090,10 @@ begin
     begin
       p := TitleImage.Picture.Bitmap.ScanLine[i];
       for j := 0 to TitleImage.Width - 1 do
-        DTA.dta[DTA.GetDataOffset(knownSections[2]) + i * TitleImage.Width + j] := p[j];
+      begin
+        DTA.SetPosition(DTA.GetDataOffset(knownSections[2]) + i * TitleImage.Width + j);
+        DTA.WriteByte(p[j]);
+        end;
     end;
     TilesDrawGrid.Repaint;
   end;
@@ -1016,11 +1112,11 @@ begin
 
   for i := 0 to h - 1 do
     for j := 0 to w - 1 do
-             if i * w + j < DTA.tilesCount then
-               begin
-                 GetTile(dta, i * w + j, bmp);
-                 DrawBMP(BMP2, j * 32, i * 32, BMP);
-               end;
+      if i * w + j < DTA.tilesCount then
+        begin
+          GetTile(dta, i * w + j, bmp);
+          DrawBMP(BMP2, j * 32, i * 32, BMP);
+        end;
 
   BMP2.SaveToFile(opath + 'tiles' + inttostr(w) +'x' + inttostr(h) + '.bmp');
 end;
@@ -1036,7 +1132,7 @@ begin
   Log.Debug('Total count: ' + IntToStr(DTA.puzzlesCount));
   Log.NewLine;
   texts.Clear;
-  DTA.SetIndex(DTA.GetDataOffset(knownSections[6]));            // PUZ2
+  DTA.SetPosition(DTA.GetDataOffset(knownSections[6]));            // PUZ2
   for i:=0 to DTA.puzzlesCount - 1 do ReadPUZ2;
   texts.SaveToFile(opath + 'puz2.txt');
 end;
@@ -1049,9 +1145,9 @@ begin
   pz := DTA.ReadWord;             //2 bytes - index of puzzle (from 0)
   DTA.ReadString(4);              //4 bytes - 'IPUZ'
   psz := DTA.ReadLongWord;        //4 bytes - rest of current puzzle length
-  DumpText(DTA.GetIndex, psz);
+  DumpText(DTA.GetPosition, psz);
   Log.Debug('Puzzle #' + IntToStr(pz) + '; Size: $' + IntToHex(psz, 4));
-  DumpData(opath + 'PUZ2\' + rightstr('000' + inttostr(pz), 4), DTA.GetIndex, psz);
+  DumpData(opath + 'PUZ2\' + rightstr('000' + inttostr(pz), 4), DTA.GetPosition, psz);
 end;
 
 
@@ -1069,11 +1165,11 @@ begin
   Log.Debug('Total count: ' + IntToStr(DTA.charsCount));
   Log.NewLine;
   texts.Clear;
-  DTA.SetIndex(DTA.GetDataOffset(knownSections[7]));            // CHAR
+  DTA.SetPosition(DTA.GetDataOffset(knownSections[7]));            // CHAR
   for i:=0 to DTA.charsCount - 1 do ReadCHAR;
-  DTA.SetIndex(DTA.GetDataOffset(knownSections[8]));            // CHWP
+  DTA.SetPosition(DTA.GetDataOffset(knownSections[8]));            // CHWP
   for i:=0 to DTA.charsCount - 1 do ReadCHWP;
-  DTA.SetIndex(DTA.GetDataOffset(knownSections[9]));            // CAUX
+  DTA.SetPosition(DTA.GetDataOffset(knownSections[9]));            // CAUX
   //incorrect CAUX offset!!!!!!!!!!!!!!
   //Showmessage(inttohex(DTA.GetIndex,6));
   for i:=0 to DTA.charsCount - 1 do ReadCAUX;
@@ -1090,7 +1186,7 @@ begin
   ch := DTA.ReadWord;             //2 bytes - index of character
   DTA.ReadString(4);              //4 bytes - 'ICHA'
   csz := DTA.ReadLongWord;        //4 bytes - rest of current character length; always 74
-  idx := DTA.GetIndex;
+  idx := DTA.GetPosition;
   // тут сделать обработку текста, спрайтиков
   name := '';
   k := DTA.ReadByte;
@@ -1110,7 +1206,7 @@ begin
     n := DTA.ReadByte;
   end;
   DTA.ReadLongWord;                     // 4 bytes 00 00 00 00
-  while DTA.GetIndex < idx + csz do
+  while DTA.GetPosition < idx + csz do
   begin
     tl := DTA.ReadWord;                 // REST - sequence of tiles # (2 bytes), or $FF FF
     if tl <> $FFFF then
@@ -1122,8 +1218,8 @@ begin
   end;
   //ReadString(csz);
   Log.Debug(seq + '      : ' + name);
-  DTA.SetIndex(idx);
-  DumpData(opath + 'CHAR\' + rightstr('00' + inttostr(ch), 3), DTA.GetIndex, csz);
+  DTA.SetPosition(idx);
+  DumpData(opath + 'CHAR\' + rightstr('00' + inttostr(ch), 3), DTA.GetPosition, csz);
 end;
 
 procedure TMainForm.ReadCHWP;
@@ -1132,7 +1228,7 @@ ch: Word;
 begin
 //  size := DTA.ReadLongWord;
   ch := DTA.ReadWord;
-  DumpData(opath + 'CHWP\' + rightstr('00' + inttostr(ch), 3), DTA.GetIndex, 4);
+  DumpData(opath + 'CHWP\' + rightstr('00' + inttostr(ch), 3), DTA.GetPosition, 4);
 end;
 
 procedure TMainForm.ReadCAUX;
@@ -1141,7 +1237,7 @@ ch: Word;
 begin
 //  size:=DTA.ReadLongWord;
   ch := DTA.ReadWord;
-  DumpData(opath + 'CAUX\' + rightstr('00' + inttostr(ch), 3), DTA.GetIndex, 2);
+  DumpData(opath + 'CAUX\' + rightstr('00' + inttostr(ch), 3), DTA.GetPosition, 2);
 end;
 
 function GetFileName(name: String): String;
@@ -1168,7 +1264,7 @@ begin
   Log.Debug('Total count: ' + IntToStr(DTA.namesCount));
   Log.NewLine;
   texts.Clear;
-  DTA.SetIndex(DTA.GetDataOffset(knownSections[10]));            // TNAM
+  DTA.SetPosition(DTA.GetDataOffset(knownSections[10]));            // TNAM
   BMP.Width := TileSize;
   BMP.Height := TileSize;
   CreateDir(opath);
@@ -1241,8 +1337,9 @@ end;
 procedure TMainForm.TilesDrawGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var pnt: TPoint;
 begin
-  if (Button = mbRight) and GetCursorPos(pnt) then TilesPopupMenu.Popup(pnt.X - 7, pnt.Y - 10)
-  else ShowTileStatus;
+  if selectedCell < DTA.tilesCount then
+    if (Button = mbRight) and GetCursorPos(pnt) then TilesPopupMenu.Popup(pnt.X - 7, pnt.Y - 10)
+    else ShowTileStatus;
 end;
 
 function TMainForm.GetFlagDescription(flag: Cardinal): String;
@@ -1325,7 +1422,259 @@ begin
   DTA.SetTileFlag(selectedCell, flag);
   ShowTileStatus;
   flag := DTA.GetTileFlag(selectedCell);
-  Showmessage(inttohex(flag,4));
+  //Showmessage(inttohex(flag,4));
+end;
+
+procedure TMainForm.Adddtiles1Click(Sender: TObject);
+var count: Byte;
+  size: Cardinal;
+begin
+  count := StrToInt(InputBox('Add tile(s)', 'How many tiles to add?', '0'));
+  if count > 0 then
+  begin
+    DTA.SetPosition(DTA.GetDataOffset(knownSections[4]) + DTA.tilesCount * $404);
+    size := $404 * count;
+    DTA.InsertEmptyArea(size);
+    DTA.SetPosition(DTA.GetDataOffset(knownSections[4]) - 4);
+    DTA.WriteLongWord(DTA.GetDataSize(knownSections[4]) + size);
+    ScanFileAndUpdate;
+  end;
+end;
+
+procedure TMainForm.Deletetile1Click(Sender: TObject);
+begin
+  if MessageDlg('Are you sure to delete current tile?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+  begin
+    DTA.SetPosition(DTA.GetDataOffset(knownSections[4]) + selectedCell * $404);
+    DTA.DeleteArea($404);
+    DTA.SetPosition(DTA.GetDataOffset(knownSections[4]) - 4);
+    DTA.WriteLongWord(DTA.GetDataSize(knownSections[4]) - $404);
+    ScanFileAndUpdate;
+  end;
+end;
+
+procedure TMainForm.MapsListStringGridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+begin
+  if ARow < DTA.mapsCount then ViewMap(ARow);
+end;
+
+procedure TMainForm.ViewMap(id: Word);
+begin
+  bmp.PixelFormat := pf8bit;
+  bmp.Width := TileSize;
+  bmp.Height := TileSize;
+  FillInternalPalette(BMP, $FE00FE);
+  ReadMap(id, true, false);
+end;
+
+procedure TMainForm.ReadColumn(c:byte);
+var f:textfile;
+s:string;
+k:word;
+begin
+   k:=1; //строка
+   s:=StringGrid1.Cells[c,0];
+   StringGrid1.Cols[c].Clear;
+   StringGrid1.Cells[c,0]:=s;
+   AssignFile(f,Opendialog1.FileName);
+   Reset(f);
+   while not eof(f) do
+    begin
+     readln(f,s);
+//     s:=trimright(s);
+     if s<>'' then
+       begin
+         if StringGrid1.RowCount=k then StringGrid1.RowCount:=StringGrid1.RowCount+1200;
+         StringGrid1.Cells[c,k]:=s;
+         inc(k);
+       end;
+    end;
+    closefile(f);
+    ck[c]:=k;
+    StringGrid1.RowCount:=max(ck[0],ck[1]);
+end;
+
+function TMainForm.FilePosStr(s:string; var ps:longword):boolean;
+var
+  buf:array[0..16384] of char;
+  bl,i,j,k:integer;
+  p:longint;
+begin
+  result:=false;
+  ps:=0; p:=0;
+  i:=1;
+  bl:=16384;
+  while (not EOF(fx))and(i<=length(s)) do
+  begin
+    if (FilePos(fx)+bl)>FileSize(fx) then bl:=1;
+    buf:='';
+    BlockRead(fx,buf,bl);
+    j:=0;
+    repeat
+      if buf[j]=s[i] then
+      begin
+        if i=1 then p:=FilePos(fx)-bl+j;
+        k:=j+1;
+        inc(i);
+        while (k<bl)and(i>1)and(i<=length(s)) do
+        begin
+          if buf[k]=s[i] then inc(i) else i:=1;
+          inc(k);
+        end;
+      end
+      else i:=1;
+      inc(j);
+    until (i>length(s))or(i>1)or(j=bl);
+  end;
+  if i>length(s) then begin Result:=true; ps:=p; end;
+end;
+
+procedure TMainForm.Button1Click(Sender: TObject);
+begin
+  if Opendialog1.Execute then ReadColumn(0);
+end;
+
+procedure TMainForm.Button12Click(Sender: TObject);
+begin
+ if Opendialog1.Execute then ReadColumn(1);
+end;
+
+procedure TMainForm.Button13Click(Sender: TObject);
+var i:word;
+p,pw:longword;
+s:string;
+begin
+//  if not OpenDialog1.Execute then Exit; // Если файл не выбран, то выходим
+//  AssignFile(fx,Form1.OpenDialog1.FileName); // Связываем файл с переменной f
+  AssignFile(fx,'D:\YodaStories\PatchWise.bak\yodesk.dta'); // Связываем файл с переменной f
+  try
+    Reset(fx,1); // Открываем файл для чтения
+  except
+    ShowMessage('Невозможно открыть "'+OpenDialog1.FileName+'"!');
+    Exit;
+  end;
+
+  pw:=$2294B0;
+  for i:=1 to StringGrid1.RowCount do
+   begin
+     seek(fx,pw);
+     s:=StringGrid1.Cells[0,i];
+     s:=ansireplacestr(s,'[CR2]','[CR][CR]');
+     s:=ansireplacestr(s,'[CR]',chr($0d)+chr($0a));
+     s:=ansireplacestr(s,chr($5F),chr($A5));
+     if FilePosStr(s,p)=true then
+      begin
+       //позиция найдена
+       StringGrid1.Cells[3,i]:=inttostr(p);
+       pw:=p+length(s);
+      end
+      else
+      begin
+       StringGrid1.Row := i;
+       StringGrid1.Selection := TGridRect(Rect(StringGrid1.FixedCols, i, StringGrid1.FixedCols+1, i));
+       application.processmessages;
+       Showmessage('не найдена строка'+chr(13)+s+chr(13)+inttostr(i));
+       exit;
+      end;
+   end;
+  CloseFile(fx);
+  showmessage('OK!')
+end;
+
+procedure TMainForm.StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+var
+  Sentence, { Выводимый текст }
+  CurWord: string; { Текущее выводимое слово }
+  SpacePos, { Позиция первого пробела }
+  CurX, { Х-координата 'курсора' }
+  CurY: Integer; { Y-координата 'курсора' }
+  EndOfSentence: Boolean; { Величина, указывающая на заполненность ячейки }
+  hGrid: TStringGrid;
+  k,n:integer;
+begin
+
+  { Инициализируем шрифт, чтобы он был управляющим шрифтом }
+  hGrid:=(Sender as TStringGrid);
+  hGrid.Canvas.Font := Font;
+
+  with hGrid.Canvas do
+  begin
+    { Если это фиксированная ячейка, тогда используем фиксированный цвет }
+    if gdFixed in State then
+    begin
+      Pen.Color := hGrid.FixedColor;
+      Brush.Color := hGrid.FixedColor;
+    end
+      { в противном случае используем нормальный цвет }
+    else
+    begin
+      Pen.Color := hGrid.Color;
+      Brush.Color := hGrid.Color;
+      if ACol=2 then if length(hGrid.Cells[ACol, ARow])>0 then if hGrid.Cells[ACol, ARow][1]='-' then
+       begin
+        Pen.Color := clRed;
+        Brush.Color := clRed;
+       end;
+    end;
+
+    { Рисуем подложку цветом ячейки }
+    Rectangle(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom);
+  end;
+
+  { Начинаем рисование с верхнего левого угла ячейки }
+  CurX := Rect.Left;
+  CurY := Rect.Top;
+
+  { Здесь мы получаем содержание ячейки }
+  Sentence := hGrid.Cells[ACol, ARow];
+  n:=0;
+
+  { для каждого слова ячейки }
+  EndOfSentence := FALSE;
+  while (not EndOfSentence) do
+  begin
+    { для получения следующего слова ищем пробел }
+    SpacePos := Pos(' ', Sentence);
+    if SpacePos > 0 then
+    begin
+      { получаем текущее слово плюс пробел }
+      CurWord := Copy(Sentence, 0, SpacePos);
+
+      { получаем остальную часть предложения }
+      Sentence := Copy(Sentence, SpacePos + 1, Length(Sentence) - SpacePos);
+    end
+    else
+    begin
+      { это - последнее слово в предложении }
+      EndOfSentence := TRUE;
+      CurWord := Sentence;
+    end;
+
+    with hGrid.Canvas do
+    begin
+      { если текст выходит за границы ячейки }
+      if (TextWidth(CurWord) + CurX) > Rect.Right then
+      begin
+        { переносим на следующую строку }
+        CurY := CurY + TextHeight(CurWord);
+        CurX := Rect.Left;
+        n:=n+ TextHeight(CurWord);
+      end;
+
+      { выводим слово }
+      TextOut(CurX, CurY, CurWord);
+      { увеличиваем X-координату курсора }
+      CurX := CurX + TextWidth(CurWord);
+    end;
+  end;
+  n:=n+ hGrid.Canvas.TextHeight(CurWord);
+  hGrid.RowHeights[Arow]:=max (n+1, hGrid.RowHeights[Arow]);
+end;
+
+procedure TMainForm.Button15Click(Sender: TObject);
+begin
+ if ck[0] = ck[1] then ShowMessage('Lines count equals.')
+  else ShowMessage('Lines count not equals! Please, check text files.');
 end;
 
 end.

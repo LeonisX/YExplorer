@@ -7,7 +7,8 @@ uses
   DataStructureUnit in 'DataStructureUnit.pas',
   CRCUnit in 'CRCUnit.pas',
   LoggerUnit in 'LoggerUnit.pas',
-  MPHexEditor in 'MPHexEditor.pas';
+  MPHexEditor in 'MPHexEditor.pas',
+  MPHexEditorEx in 'MPHexEditorEx.pas';
 
 {$R *.res}
 
