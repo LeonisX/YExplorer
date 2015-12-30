@@ -1,6 +1,6 @@
 object MainForm: TMainForm
   Left = 193
-  Top = 118
+  Top = 106
   Width = 995
   Height = 807
   Caption = 'Yoda Stories Explorer'
@@ -534,11 +534,11 @@ object MainForm: TMainForm
               OnClick = Button12Click
             end
             object Button13: TButton
-              Left = 168
+              Left = 192
               Top = 8
-              Width = 75
+              Width = 129
               Height = 25
-              Caption = 'Check original'
+              Caption = 'Check phrases positions'
               TabOrder = 2
               OnClick = Button13Click
             end
@@ -549,13 +549,14 @@ object MainForm: TMainForm
               Height = 25
               Caption = 'Replace text'
               TabOrder = 3
+              OnClick = Button14Click
             end
             object Button15: TButton
-              Left = 248
+              Left = 328
               Top = 8
-              Width = 75
+              Width = 113
               Height = 25
-              Caption = 'Check equality'
+              Caption = 'Check phrases sizes'
               TabOrder = 4
               OnClick = Button15Click
             end

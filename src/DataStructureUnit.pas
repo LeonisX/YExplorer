@@ -23,6 +23,7 @@ type
     public
     mapOffset, izonOffset, izaxOffset, izx2Offset, izx3Offset, izx4Offset, iactOffset: Cardinal;
     mapSize, izonSize, izaxSize, izx2Size, izx3Size, izx4Size, iactSize, oieOffset, oieSize, oieCount: Cardinal;
+    IACTS: Array of Cardinal;
     constructor Create;
   end;
 
@@ -68,6 +69,7 @@ type
     function ReadWord: Word;
     function ReadLongWord: Longword;
     function ReadString(size: Cardinal): String;
+    function ReadChar: Char;
 
     procedure WriteByte(value: Byte);
     procedure WriteWord(value: Word);
@@ -105,6 +107,13 @@ type
     procedure DeleteArea(length: Cardinal);
     procedure InsertArea(length: Cardinal);
     procedure InsertEmptyArea(length: Cardinal);
+
+    function GetSize: Cardinal;
+
+    function GetIZON(offset : Cardinal): Word;
+    function GetIACT(offset : Cardinal): Word;
+
+    procedure ReplaceArea(oldString, newString: String); overload;
   end;
 
   var DTA: TSection;
@@ -129,6 +138,7 @@ begin
   iactSize := 0;
   oieOffset := 0;
   oieCount := 0;
+  SetLength(IACTS, 0);
 end;
 
 
@@ -225,6 +235,11 @@ begin
   FreeAndNil(data);
 end;
 
+
+function TSection.GetSize: Cardinal;
+begin
+  result := data.Size;
+end;
 
 function TSection.InBound(section: String): boolean;
 begin
@@ -409,7 +424,7 @@ i: Word;
 ind: Cardinal;
 begin
   //Signature: String[4];       // 4 bytes: "ZONE" - уже прочитано
-  ind := data.Position;
+  ind := GetPosition;
   mapsCount := ReadWord;        // 2 bytes - maps count $0291 = 657 items
   // Next repeated data of TZone
   for i:=1 to mapsCount do
@@ -517,16 +532,21 @@ procedure TSection.ScanIACT(id: Word);
 label l1, l2;
 var title: String;
 size, idx: Longword;
+k: Byte;
 begin
   idx := data.Position;
   TMap(maps.Objects[id]).iactOffset := data.Position;
   //TMap(maps.Objects[id]).iactSize := size - 6;
+  k := 0;
 l1:
   title := ReadString(4); //4 bytes: "IACT"
   if title <> 'IACT' then goto l2;
+  SetLength(TMap(maps.Objects[id]).IACTS, Length(TMap(maps.Objects[id]).IACTS) + 1);
+  TMap(maps.Objects[id]).IACTS[k] := GetPosition;
   size := ReadLongWord;   //4 bytes: length (X)
   //Log.Debug(title + ' ' + inttohex(size, 4));
   MovePosition(size);
+  Inc(k);
   goto l1;
 l2:
   MovePosition(-4);
@@ -584,6 +604,24 @@ begin
 end;
 
 
+function TSection.GetIZON(offset : Cardinal): Word;
+var i: Word;
+begin
+  for i := 0 to mapsCount - 1 do
+    if offset > TMap(maps.Objects[i]).izonOffset then Break;
+  Result := i - 1;
+end;
+
+function TSection.GetIACT(offset : Cardinal): Word;
+var izon, i: Word;
+begin
+  izon := GetIZON(offset);
+  for i := 0 to Length(TMap(maps.Objects[izon]).IACTS) - 1 do
+    if offset > TMap(maps.Objects[izon]).IACTS[i] then Break;
+  Result := i - 1;
+end;
+
+
 procedure TSection.LoadFileToArray(fileName: String);
 begin
   Log.Debug('DTA file internal structure');
@@ -635,6 +673,15 @@ begin
   result := data.Position;
 end;
 
+procedure TSection.ReplaceArea(oldString, newString: String);
+var delta: Integer;
+begin
+  delta := Length(oldString) - Length(newString);
+  if delta > 0 then DeleteArea(delta);
+  if delta < 0 then InsertArea(Abs(delta));
+  WriteString(newString);
+end;
+
 procedure TSection.DeleteArea(length: Cardinal);
 begin
   Move(Pointer(Cardinal(data.Memory) + data.Position + length)^,
@@ -656,6 +703,11 @@ procedure TSection.InsertEmptyArea(length: Cardinal);
 begin
   InsertArea(length);
   FillChar(Pointer(Cardinal(data.Memory) + data.Position)^, length, $00);
+end;
+
+function TSection.ReadChar: Char;
+begin
+  data.ReadBuffer(result, SizeOf(result));
 end;
 
 function TSection.ReadByte: Byte;
