@@ -165,6 +165,8 @@ type
     Button15: TButton;
     StringGrid1: TStringGrid;
     OpenDialog1: TOpenDialog;
+    CheckBox3: TCheckBox;
+    Open1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -203,13 +205,11 @@ type
     procedure Bottomlayer1Click(Sender: TObject);
     procedure Adddtiles1Click(Sender: TObject);
     procedure Deletetile1Click(Sender: TObject);
-    procedure MapsListStringGridSelectCell(Sender: TObject; ACol,
-      ARow: Integer; var CanSelect: Boolean);
+    procedure MapsListStringGridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
     procedure Button1Click(Sender: TObject);
     procedure Button12Click(Sender: TObject);
     procedure Button13Click(Sender: TObject);
-    procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer;
-      Rect: TRect; State: TGridDrawState);
+    procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
     procedure Button15Click(Sender: TObject);
     procedure Button14Click(Sender: TObject);
   private
@@ -248,7 +248,10 @@ type
 
     procedure ReadColumn(col: Byte);
     function FindStringPosition(searchString: String): Cardinal;
+    function FindStringPositionReverse(searchString: String): Cardinal;
     function DecompressString(s: String): String;
+
+    procedure Highlight(offset, size: Cardinal);
   end;
 
 var
@@ -327,15 +330,24 @@ end;
 
 procedure TMainForm.OpenDTAButtonClick(Sender: TObject);
 begin
-  if OpenDTADialog.Execute then
-    begin
+OpenDTADialog.FileName := 'D:\YExplorer\Yodesk.dta';
+//  if OpenDTADialog.Execute then
+//    begin
+PageControl.Visible := true;
       log.Clear;
       DTA.LoadFileToArray(OpenDTADialog.FileName);
 
       ScanFileAndUpdate;
 
       Log.SaveToFile(opath, 'Structure');
-    end;
+//    end;
+
+OpenDialog1.FileName := 'D:\YExplorer\iact-e.txt';
+ ReadColumn(0);
+OpenDialog1.FileName := 'D:\YExplorer\iact.txt';
+ ReadColumn(1);
+  Button13Click(Self);
+    Button15Click(Self);
 end;
 
 procedure TMainForm.ScanFileAndUpdate;
@@ -759,7 +771,6 @@ begin
 
   while DTA.ReadString(4) = 'IACT' do
   begin
-    inc(k);
 //    HEX.SetSelStart(DTA.GetIndex);
 //    HEX.SetSelEnd(DTA.GetIndex + 3);
 //    HEX.CenterCursorPosition;
@@ -767,8 +778,9 @@ begin
     size := DTA.ReadLongWord;  //4 bytes: length (X)
     if CheckBox2.Checked then DumpText(DTA.GetPosition, size);
     if ActionsCheckBox.Checked then
-       DumpData(opath + 'IACT\' + rightstr('000' + inttostr(id), 3) + '-'+rightstr('00'+inttostr(k),2), DTA.GetPosition, size)
+       DumpData(opath + 'IACT\' + rightstr('000' + inttostr(id), 3) + '-'+rightstr('000'+inttostr(k), 3), DTA.GetPosition, size)
        else DTA.MovePosition(size);
+    inc(k);
   end;
 end;
 
@@ -1480,7 +1492,7 @@ begin
    StringGrid1.Cols[3].Clear;
    StringGrid1.Cells[3, 0] := s;
 
-   AssignFile(f,Opendialog1.FileName);
+   AssignFile(f, Opendialog1.FileName);
    Reset(f);
    while not eof(f) do
     begin
@@ -1524,6 +1536,31 @@ begin
   end; // while
 end;
 
+function TMainForm.FindStringPositionReverse(searchString: String): Cardinal;
+var
+  startPosition: Cardinal;
+  searchLength, currentLength, i: Word;
+begin
+  Result := 0;
+  searchLength := Length(searchString);
+  startPosition := DTA.GetPosition;
+  while (DTA.GetPosition > 0) do
+  begin
+    DTA.SetPosition(startPosition);
+    currentLength := 0;
+    for i := 1 to searchLength do
+    begin
+      if DTA.ReadChar <> searchString[i] then Break;
+      Inc(currentLength);
+    end;
+    if currentLength = searchLength then
+    begin
+      Result := startPosition;
+      Break;
+    end else Dec(startPosition);
+  end; // while
+end;
+
 procedure TMainForm.Button1Click(Sender: TObject);
 begin
   if Opendialog1.Execute then ReadColumn(0);
@@ -1560,7 +1597,7 @@ begin
     StringGrid1.Selection := TGridRect(Rect(StringGrid1.FixedCols, i, StringGrid1.FixedCols + 1, i));
     Application.ProcessMessages;
     Showmessage('String not found:' + Chr(13) + phrase)
-  end else ShowMessage('OK!')
+  end else ShowMessage('OK, founded all phrases.')
 end;
 
 procedure TMainForm.StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
@@ -1670,136 +1707,114 @@ begin
     if ps = '' then ShowMessage('String not found:' + Chr(13) + phrase)
     else ShowMessage('Expected size: ' + IntToStr(size) + ' don''t match phrase size: ' +
       IntToStr(Length(phrase)) + Chr(13) + 'Phrase: ' + phrase);
-  end else ShowMessage('OK!')
+  end else ShowMessage('OK, all sizes match.')
+end;
+
+procedure TMainForm.Highlight(offset, size: Cardinal);
+begin
+  HEX.LoadFromStream(DTA.data);
+  HEX.SetSelStart(offset);
+  HEX.SetSelEnd(offset + size - 1);
+  HEX.CenterCursorPosition;
+  Application.ProcessMessages;
 end;
 
 procedure TMainForm.Button14Click(Sender: TObject);
 var
-  i, j, oldSize, newSize, currentIzon, currentIact, newIzon, newIact, iz, ia: Word;
-  currentDelta, izonDelta, iactDelta, totalDelta: Integer;
-  currentOffset, size: Cardinal;
+  i, tw, oldSize, newSize: Word;
   oldPhrase, newPhrase: String;
-  ts: String;
+  size, phaseStart, phaseEnd, iactOffset, izonOffset: Cardinal;
+  delta: Integer;
 begin
   Log.Clear;
-  totalDelta := 0;
-  izonDelta := 0;
-  iactDelta := 0;
-  currentIzon := 0;
-  currentIact := 0;
-  for i := 1 to StringGrid1.RowCount do
+  DTA.SetPosition(TMap(DTA.maps.Objects[0]).mapOffset);
+  phaseStart := FindStringPosition(oldPhrase);
+  phaseEnd := phaseStart;
+
+  for i := 1 to StringGrid1.RowCount - 1 do
   begin
-    oldPhrase := StringGrid1.Cells[0, i];
-    oldSize := StrToInt(StringGrid1.Cells[3, i]);
-    newPhrase := DecompressString(Trim(StringGrid1.Cells[1, i]));
+    oldPhrase := DecompressString(StringGrid1.Cells[0, i]);
+    oldSize := Length(oldPhrase);
+    if CheckBox3.Checked then newPhrase := DecompressString(Trim(StringGrid1.Cells[1, i]))
+      else newPhrase := DecompressString(StringGrid1.Cells[1, i]);
     newSize := Length(newPhrase);
-    currentDelta := newSize - oldSize;
-    izonDelta := izonDelta + currentDelta;
-    iactDelta := iactDelta + currentDelta;
-    totalDelta := totalDelta + currentDelta;
-    currentOffset := StrToInt(StringGrid1.Cells[2, i]);
+    delta := newSize - oldSize;
+    Log.Debug('======================================================================== #' + IntToStr(i));
+    Log.Debug('Search phase: ' + IntToHex(phaseEnd, 2));
+    DTA.SetPosition(phaseEnd);
+    phaseStart := FindStringPosition(oldPhrase);
 
-    Log.Debug('i: ' + IntToStr(i));
+    Log.Debug('oldPhrase: ' + oldPhrase + ': oldSize: ' + IntToHex(oldSize, 2));
+    Log.Debug('newPhrase: ' + newPhrase + ': newSize: ' + IntToHex(newSize, 2));
+    Log.Debug('Delta: ' + IntToStr(delta));
+    Log.Debug('Phase start: ' + IntToHex(phaseStart, 2));
 
-    Log.Debug('oldPhrase: ' + oldPhrase);
-    Log.Debug('oldSize: ' + IntToHex(oldSize, 2));
-    Log.Debug('newPhrase: ' + oldPhrase);
-    Log.Debug('newSize: ' + IntToHex(newSize, 2));
+    DTA.SetPosition(phaseStart - 2);
+    tw := DTA.ReadWord;
+    if tw <> oldSize then
+    begin
+      Highlight(phaseStart - 2, 2);
+      ShowMessage('Readed size:' + Inttohex(tw, 4) + '(need ' + inttostr (oldSize) + ')');
+      break;
+    end;
 
-    Log.Debug('currentDelta: ' + IntToStr(currentDelta));
-    Log.Debug('izonDelta: ' + IntToStr(izonDelta));
-    Log.Debug('iactDelta: ' + IntToStr(iactDelta));
-    Log.Debug('totalDelta: ' + IntToStr(totalDelta));
-
-    Log.Debug('currentOffset: ' + IntToHex(currentOffset, 2));
-
-    HEX.SetSelStart(currentOffset);
-    HEX.SetSelEnd(currentOffset + Length(oldPhrase) - 1);
-    HEX.CenterCursorPosition;
-    Application.ProcessMessages;
-    ShowMessage('Before writing text');
-
-
-    Log.Debug('Writing text: ' + newPhrase);
-    DTA.SetPosition(currentOffset - 2);
+    DTA.SetPosition(phaseStart - 2);
     DTA.WriteWord(newSize);
+
+    //Highlight(phaseStart, oldSize);
+    //ShowMessage('Before writing text. Size: ' + Inttohex(hex.SelCount, 4));
+
     DTA.ReplaceArea(oldPhrase, newPhrase);
+    phaseEnd := phaseStart + newSize - 2;
+
     HEX.LoadFromStream(DTA.data);
-    HEX.SetSelStart(currentOffset);
-    HEX.SetSelEnd(currentOffset + Length(newPhrase) - 1);
-    HEX.CenterCursorPosition;
+    //Highlight(phaseStart, newSize);
+    //ShowMessage('After writing text. Size: ' + Inttohex(hex.SelCount, 4));
+
+    if delta <> 0 then
+    begin
+      DTA.SetPosition(phaseStart - 2);
+      iactOffset := FindStringPositionReverse('IACT');
+      //Showmessage(inttohex(iactOffset,4));
+
+      DTA.SetPosition(iactOffset);
+      if DTA.ReadString(4) <> 'IACT' then
+      begin
+        Highlight(iactOffset, 4);
+        ShowMessage('IACT not found!!!');
+        Break;
+      end;
+
+      size := DTA.ReadLongWord;
+      DTA.MovePosition(-4);
+      DTA.WriteLongWord(size + delta);
+
+      //Highlight(iactOffset + 4, 4);
+      //ShowMessage('IACT size (old:new): ' + Inttohex(size, 4) + ':' + inttohex(size + delta, 4));
+
+
+      DTA.SetPosition(iactOffset);
+      izonOffset := FindStringPositionReverse('IZON');
+      //Showmessage(inttohex(izonOffset,4));
+      DTA.SetPosition(izonOffset);
+      if DTA.ReadString(4) <> 'IZON' then ShowMessage('IZON not found!!!');
+      DTA.MovePosition(-10);
+      size := DTA.ReadLongWord;
+      DTA.MovePosition(-4);
+      DTA.WriteLongWord(size + delta);
+
+      //Highlight(izonOffset - 6, 4);
+      //ShowMessage('IZON size (old:new): ' + Inttohex(size, 4) + ':' + inttohex(size + delta, 4));
+    end;
+
     Application.ProcessMessages;
-    ShowMessage('After writing text');
-
-    newIact := DTA.GetIACT(currentOffset);
-    Log.Debug('newIact: ' + IntToStr(newIact));
-    if newIact <> currentIact then
-    begin
-      Log.Debug('newIact <> currentIact');
-      // write IACT size;
-      DTA.SetPosition(TMap(DTA.maps.Objects[currentIzon]).IACTS[currentIact]);
-      size := DTA.ReadLongWord + iactDelta;
-      DTA.WriteLongWord(size);
-      currentIact := newIact;
-      iactDelta := 0;
-    end;
-
-    newIzon := DTA.GetIZON(currentOffset);
-    if newIzon <> currentIzon then
-    begin
-      Log.Debug('newIzon <> currentIzon');
-      // write IZON size;
-      DTA.SetPosition(TMap(DTA.maps.Objects[currentIzon]).izonOffset - 4);
-      size := DTA.ReadLongWord + izonDelta;
-      DTA.WriteLongWord(size);
-      currentIzon := newIzon;
-      izonDelta := 0;
-    end;
-
-    Log.Debug('Recalculating phases offsets');
-    for j := i + 1 to StringGrid1.RowCount do
-    begin
-      ts := StringGrid1.Cells[2, j];
-      StringGrid1.Cells[2, j] := '$' + IntToStr(StrToInt(StringGrid1.Cells[2, j]) + totalDelta);
-      Log.Debug('newIact: ' + IntToStr(newIact));
-    end;
-
-    for iz := currentIZON + 1 to DTA.mapsCount - 1 do
-    begin
-      TMap(DTA.maps.Objects[currentIZON]).izonOffset := TMap(DTA.maps.Objects[currentIZON]).izonOffset + izonDelta;
-      for ia := currentIACT to Length(TMap(DTA.maps.Objects[currentIZON]).IACTS) - 1 do
-        TMap(DTA.maps.Objects[currentIZON]).IACTS[ia] := TMap(DTA.maps.Objects[currentIZON]).IACTS[ia] +  iactDelta;
-    end;
   end;
- //идея такая
- //надо поменять:
 
- //2. Размеры конкретных IACT
- // В IZON может быть несколько IACT а может быть и не одного
- //  DTA.SetPosition(TMap(DTA.maps.Objects[id]).iactOffset);
+ Hex.LoadFromStream(DTA.data);
+  // тут надо пересканировать всё
+ DTA.data.SaveToFile('d:\YExplorer\test\test2\Yodesk.dta');
 
- // while DTA.ReadString(4) = 'IACT' do
- //begin
- //  inc(k);
- //  size := DTA.ReadLongWord;  //4 bytes: length (X)
- //  if CheckBox2.Checked then DumpText(DTA.GetPosition, size);
- //  if ActionsCheckBox.Checked then
- //     DumpData(opath + 'IACT\' + rightstr('000' + inttostr(id), 3) + '-'+rightstr('00'+inttostr(k),2), DTA.GetPosition, size)
- //     else DTA.MovePosition(size);
- //end;
-
- //1. размер IZON
-  //DTA.SetPosition(TMap(DTA.maps.Objects[id]).mapOffset);   // go to map data
-  //pn := DTA.ReadWord;               // number:word; //2 bytes - serial number of the map starting with 0
-  //if pn <> id then ShowMessage(IntToStr(pn) + ' <> ' + IntToStr(id));
-  //DTA.ReadString(4);                // izon:string[4]; //4 bytes: "IZON"
-  //DTA.ReadLongWord;                 // longword; //4 bytes - size of block IZON (include 'IZON') until object info entry count
-
-
- //3. сдвинуть все остальные после ZONE
- // как это сделать:
- // 1. прохожу и тупо меняю данные,
-  Hex.LoadFromStream(DTA.data);
+  showmessage('OK');
 end;
 
 end.

@@ -431,6 +431,7 @@ begin
     begin
       ReadWord;                //unknown:word;          01 00 - unknown 2 bytes
       sz:=ReadLongWord;        //size:longword;         size of current map (4b)
+      Log.Debug(inttostr(i-1) + ' Offset:Size: ' + IntToHex(GetPosition - 4, 4) + ':' + IntToHex(sz, 4));
       MovePosition(sz);
     end;
   //Add(sectionName, 4 + index - ind, ind);
@@ -438,25 +439,28 @@ begin
   Log.Debug('Maps (zones): ' + IntToStr(mapsCount));
   //Log.NewLine;
 
+
   SetPosition(knownSections[5]);   // ZONE
   ReadWord;                     // 2 bytes - maps count $0291 = 657 items
-
+//    showmessage('scan zone ok');
   for i := 0 to mapsCount - 1 do ScanIZON(i);
   //Log.NewLine;
+
 end;
 
 procedure TSection.ScanIZON(id: Word);
-var sz,  pn, w, h, oieCount: Word;
+var sz,  pn, w, h, oieCount, uw: Word;
   size, unk2: Longword;
 begin
   // Repeated data of TZone
   AddMap(id);
-  ReadWord;                     // unknown:word; //01 00
+  uw := ReadWord;               // unknown:word; //01 00 // map type (desert, ...)
+  if uw > $0005 then ShowMessage('ID: ' + IntToStr(id) + ' UNK: ' + IntToHex(uw, 4) + ' > ' + IntToStr($0005));
   sz := ReadLongWord;           // size:longword; size of the current map
   TMap(maps.Objects[id]).mapOffset := data.Position;
   TMap(maps.Objects[id]).mapSize := sz + 6;
   pn := ReadWord;               // number:word; //2 bytes - serial number of the map starting with 0
-  if pn <> id then ShowMessage(IntToStr(pn) + ' <> ' + IntToStr(id));
+  if pn <> id then ShowMessage('ID: ' + IntToStr(pn) + ' <> ' + IntToStr(id));
   ReadString(4);                // izon:string[4]; //4 bytes: "IZON"
   size := ReadLongWord;         // longword; //4 bytes - size of block IZON (include 'IZON') until object info entry count
   TMap(maps.Objects[id]).izonOffset := data.Position;
@@ -607,18 +611,31 @@ end;
 function TSection.GetIZON(offset : Cardinal): Word;
 var i: Word;
 begin
+  //Log.Debug(inttostr(maps.Count));
+  //for i := 0 to 5 do
+  //  Log.Debug('====izon #' + inttostr(i) + ': ' + inttohex(TMap(maps.Objects[i]).izonOffset, 4));
+
   for i := 0 to mapsCount - 1 do
-    if offset > TMap(maps.Objects[i]).izonOffset then Break;
+  begin
+    //Log.Debug('-izon #' + inttostr(i) + ': ' + inttohex(offset, 4) + '~' + inttohex(TMap(maps.Objects[i]).izonOffset, 4));
+    if offset < TMap(maps.Objects[i]).izonOffset then Break;
+  end;
   Result := i - 1;
 end;
 
 function TSection.GetIACT(offset : Cardinal): Word;
 var izon, i: Word;
 begin
+//  Log.Debug('GetIACT. Offset: ' + inttohex(offset,4));
   izon := GetIZON(offset);
+  Log.Debug('GetIZON: ' + inttostr(izon));
   for i := 0 to Length(TMap(maps.Objects[izon]).IACTS) - 1 do
-    if offset > TMap(maps.Objects[izon]).IACTS[i] then Break;
+  begin
+//    Log.Debug(inttostr(i) + ': ' + inttohex(TMap(maps.Objects[izon]).IACTS[i], 4));
+    if offset < TMap(maps.Objects[izon]).IACTS[i] then Break;
+    end;
   Result := i - 1;
+  Log.Debug('IZON/IACT: ' + inttostr(izon) + '/' + inttostr(i - 1));
 end;
 
 

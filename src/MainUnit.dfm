@@ -1,8 +1,8 @@
 object MainForm: TMainForm
   Left = 193
   Top = 106
-  Width = 995
-  Height = 807
+  Width = 1253
+  Height = 903
   Caption = 'Yoda Stories Explorer'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,8 +18,8 @@ object MainForm: TMainForm
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 0
-    Top = 404
-    Width = 987
+    Top = 236
+    Width = 1245
     Height = 12
     Cursor = crVSplit
     Align = alBottom
@@ -37,8 +37,8 @@ object MainForm: TMainForm
   object PageControl: TPageControl
     Left = 0
     Top = 0
-    Width = 987
-    Height = 404
+    Width = 1245
+    Height = 236
     ActivePage = TabSheet5
     Align = alClient
     MultiLine = True
@@ -368,8 +368,8 @@ object MainForm: TMainForm
       object PageControl1: TPageControl
         Left = 0
         Top = 0
-        Width = 979
-        Height = 376
+        Width = 1237
+        Height = 208
         ActivePage = TabSheet13
         Align = alClient
         MultiLine = True
@@ -511,7 +511,7 @@ object MainForm: TMainForm
           object Panel1: TPanel
             Left = 0
             Top = 0
-            Width = 971
+            Width = 1229
             Height = 41
             Align = alTop
             TabOrder = 0
@@ -560,19 +560,27 @@ object MainForm: TMainForm
               TabOrder = 4
               OnClick = Button15Click
             end
+            object CheckBox3: TCheckBox
+              Left = 560
+              Top = 12
+              Width = 97
+              Height = 17
+              Caption = 'Trim spaces'
+              TabOrder = 5
+            end
           end
           object Panel2: TPanel
             Left = 0
             Top = 41
-            Width = 971
-            Height = 304
+            Width = 1229
+            Height = 136
             Align = alClient
             TabOrder = 1
             object StringGrid1: TStringGrid
               Left = 1
               Top = 1
-              Width = 969
-              Height = 302
+              Width = 1227
+              Height = 134
               Align = alClient
               ColCount = 4
               Ctl3D = False
@@ -667,9 +675,9 @@ object MainForm: TMainForm
   end
   object BottomPageControl: TPageControl
     Left = 0
-    Top = 416
-    Width = 987
-    Height = 318
+    Top = 248
+    Width = 1245
+    Height = 582
     ActivePage = TabSheet9
     Align = alBottom
     TabIndex = 1
@@ -692,8 +700,8 @@ object MainForm: TMainForm
       object Hex: TMPHexEditorEx
         Left = 0
         Top = 0
-        Width = 979
-        Height = 290
+        Width = 1237
+        Height = 554
         Cursor = crIBeam
         BackupExtension = '.bak'
         PrintOptions.MarginLeft = 20
@@ -718,7 +726,7 @@ object MainForm: TMainForm
         ParentShowHint = False
         ShowHint = False
         TabOrder = 0
-        BytesPerRow = 16
+        BytesPerRow = 32
         Translation = tkAsIs
         OffsetFormat = '-!10:0x|'
         Colors.Background = clWindow
@@ -745,8 +753,8 @@ object MainForm: TMainForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 734
-    Width = 987
+    Top = 830
+    Width = 1245
     Height = 19
     Panels = <
       item
@@ -786,6 +794,10 @@ object MainForm: TMainForm
       Caption = 'File'
       object Exit1: TMenuItem
         Caption = 'Exit'
+      end
+      object Open1: TMenuItem
+        Caption = 'Open...'
+        OnClick = OpenDTAButtonClick
       end
     end
     object Settings1: TMenuItem
