@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 193
-  Top = 106
+  Left = 280
+  Top = 109
   Width = 1253
   Height = 903
   Caption = 'Yoda Stories Explorer'
@@ -18,7 +18,7 @@ object MainForm: TMainForm
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 0
-    Top = 236
+    Top = 518
     Width = 1245
     Height = 12
     Cursor = crVSplit
@@ -38,11 +38,11 @@ object MainForm: TMainForm
     Left = 0
     Top = 0
     Width = 1245
-    Height = 236
-    ActivePage = TabSheet5
+    Height = 518
+    ActivePage = TabSheet6
     Align = alClient
     MultiLine = True
-    TabIndex = 4
+    TabIndex = 5
     TabOrder = 1
     Visible = False
     object TabSheet1: TTabSheet
@@ -369,7 +369,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 1237
-        Height = 208
+        Height = 490
         ActivePage = TabSheet13
         Align = alClient
         MultiLine = True
@@ -515,6 +515,14 @@ object MainForm: TMainForm
             Height = 41
             Align = alTop
             TabOrder = 0
+            object Label3: TLabel
+              Left = 558
+              Top = 23
+              Width = 153
+              Height = 13
+              Alignment = taCenter
+              AutoSize = False
+            end
             object Button1: TButton
               Left = 8
               Top = 8
@@ -543,7 +551,7 @@ object MainForm: TMainForm
               OnClick = Button13Click
             end
             object Button14: TButton
-              Left = 480
+              Left = 368
               Top = 8
               Width = 75
               Height = 25
@@ -551,21 +559,22 @@ object MainForm: TMainForm
               TabOrder = 3
               OnClick = Button14Click
             end
-            object Button15: TButton
-              Left = 328
-              Top = 8
-              Width = 113
-              Height = 25
-              Caption = 'Check phrases sizes'
-              TabOrder = 4
-              OnClick = Button15Click
-            end
             object CheckBox3: TCheckBox
-              Left = 560
+              Left = 448
               Top = 12
               Width = 97
               Height = 17
               Caption = 'Trim spaces'
+              TabOrder = 4
+            end
+            object ProgressBar1: TProgressBar
+              Left = 560
+              Top = 5
+              Width = 150
+              Height = 17
+              Min = 0
+              Max = 100
+              Smooth = True
               TabOrder = 5
             end
           end
@@ -573,16 +582,16 @@ object MainForm: TMainForm
             Left = 0
             Top = 41
             Width = 1229
-            Height = 136
+            Height = 418
             Align = alClient
             TabOrder = 1
             object StringGrid1: TStringGrid
               Left = 1
               Top = 1
               Width = 1227
-              Height = 134
+              Height = 416
               Align = alClient
-              ColCount = 4
+              ColCount = 3
               Ctl3D = False
               DefaultRowHeight = 18
               FixedCols = 0
@@ -597,27 +606,144 @@ object MainForm: TMainForm
     object TabSheet6: TTabSheet
       Caption = 'Puzzles'
       ImageIndex = 5
-      object LabelPuzzles: TLabel
-        Left = 8
-        Top = 8
-        Width = 69
-        Height = 13
-        Caption = 'Puzzles count:'
-      end
-      object PuzzlesLabel: TLabel
-        Left = 88
-        Top = 8
-        Width = 3
-        Height = 13
-      end
-      object Button9: TButton
-        Left = 6
-        Top = 32
-        Width = 107
-        Height = 25
-        Caption = 'Save puzzles to files'
+      object PageControl2: TPageControl
+        Left = 0
+        Top = 0
+        Width = 1237
+        Height = 490
+        ActivePage = TabSheet16
+        Align = alClient
+        MultiLine = True
+        Style = tsFlatButtons
+        TabIndex = 1
         TabOrder = 0
-        OnClick = Button9Click
+        object TabSheet14: TTabSheet
+          Caption = 'General information'
+          object Label6: TLabel
+            Left = 88
+            Top = 8
+            Width = 3
+            Height = 13
+          end
+          object LabelPuzzles: TLabel
+            Left = 8
+            Top = 8
+            Width = 69
+            Height = 13
+            Caption = 'Puzzles count:'
+          end
+          object PuzzlesLabel: TLabel
+            Left = 96
+            Top = 8
+            Width = 3
+            Height = 13
+          end
+          object Button9: TButton
+            Left = 6
+            Top = 32
+            Width = 107
+            Height = 25
+            Caption = 'Save puzzles to files'
+            TabOrder = 0
+            OnClick = Button9Click
+          end
+        end
+        object TabSheet16: TTabSheet
+          Caption = 'Text translation'
+          ImageIndex = 2
+          object Panel3: TPanel
+            Left = 0
+            Top = 0
+            Width = 1229
+            Height = 41
+            Align = alTop
+            TabOrder = 0
+            object Label7: TLabel
+              Left = 558
+              Top = 23
+              Width = 153
+              Height = 13
+              Alignment = taCenter
+              AutoSize = False
+            end
+            object Button16: TButton
+              Left = 8
+              Top = 8
+              Width = 75
+              Height = 25
+              Caption = 'Get original'
+              TabOrder = 0
+              OnClick = Button16Click
+            end
+            object Button17: TButton
+              Left = 88
+              Top = 8
+              Width = 75
+              Height = 25
+              Caption = 'Get translated'
+              TabOrder = 1
+              OnClick = Button17Click
+            end
+            object Button18: TButton
+              Left = 192
+              Top = 8
+              Width = 129
+              Height = 25
+              Caption = 'Check phrases positions'
+              TabOrder = 2
+              OnClick = Button18Click
+            end
+            object Button19: TButton
+              Left = 368
+              Top = 8
+              Width = 75
+              Height = 25
+              Caption = 'Replace text'
+              TabOrder = 3
+              OnClick = Button19Click
+            end
+            object CheckBox10: TCheckBox
+              Left = 448
+              Top = 12
+              Width = 97
+              Height = 17
+              Caption = 'Trim spaces'
+              TabOrder = 4
+            end
+            object ProgressBar3: TProgressBar
+              Left = 560
+              Top = 5
+              Width = 150
+              Height = 17
+              Min = 0
+              Max = 100
+              Smooth = True
+              TabOrder = 5
+            end
+          end
+          object Panel5: TPanel
+            Left = 0
+            Top = 41
+            Width = 1229
+            Height = 418
+            Align = alClient
+            TabOrder = 1
+            object StringGrid4: TStringGrid
+              Left = 1
+              Top = 1
+              Width = 1227
+              Height = 416
+              Align = alClient
+              ColCount = 3
+              Ctl3D = False
+              DefaultRowHeight = 18
+              FixedCols = 0
+              ParentCtl3D = False
+              TabOrder = 0
+              OnDrawCell = StringGrid1DrawCell
+            end
+          end
+        end
       end
     end
     object TabSheet7: TTabSheet
@@ -675,9 +801,9 @@ object MainForm: TMainForm
   end
   object BottomPageControl: TPageControl
     Left = 0
-    Top = 248
+    Top = 530
     Width = 1245
-    Height = 582
+    Height = 300
     ActivePage = TabSheet9
     Align = alBottom
     TabIndex = 1
@@ -701,7 +827,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 1237
-        Height = 554
+        Height = 272
         Cursor = crIBeam
         BackupExtension = '.bak'
         PrintOptions.MarginLeft = 20
@@ -879,8 +1005,8 @@ object MainForm: TMainForm
     end
   end
   object TilesPopupMenu: TPopupMenu
-    Left = 296
-    Top = 264
+    Left = 872
+    Top = 184
     object Setflag1: TMenuItem
       Caption = 'Set flag'
       object Bottomlayer1: TMenuItem

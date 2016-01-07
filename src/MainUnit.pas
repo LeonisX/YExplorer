@@ -42,8 +42,6 @@ type
     SaveTilesButton: TButton;
     LabelSounds: TLabel;
     SoundsLabel: TLabel;
-    LabelPuzzles: TLabel;
-    PuzzlesLabel: TLabel;
     LabelChars: TLabel;
     CharsLabel: TLabel;
     LabelNames: TLabel;
@@ -78,7 +76,6 @@ type
     Button8: TButton;
     Label2: TLabel;
     Edit1: TEdit;
-    Button9: TButton;
     Button10: TButton;
     Button11: TButton;
     MainMenu1: TMainMenu;
@@ -162,11 +159,29 @@ type
     Button12: TButton;
     Button13: TButton;
     Button14: TButton;
-    Button15: TButton;
     StringGrid1: TStringGrid;
     OpenDialog1: TOpenDialog;
     CheckBox3: TCheckBox;
     Open1: TMenuItem;
+    ProgressBar1: TProgressBar;
+    Label3: TLabel;
+    PageControl2: TPageControl;
+    TabSheet14: TTabSheet;
+    Label6: TLabel;
+    TabSheet16: TTabSheet;
+    Panel3: TPanel;
+    Label7: TLabel;
+    Button16: TButton;
+    Button17: TButton;
+    Button18: TButton;
+    Button19: TButton;
+    CheckBox10: TCheckBox;
+    ProgressBar3: TProgressBar;
+    Panel5: TPanel;
+    StringGrid4: TStringGrid;
+    LabelPuzzles: TLabel;
+    Button9: TButton;
+    PuzzlesLabel: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -210,8 +225,11 @@ type
     procedure Button12Click(Sender: TObject);
     procedure Button13Click(Sender: TObject);
     procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
-    procedure Button15Click(Sender: TObject);
     procedure Button14Click(Sender: TObject);
+    procedure Button16Click(Sender: TObject);
+    procedure Button17Click(Sender: TObject);
+    procedure Button18Click(Sender: TObject);
+    procedure Button19Click(Sender: TObject);
   private
     texts: TStringList;
   public
@@ -246,12 +264,14 @@ type
     procedure ReadMap(id: Word; show, save: Boolean);
     procedure ViewMap(id: Word);
 
-    procedure ReadColumn(col: Byte);
+    procedure ReadColumn(col: Byte; StringGrid: TStringGrid);
     function FindStringPosition(searchString: String): Cardinal;
     function FindStringPositionReverse(searchString: String): Cardinal;
     function DecompressString(s: String): String;
 
     procedure Highlight(offset, size: Cardinal);
+
+    procedure CheckPhasePositions(StringGrid: TStringGrid);
   end;
 
 var
@@ -262,7 +282,6 @@ var
   currentFillColor: TColor;
 
   // Insert text
-  ck: array[0 .. 1] of Word = (0, 0);
   ts, ts2: TStringList;
 
   
@@ -295,19 +314,22 @@ begin
   WhiteMenuItem.Bitmap.Transparent := false;
 
   // insert text
-   ts:=TStringList.Create;
- ts2:=TStringList.Create;
+  ts := TStringList.Create;
+  ts2 := TStringList.Create;
 
- StringGrid1.Cells[0,0]:='Original';
- StringGrid1.Cells[1,0]:='Translated';
- StringGrid1.Cells[2,0]:='Position';
- StringGrid1.Cells[3,0]:='Size';
-// StringGrid1.RowHeights[0]:=18;
- k:=(StringGrid1.Width-128) div 2 - StringGrid1.GridLineWidth*StringGrid1.ColCount -8;
- StringGrid1.ColWidths[0]:=k;
- StringGrid1.ColWidths[1]:=k;
+  StringGrid1.Cells[0,0]:='#';
+  StringGrid1.Cells[1,0]:='Original';
+  StringGrid1.Cells[2,0]:='Translated';
+  k:=(StringGrid1.Width - 96) div 2 - StringGrid1.GridLineWidth * StringGrid1.ColCount - 8;
+  StringGrid1.ColWidths[1]:=k;
+  StringGrid1.ColWidths[2]:=k;
+  StringGrid4.Cells[0,0]:='#';
+  StringGrid4.Cells[1,0]:='Original';
+  StringGrid4.Cells[2,0]:='Translated';
+  StringGrid4.ColWidths[1]:=k;
+  StringGrid4.ColWidths[2]:=k;
 
- Opendialog1.InitialDir:=ExtractFilePath(ParamStr(0))+'\';
+  Opendialog1.InitialDir := ExtractFilePath(ParamStr(0))+'\';
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -330,59 +352,63 @@ end;
 
 procedure TMainForm.OpenDTAButtonClick(Sender: TObject);
 begin
-OpenDTADialog.FileName := 'D:\YExplorer\Yodesk.dta';
-//  if OpenDTADialog.Execute then
-//    begin
-PageControl.Visible := true;
-      log.Clear;
-      DTA.LoadFileToArray(OpenDTADialog.FileName);
+  OpenDTADialog.FileName := 'D:\YExplorer\Yodesk.dta';
+  //if OpenDTADialog.Execute then
+  //  begin
+    PageControl.Visible := true;
+    log.Clear;
+    DTA.LoadFileToArray(OpenDTADialog.FileName);
 
-      ScanFileAndUpdate;
+    ScanFileAndUpdate;
 
-      Log.SaveToFile(opath, 'Structure');
-//    end;
+    Log.SaveToFile(opath, 'Structure');
+  //  end;
 
-OpenDialog1.FileName := 'D:\YExplorer\iact-e.txt';
- ReadColumn(0);
-OpenDialog1.FileName := 'D:\YExplorer\iact.txt';
- ReadColumn(1);
+  OpenDialog1.FileName := 'D:\YExplorer\iact-e.txt';
+  ReadColumn(1, StringGrid1);
+  OpenDialog1.FileName := 'D:\YExplorer\iact-d.txt';
+  ReadColumn(2, StringGrid1);
   Button13Click(Self);
-    Button15Click(Self);
+  OpenDialog1.FileName := 'D:\YExplorer\puz2-e.txt';
+  ReadColumn(1, StringGrid4);
+  OpenDialog1.FileName := 'D:\YExplorer\puz2-d.txt';
+  ReadColumn(2, StringGrid4);
+  Button18Click(Self);
 end;
 
 procedure TMainForm.ScanFileAndUpdate;
 var i: Word;
 begin
   DTA.Clear;
-      DTA.readDTAMetricks;
-      HEX.LoadFromStream(DTA.data);
-      VersionLabel.Caption := DTA.version;
-      SizeLabel.Caption := IntToStr(DTA.data.Size);
-      CRC32Label.Caption := DTA.crc32;
-      NameLabel.Caption := DTA.dtaRevision;
+  DTA.readDTAMetricks;
+  HEX.LoadFromStream(DTA.data);
+  VersionLabel.Caption := DTA.version;
+  SizeLabel.Caption := IntToStr(DTA.data.Size);
+  CRC32Label.Caption := DTA.crc32;
+  NameLabel.Caption := DTA.dtaRevision;
 
-      DrawTitleImage;
+  DrawTitleImage;
 
-      SoundsLabel.Caption := IntToStr(DTA.soundsCount);
+  SoundsLabel.Caption := IntToStr(DTA.soundsCount);
 
-      TilesLabel.Caption := IntToStr(DTA.tilesCount);
+  TilesLabel.Caption := IntToStr(DTA.tilesCount);
 
-      MapsLabel.Caption := IntToStr(DTA.mapsCount);
+  MapsLabel.Caption := IntToStr(DTA.mapsCount);
 
-      PuzzlesLabel.Caption := IntToStr(DTA.puzzlesCount);
+  PuzzlesLabel.Caption := IntToStr(DTA.puzzlesCount);
 
-      CharsLabel.Caption := IntToStr(DTA.charsCount);
+  CharsLabel.Caption := IntToStr(DTA.charsCount);
 
-      NamesLabel.Caption := IntToStr(DTA.namesCount);
+  NamesLabel.Caption := IntToStr(DTA.namesCount);
 
 
-      // refactor
-      SectionsStringGrid.RowCount := DTA.sections.Count + 1;
-      SectionsStringGrid.Cells[1, 0] := 'Section';
-      SectionsStringGrid.Cells[1, 0] := 'Data size';
-      SectionsStringGrid.Cells[2, 0] := 'Full size';
-      SectionsStringGrid.Cells[3, 0] := 'Data offset';
-      SectionsStringGrid.Cells[4, 0] := 'Start offset';
+  // refactor
+  SectionsStringGrid.RowCount := DTA.sections.Count + 1;
+  SectionsStringGrid.Cells[1, 0] := 'Section';
+  SectionsStringGrid.Cells[1, 0] := 'Data size';
+  SectionsStringGrid.Cells[2, 0] := 'Full size';
+  SectionsStringGrid.Cells[3, 0] := 'Data offset';
+  SectionsStringGrid.Cells[4, 0] := 'Start offset';
 
       for i := 0 to DTA.sections.Count - 1 do
       begin
@@ -1476,39 +1502,44 @@ begin
   ReadMap(id, true, false);
 end;
 
-procedure TMainForm.ReadColumn(col: Byte);
-var f:textfile;
-s:string;
-k:word;
+procedure TMainForm.ReadColumn(col: Byte; StringGrid: TStringGrid);
+var f: textfile;
+s: String;
+i, c1, c2: Word;
 begin
-   k := 1; //строка
-   s := StringGrid1.Cells[col, 0];
-   StringGrid1.Cols[col].Clear;
-   StringGrid1.Cells[col, 0] := s;
-   s := StringGrid1.Cells[2, 0];
-   StringGrid1.Cols[2].Clear;
-   StringGrid1.Cells[2, 0] := s;
-   s := StringGrid1.Cells[3, 0];
-   StringGrid1.Cols[3].Clear;
-   StringGrid1.Cells[3, 0] := s;
+  s := StringGrid.Cells[0, 0];
+  StringGrid.Cols[0].Clear;
+  StringGrid.Cells[0, 0] := s;
+  s := StringGrid.Cells[col, 0];
+  StringGrid.Cols[col].Clear;
+  StringGrid.Cells[col, 0] := s;
 
-   AssignFile(f, Opendialog1.FileName);
-   Reset(f);
-   while not eof(f) do
+  i := 1; //строка
+  AssignFile(f, Opendialog1.FileName);
+  Reset(f);
+  while not Eof(f) do
+  begin
+    ReadLn(f, s);
+    if s <> '' then
     begin
-     readln(f,s);
-//     s:=trimright(s);
-     if s<>'' then
-       begin
-         if StringGrid1.RowCount=k then StringGrid1.RowCount:=StringGrid1.RowCount+1200;
-         StringGrid1.Cells[col,k]:=s;
-         inc(k);
-       end;
+      if StringGrid.RowCount = i then StringGrid.RowCount := StringGrid.RowCount + 300;
+      StringGrid.Cells[0, i] := IntToStr(i);
+      StringGrid.Cells[col, i] := s;
+      inc(i);
     end;
-    closefile(f);
-    ck[col]:=k;
-    StringGrid1.RowCount:=max(ck[0], ck[1]);
-    if (ck[0] <> 0) and (ck[1] <> 0) and (ck[0] <> ck[1]) then Showmessage('Number of phrases does not match!');
+  end;
+  CloseFile(f);
+
+  c1 := 1;
+  c2 := 1;
+  for i := 1 to StringGrid.RowCount - 1 do
+  begin
+    if StringGrid.Cells[1, i] <> '' then inc(c1);
+    if StringGrid.Cells[2, i] <> '' then inc(c2);
+  end;
+
+  if (c1 > 1) or (c2 > 1) then StringGrid.RowCount := Max(c1, c2);
+  if (c1 > 1) and (c2 > 1) and (c1 <> c2) then Showmessage('Number of phrases does not match!');
 end;
 
 function TMainForm.FindStringPosition(searchString: String): Cardinal;
@@ -1563,12 +1594,12 @@ end;
 
 procedure TMainForm.Button1Click(Sender: TObject);
 begin
-  if Opendialog1.Execute then ReadColumn(0);
+  if Opendialog1.Execute then ReadColumn(1, StringGrid1);
 end;
 
 procedure TMainForm.Button12Click(Sender: TObject);
 begin
- if Opendialog1.Execute then ReadColumn(1);
+ if Opendialog1.Execute then ReadColumn(2, StringGrid1);
 end;
 
 function TMainForm.DecompressString(s: String): String;
@@ -1580,25 +1611,50 @@ end;
 
 //check original
 procedure TMainForm.Button13Click(Sender: TObject);
-var i: Word;
-p: Cardinal;
-phrase: String;
 begin
   DTA.SetPosition(DTA.GetDataOffset(knownSections[5]));
-  for i := 1 to StringGrid1.RowCount do
-  begin
-     phrase := DecompressString(StringGrid1.Cells[0, i]);
-     p := FindStringPosition(phrase);
-     if p > 0 then StringGrid1.Cells[2, i] := '$' + IntToHex(p, 4) else Break;
-  end;
-  if StringGrid1.Cells[2, StringGrid1.RowCount] = '' then
-  begin
-    StringGrid1.Row := i;
-    StringGrid1.Selection := TGridRect(Rect(StringGrid1.FixedCols, i, StringGrid1.FixedCols + 1, i));
-    Application.ProcessMessages;
-    Showmessage('String not found:' + Chr(13) + phrase)
-  end else ShowMessage('OK, founded all phrases.')
+  CheckPhasePositions(StringGrid1);
 end;
+
+
+//check original
+procedure TMainForm.CheckPhasePositions(StringGrid: TStringGrid);
+var i, size: Word;
+p: Cardinal;
+phrase, msg: String;
+begin
+  msg := '';
+  for i := 1 to StringGrid.RowCount - 1 do
+  begin
+    phrase := DecompressString(StringGrid.Cells[1, i]);
+    p := FindStringPosition(phrase);
+    if p > 0 then
+    begin
+      DTA.SetPosition(p - 2);
+      size := DTA.ReadWord;
+      if size <> Length(phrase) then
+      begin
+        Showmessage(inttohex(p - 2, 4));
+        msg := 'Expected size: ' + IntToStr(size) + ' don''t match phrase size: ' +
+         IntToStr(Length(phrase)) + Chr(13) + 'Phrase: ' + phrase;
+       Break;
+      end;
+      DTA.MovePosition(size);
+    end else
+    begin
+      msg := 'String not found:' + Chr(13) + phrase;
+      break;
+    end;
+  end;
+  if msg <> '' then
+  begin
+    StringGrid.Row := i;
+    StringGrid.Selection := TGridRect(Rect(StringGrid.FixedCols, i, StringGrid.FixedCols + 1, i));
+    Application.ProcessMessages;
+    Showmessage(msg);
+  end else ShowMessage('OK, founded all phrases.');
+end;
+
 
 procedure TMainForm.StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
 var
@@ -1611,9 +1667,8 @@ var
   hGrid: TStringGrid;
   n:integer;
 begin
-
   { »нициализируем шрифт, чтобы он был управл€ющим шрифтом }
-  hGrid:=(Sender as TStringGrid);
+  hGrid := (Sender as TStringGrid);
   hGrid.Canvas.Font := Font;
 
   with hGrid.Canvas do
@@ -1671,7 +1726,7 @@ begin
         { переносим на следующую строку }
         CurY := CurY + TextHeight(CurWord);
         CurX := Rect.Left;
-        n:=n+ TextHeight(CurWord);
+        n:=n + TextHeight(CurWord);
       end;
 
       { выводим слово }
@@ -1680,34 +1735,8 @@ begin
       CurX := CurX + TextWidth(CurWord);
     end;
   end;
-  n:=n+ hGrid.Canvas.TextHeight(CurWord);
-  hGrid.RowHeights[Arow]:=max (n+1, hGrid.RowHeights[Arow]);
-end;
-
-procedure TMainForm.Button15Click(Sender: TObject);
-var i, size: Word;
-ps, phrase: String;
-begin
-  size := 0;
-  for i := 1 to StringGrid1.RowCount do
-  begin
-     phrase := DecompressString(StringGrid1.Cells[0, i]);
-     ps := StringGrid1.Cells[2, i];
-     if ps = '' then Break;
-     DTA.SetPosition(StrToInt(ps) - 2);
-     size := DTA.ReadWord;
-     if size <> Length(phrase) then Break;
-     StringGrid1.Cells[3, i] := IntToStr(size);
-  end;
-  if StringGrid1.Cells[3, StringGrid1.RowCount - 1] = '' then
-  begin
-    StringGrid1.Row := i;
-    StringGrid1.Selection := TGridRect(Rect(StringGrid1.FixedCols, i, StringGrid1.FixedCols + 1, i));
-    Application.ProcessMessages;
-    if ps = '' then ShowMessage('String not found:' + Chr(13) + phrase)
-    else ShowMessage('Expected size: ' + IntToStr(size) + ' don''t match phrase size: ' +
-      IntToStr(Length(phrase)) + Chr(13) + 'Phrase: ' + phrase);
-  end else ShowMessage('OK, all sizes match.')
+  n := n + hGrid.Canvas.TextHeight(CurWord);
+  hGrid.RowHeights[Arow] := Max(n + 1, hGrid.RowHeights[Arow]);
 end;
 
 procedure TMainForm.Highlight(offset, size: Cardinal);
@@ -1727,27 +1756,30 @@ var
   delta: Integer;
 begin
   Log.Clear;
+  ProgressBar1.Position := 0;
+  ProgressBar1.Max := StringGrid1.RowCount;
+  Label3.Caption := '';
+
   DTA.SetPosition(TMap(DTA.maps.Objects[0]).mapOffset);
-  phaseStart := FindStringPosition(oldPhrase);
-  phaseEnd := phaseStart;
+  phaseEnd := DTA.GetPosition;
 
   for i := 1 to StringGrid1.RowCount - 1 do
   begin
-    oldPhrase := DecompressString(StringGrid1.Cells[0, i]);
+    oldPhrase := DecompressString(StringGrid1.Cells[1, i]);
     oldSize := Length(oldPhrase);
-    if CheckBox3.Checked then newPhrase := DecompressString(Trim(StringGrid1.Cells[1, i]))
-      else newPhrase := DecompressString(StringGrid1.Cells[1, i]);
+    if CheckBox3.Checked then newPhrase := DecompressString(Trim(StringGrid1.Cells[2, i]))
+      else newPhrase := DecompressString(StringGrid1.Cells[2, i]);
     newSize := Length(newPhrase);
     delta := newSize - oldSize;
-    Log.Debug('======================================================================== #' + IntToStr(i));
-    Log.Debug('Search phase: ' + IntToHex(phaseEnd, 2));
+//    Log.Debug('======================================================================== #' + IntToStr(i));
+//    Log.Debug('Search phase: ' + IntToHex(phaseEnd, 2));
     DTA.SetPosition(phaseEnd);
     phaseStart := FindStringPosition(oldPhrase);
 
-    Log.Debug('oldPhrase: ' + oldPhrase + ': oldSize: ' + IntToHex(oldSize, 2));
-    Log.Debug('newPhrase: ' + newPhrase + ': newSize: ' + IntToHex(newSize, 2));
-    Log.Debug('Delta: ' + IntToStr(delta));
-    Log.Debug('Phase start: ' + IntToHex(phaseStart, 2));
+//    Log.Debug('oldPhrase: ' + oldPhrase + ': oldSize: ' + IntToHex(oldSize, 2));
+//    Log.Debug('newPhrase: ' + newPhrase + ': newSize: ' + IntToHex(newSize, 2));
+//    Log.Debug('Delta: ' + IntToStr(delta));
+//    Log.Debug('Phase start: ' + IntToHex(phaseStart, 2));
 
     DTA.SetPosition(phaseStart - 2);
     tw := DTA.ReadWord;
@@ -1767,7 +1799,7 @@ begin
     DTA.ReplaceArea(oldPhrase, newPhrase);
     phaseEnd := phaseStart + newSize - 2;
 
-    HEX.LoadFromStream(DTA.data);
+    //HEX.LoadFromStream(DTA.data);
     //Highlight(phaseStart, newSize);
     //ShowMessage('After writing text. Size: ' + Inttohex(hex.SelCount, 4));
 
@@ -1807,14 +1839,123 @@ begin
       //ShowMessage('IZON size (old:new): ' + Inttohex(size, 4) + ':' + inttohex(size + delta, 4));
     end;
 
+    ProgressBar1.Position := i;
+    Label3.Caption := Format('%.2f %%', [((i + 1)/ StringGrid1.RowCount) * 100]);
+
     Application.ProcessMessages;
   end;
 
- Hex.LoadFromStream(DTA.data);
-  // тут надо пересканировать всЄ
- DTA.data.SaveToFile('d:\YExplorer\test\test2\Yodesk.dta');
-
+  Hex.LoadFromStream(DTA.data);
+  DTA.data.SaveToFile('d:\YExplorer\test\test2\Yodesk.dta');
   showmessage('OK');
+  ScanFileAndUpdate;
+end;
+
+procedure TMainForm.Button16Click(Sender: TObject);
+begin
+  if Opendialog1.Execute then ReadColumn(1, StringGrid4);
+end;
+
+procedure TMainForm.Button17Click(Sender: TObject);
+begin
+  if Opendialog1.Execute then ReadColumn(2, StringGrid4);
+end;
+
+procedure TMainForm.Button18Click(Sender: TObject);
+begin
+  DTA.SetPosition(DTA.GetDataOffset(knownSections[6]));
+  CheckPhasePositions(StringGrid4);
+end;
+
+procedure TMainForm.Button19Click(Sender: TObject);
+var
+  i, tw, oldSize, newSize: Word;
+  oldPhrase, newPhrase: String;
+  size, phaseStart, phaseEnd, ipuzOffset, previousSize: Cardinal;
+  delta: Integer;
+begin
+  Log.Clear;
+  ProgressBar3.Position := 0;
+  ProgressBar3.Max := StringGrid4.RowCount;
+  Label7.Caption := '';
+
+  previousSize := DTA.GetSize;
+  DTA.SetPosition(DTA.GetDataOffset(knownSections[6]));
+  phaseEnd := DTA.GetPosition;
+
+  for i := 1 to StringGrid4.RowCount - 1 do
+  begin
+    oldPhrase := DecompressString(StringGrid4.Cells[1, i]);
+    oldSize := Length(oldPhrase);
+    if CheckBox10.Checked then newPhrase := DecompressString(Trim(StringGrid4.Cells[2, i]))
+      else newPhrase := DecompressString(StringGrid4.Cells[2, i]);
+    newSize := Length(newPhrase);
+    delta := newSize - oldSize;
+//    Log.Debug('======================================================================== #' + IntToStr(i));
+//    Log.Debug('Search phase: ' + IntToHex(phaseEnd, 2));
+    DTA.SetPosition(phaseEnd);
+    phaseStart := FindStringPosition(oldPhrase);
+
+//    Log.Debug('oldPhrase: ' + oldPhrase + ': oldSize: ' + IntToHex(oldSize, 2));
+//    Log.Debug('newPhrase: ' + newPhrase + ': newSize: ' + IntToHex(newSize, 2));
+//    Log.Debug('Delta: ' + IntToStr(delta));
+//    Log.Debug('Phase start: ' + IntToHex(phaseStart, 2));
+
+    DTA.SetPosition(phaseStart - 2);
+    tw := DTA.ReadWord;
+    if tw <> oldSize then
+    begin
+      Highlight(phaseStart - 2, 2);
+      ShowMessage('Readed size:' + Inttohex(tw, 4) + '(need ' + inttostr (oldSize) + ')');
+      break;
+    end;
+
+    DTA.SetPosition(phaseStart - 2);
+    DTA.WriteWord(newSize);
+
+    //Highlight(phaseStart, oldSize);
+    //ShowMessage('Before writing text. Size: ' + Inttohex(hex.SelCount, 4));
+
+    DTA.ReplaceArea(oldPhrase, newPhrase);
+    phaseEnd := phaseStart + newSize - 2;
+
+    //HEX.LoadFromStream(DTA.data);
+    //Highlight(phaseStart, newSize);
+    //ShowMessage('After writing text. Size: ' + Inttohex(hex.SelCount, 4));
+
+    if delta <> 0 then
+    begin
+      DTA.SetPosition(phaseStart - 2);
+      ipuzOffset := FindStringPositionReverse('IPUZ');
+      //Showmessage(inttohex(ipuzOffset,4));
+      DTA.SetPosition(ipuzOffset);
+      if DTA.ReadString(4) <> 'IPUZ' then ShowMessage('IPUZ not found!!!');
+      size := DTA.ReadLongWord;
+      DTA.MovePosition(-4);
+      DTA.WriteLongWord(size + delta);
+
+      //Highlight(izonOffset - 6, 4);
+      //ShowMessage('IZON size (old:new): ' + Inttohex(size, 4) + ':' + inttohex(size + delta, 4));
+    end;
+
+    ProgressBar3.Position := i;
+    Label7.Caption := Format('%.2f %%', [((i + 1)/ StringGrid4.RowCount) * 100]);
+
+    Application.ProcessMessages;
+  end;
+
+  // помен€ть размер PUZ2
+  DTA.SetPosition(DTA.GetStartOffset(knownSections[6]));
+  if DTA.ReadString(4) <> 'PUZ2' then ShowMessage('PUZ2 not found!!!');
+  size := DTA.ReadLongWord;
+  if size <> DTA.GetDataSize((knownSections[6])) then ShowMessage('PUZ2 size don''t match!');
+  DTA.MovePosition(-4);
+  DTA.WriteLongWord(size - previousSize + DTA.GetSize);
+
+  Hex.LoadFromStream(DTA.data);
+  DTA.data.SaveToFile('d:\YExplorer\test\test2\Yodesk.dta');
+  showmessage('OK');
+  ScanFileAndUpdate;
 end;
 
 end.

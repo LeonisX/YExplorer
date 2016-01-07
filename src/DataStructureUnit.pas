@@ -329,7 +329,7 @@ var sz: Longword;
 begin
   sz := ReadLongWord;            //4 байта - длина блока TGEN
   //Add(sectionName, 4 + sz, index);
-  Add(sectionName, sz, sz + 4 + 4, data.Position, data.Position - 4 - 4);
+  Add(sectionName, sz, sz + 4 + 4, GetPosition, GetPosition - 4 - 4);
   MovePosition(sz);
   Log.Debug(sectionName + ' - what is it?...');
 end;
@@ -341,7 +341,7 @@ sz: Longword;
 count: Byte;
 begin
   sz := ReadLongWord;           //4 bytes - length of section TNAM
-  Add(sectionName, sz, sz + 4 + 4, data.Position, data.Position - 4 - 4);
+  Add(sectionName, sz, sz + 4 + 4, GetPosition, GetPosition - 4 - 4);
   //MoveIndex(sz);
   count := 0;
   while InBound(sectionName) do
@@ -361,7 +361,7 @@ var sz: Longword;
 count: Byte;
 begin
   sz := ReadLongWord;           //4 bytes - length of section CAUX
-  Add(sectionName, sz, sz + 4 + 4, data.Position, data.Position - 4 - 4);
+  Add(sectionName, sz, sz + 4 + 4, GetPosition, GetPosition - 4 - 4);
   MovePosition(sz);
   count := (sz - 2) div 4;
   Log.Debug(sectionName + ': ' + inttostr(count));
@@ -373,7 +373,7 @@ var sz: Longword;
 count: Byte;
 begin
   sz := ReadLongWord;           //4 bytes - length of section CHWP
-  Add(sectionName, sz, sz + 4 + 4, data.Position, data.Position - 4 - 4);
+  Add(sectionName, sz, sz + 4 + 4, GetPosition, GetPosition - 4 - 4);
   MovePosition(sz);
     count := (sz - 2) div 6;
   Log.Debug(sectionName + ': ' + inttostr(count));
@@ -385,7 +385,7 @@ var sz, csz: Longword;
 ch: Word;
 begin
   sz := ReadLongWord;           //4 bytes - length of section CHAR
-  Add(sectionName, sz, sz + 4 + 4, data.Position, data.Position - 4 - 4);
+  Add(sectionName, sz, sz + 4 + 4, GetPosition, GetPosition - 4 - 4);
   charsCount := 0;
   while InBound(sectionName) do
    begin
@@ -404,7 +404,7 @@ var sz, psz: Longword;
 pz: Word;
 begin
   sz := ReadLongWord;           //4 bytes - length of section PUZ2
-  Add(sectionName, sz, sz + 4 + 4, data.Position, data.Position - 4 - 4);
+  Add(sectionName, sz, sz + 4 + 4, GetPosition, GetPosition - 4 - 4);
   puzzlesCount := 0;
   while InBound(sectionName) do
    begin
@@ -435,7 +435,7 @@ begin
       MovePosition(sz);
     end;
   //Add(sectionName, 4 + index - ind, ind);
-  Add(sectionName, data.Position - ind, data.Position - ind + 4, ind, ind - 4);
+  Add(sectionName, GetPosition - ind, GetPosition - ind + 4, ind, ind - 4);
   Log.Debug('Maps (zones): ' + IntToStr(mapsCount));
   //Log.NewLine;
 
@@ -457,13 +457,13 @@ begin
   uw := ReadWord;               // unknown:word; //01 00 // map type (desert, ...)
   if uw > $0005 then ShowMessage('ID: ' + IntToStr(id) + ' UNK: ' + IntToHex(uw, 4) + ' > ' + IntToStr($0005));
   sz := ReadLongWord;           // size:longword; size of the current map
-  TMap(maps.Objects[id]).mapOffset := data.Position;
+  TMap(maps.Objects[id]).mapOffset := GetPosition;
   TMap(maps.Objects[id]).mapSize := sz + 6;
   pn := ReadWord;               // number:word; //2 bytes - serial number of the map starting with 0
   if pn <> id then ShowMessage('ID: ' + IntToStr(pn) + ' <> ' + IntToStr(id));
   ReadString(4);                // izon:string[4]; //4 bytes: "IZON"
   size := ReadLongWord;         // longword; //4 bytes - size of block IZON (include 'IZON') until object info entry count
-  TMap(maps.Objects[id]).izonOffset := data.Position;
+  TMap(maps.Objects[id]).izonOffset := GetPosition;
   TMap(maps.Objects[id]).izonSize := size - 6;
   Application.ProcessMessages;
 
@@ -480,7 +480,7 @@ begin
   MovePosition(w * h * 6);
 
   oieCount := ReadWord;         //2 bytes: object info entry count (X)
-  TMap(maps.Objects[id]).oieOffset := data.Position;
+  TMap(maps.Objects[id]).oieOffset := GetPosition;
   TMap(maps.Objects[id]).oieCount := oieCount;
   TMap(maps.Objects[id]).oieSize := oieCount * 12;
   MovePosition(oieCount * 12);     //X*12 bytes: object info data
@@ -499,7 +499,7 @@ var size: Longword;
 begin
   ReadString(4);                //4 bytes: "IZAX"
   size := ReadLongWord;         //4 bytes: length (X)
-  TMap(maps.Objects[id]).izaxOffset := data.Position;
+  TMap(maps.Objects[id]).izaxOffset := GetPosition;
   TMap(maps.Objects[id]).izaxSize := size - 8;
   MovePosition(size - 8);          //X-8 bytes: IZAX data
 end;
@@ -509,7 +509,7 @@ var size: Longword;
 begin
   ReadString(4);                //4 bytes: "IZX2"
   size := ReadLongWord;         //4 bytes: length (X)
-  TMap(maps.Objects[id]).izx2Offset := data.Position;
+  TMap(maps.Objects[id]).izx2Offset := GetPosition;
   TMap(maps.Objects[id]).izx2Size := size - 8;
   MovePosition(size - 8);          //X-8 bytes: IZX2 data
 end;
@@ -519,7 +519,7 @@ var size: Longword;
 begin
   ReadString(4);                //4 bytes: "IZX3"
   size := ReadLongWord;         //4 bytes: length (X)
-  TMap(maps.Objects[id]).izx3Offset := data.Position;
+  TMap(maps.Objects[id]).izx3Offset := GetPosition;
   TMap(maps.Objects[id]).izx3Size := size - 8;
   MovePosition(size - 8);          //X-8 bytes: IZX3 data
 end;
@@ -527,7 +527,7 @@ end;
 procedure TSection.ScanIZX4(id: Word);
 begin
   ReadString(4);                //4 bytes: "IZX4"
-  TMap(maps.Objects[id]).izx4Offset := data.Position;
+  TMap(maps.Objects[id]).izx4Offset := GetPosition;
   TMap(maps.Objects[id]).izx4Size := 8;
   MovePosition(8);          //8 bytes: IZX4 data
 end;
@@ -539,7 +539,7 @@ size, idx: Longword;
 k: Byte;
 begin
   idx := data.Position;
-  TMap(maps.Objects[id]).iactOffset := data.Position;
+  TMap(maps.Objects[id]).iactOffset := GetPosition;
   //TMap(maps.Objects[id]).iactSize := size - 6;
   k := 0;
 l1:
@@ -554,7 +554,7 @@ l1:
   goto l1;
 l2:
   MovePosition(-4);
-  TMap(maps.Objects[id]).iactSize := data.Position - idx;
+  TMap(maps.Objects[id]).iactSize := GetPosition - idx;
 end;
 
 
@@ -563,7 +563,7 @@ var sz: Cardinal;
 i: Word;
 begin
   sz:=ReadLongWord;             //4 bytes - length of section TILE
-  Add(sectionName, sz, sz + 4 + 4, data.Position, data.Position - 4 - 4);
+  Add(sectionName, sz, sz + 4 + 4, GetPosition, GetPosition - 4 - 4);
   MovePosition(sz);
   tilesCount := sz div $404;
   SetLength(tiles, tilesCount);
@@ -576,7 +576,7 @@ procedure TSection.ScanSNDS(sectionName: String);
 var sz, msz: Word;
 begin
   sz:=ReadLongWord;             //4 bytes - length of section SNDS
-  Add(sectionName, sz, sz + 4 + 4, data.Position, data.Position - 4 - 4);
+  Add(sectionName, sz, sz + 4 + 4, GetPosition, GetPosition - 4 - 4);
   soundsCount := 0;
   ReadWord;
   while InBound(knownSections[3]) do
@@ -592,7 +592,7 @@ procedure TSection.ScanSTUP(sectionName: String);
 var sz: Longword;
 begin
   sz:=ReadLongWord;             //4 bytes - length of section STUP
-  Add(sectionName, sz, sz + 4 + 4, data.Position, data.Position - 4 - 4);
+  Add(sectionName, sz, sz + 4 + 4, GetPosition, GetPosition - 4 - 4);
   MovePosition(sz);
   Log.Debug('Title screen: exists');
 end;
@@ -600,7 +600,7 @@ end;
 procedure TSection.ScanVERS(sectionName: String);
 var ver: LongWord;
 begin
-  Add(sectionName, 4, 4 + 4, data.Position, data.Position - 4);
+  Add(sectionName, 4, 4 + 4, GetPosition, GetPosition - 4);
   data.ReadBuffer(ver, SizeOf(ver));
   if ver = $0200 then version := '2.0' else version := 'x.x';
   Log.Debug('File version: ' + version);
