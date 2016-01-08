@@ -44,8 +44,6 @@ type
     SoundsLabel: TLabel;
     LabelChars: TLabel;
     CharsLabel: TLabel;
-    LabelNames: TLabel;
-    NamesLabel: TLabel;
     DecimalCheckBox: TCheckBox;
     HexCheckBox: TCheckBox;
     AttrCheckBox: TCheckBox;
@@ -77,7 +75,6 @@ type
     Label2: TLabel;
     Edit1: TEdit;
     Button10: TButton;
-    Button11: TButton;
     MainMenu1: TMainMenu;
     File1: TMenuItem;
     Settings1: TMenuItem;
@@ -182,6 +179,23 @@ type
     LabelPuzzles: TLabel;
     Button9: TButton;
     PuzzlesLabel: TLabel;
+    PageControl3: TPageControl;
+    TabSheet15: TTabSheet;
+    TabSheet17: TTabSheet;
+    Panel6: TPanel;
+    Label9: TLabel;
+    Button20: TButton;
+    Button21: TButton;
+    Button22: TButton;
+    Button23: TButton;
+    ProgressBar2: TProgressBar;
+    Panel7: TPanel;
+    StringGrid2: TStringGrid;
+    Button11: TButton;
+    NamesLabel: TLabel;
+    LabelNames: TLabel;
+    CheckBox4: TCheckBox;
+    Label4: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -224,12 +238,20 @@ type
     procedure Button1Click(Sender: TObject);
     procedure Button12Click(Sender: TObject);
     procedure Button13Click(Sender: TObject);
-    procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+    procedure StringGridDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
     procedure Button14Click(Sender: TObject);
     procedure Button16Click(Sender: TObject);
     procedure Button17Click(Sender: TObject);
     procedure Button18Click(Sender: TObject);
     procedure Button19Click(Sender: TObject);
+    procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer;
+      Rect: TRect; State: TGridDrawState);
+    procedure StringGrid4DrawCell(Sender: TObject; ACol, ARow: Integer;
+      Rect: TRect; State: TGridDrawState);
+    procedure Button20Click(Sender: TObject);
+    procedure Button21Click(Sender: TObject);
+    procedure Button22Click(Sender: TObject);
+    procedure Button23Click(Sender: TObject);
   private
     texts: TStringList;
   public
@@ -328,6 +350,11 @@ begin
   StringGrid4.Cells[2,0]:='Translated';
   StringGrid4.ColWidths[1]:=k;
   StringGrid4.ColWidths[2]:=k;
+  StringGrid2.Cells[0,0]:='#';
+  StringGrid2.Cells[1,0]:='Original';
+  StringGrid2.Cells[2,0]:='Translated';
+  StringGrid2.ColWidths[1]:=k;
+  StringGrid2.ColWidths[2]:=k;
 
   Opendialog1.InitialDir := ExtractFilePath(ParamStr(0))+'\';
 end;
@@ -1656,7 +1683,7 @@ begin
 end;
 
 
-procedure TMainForm.StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+procedure TMainForm.StringGridDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
 var
   Sentence, { Выводимый текст }
   CurWord: string; { Текущее выводимое слово }
@@ -1665,7 +1692,7 @@ var
   CurY: Integer; { Y-координата 'курсора' }
   EndOfSentence: Boolean; { Величина, указывающая на заполненность ячейки }
   hGrid: TStringGrid;
-  n:integer;
+  n: Integer;
 begin
   { Инициализируем шрифт, чтобы он был управляющим шрифтом }
   hGrid := (Sender as TStringGrid);
@@ -1951,6 +1978,96 @@ begin
   if size <> DTA.GetDataSize((knownSections[6])) then ShowMessage('PUZ2 size don''t match!');
   DTA.MovePosition(-4);
   DTA.WriteLongWord(size - previousSize + DTA.GetSize);
+
+  Hex.LoadFromStream(DTA.data);
+  DTA.data.SaveToFile('d:\YExplorer\test\test2\Yodesk.dta');
+  showmessage('OK');
+  ScanFileAndUpdate;
+end;
+
+procedure TMainForm.StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+begin
+  StringGridDrawCell(Sender, ACol, ARow, Rect, State);
+end;
+
+procedure TMainForm.StringGrid4DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+begin
+  StringGridDrawCell(Sender, ACol, ARow, Rect, State);
+end;
+
+procedure TMainForm.Button20Click(Sender: TObject);
+begin
+  if Opendialog1.Execute then ReadColumn(1, StringGrid2);
+end;
+
+procedure TMainForm.Button21Click(Sender: TObject);
+begin
+  if Opendialog1.Execute then ReadColumn(2, StringGrid2);
+end;
+
+procedure TMainForm.Button22Click(Sender: TObject);
+var i: Word;
+  s, msg: String;
+  len: Byte;
+begin
+  DTA.SetPosition(DTA.GetDataOffset(knownSections[10]));
+  msg := '';
+  for i := 1 to DTA.namesCount do
+  begin
+    DTA.ReadWord;
+    len := Length(StringGrid2.Cells[1, i]);
+    s := DTA.ReadString(len);
+    if s <> StringGrid2.Cells[1, i] then
+    begin
+      msg := 'Readed name "' + s + '" must be: "' + StringGrid2.Cells[1, i] + '"';
+      Break;
+    end;
+    DTA.ReadString(24 - len);
+  end;
+  if msg <> '' then
+  begin
+    StringGrid2.Row := i;
+    StringGrid2.Selection := TGridRect(Rect(StringGrid2.FixedCols, i, StringGrid2.FixedCols + 1, i));
+    Application.ProcessMessages;
+    Showmessage(msg);
+  end else ShowMessage('OK, founded all names.');
+end;
+
+procedure TMainForm.Button23Click(Sender: TObject);
+var currentPos: Cardinal;
+  i: Word;
+  j, len: Byte;
+  str: String;
+begin
+  Log.Clear;
+  ProgressBar2.Position := 0;
+  ProgressBar2.Max := StringGrid2.RowCount;
+  Label9.Caption := '';
+
+  DTA.SetPosition(DTA.GetDataOffset(knownSections[10]));
+
+  for i := 1 to DTA.namesCount do
+  begin
+    DTA.ReadWord;
+    currentPos := DTA.GetPosition;
+    // Check again
+    //if DTA.ReadString(Length(StringGrid2.Cells[1, i])) <> StringGrid2.Cells[1, i] then showmessage(inttohex(currentPos,4) + ' !! ' + StringGrid2.Cells[1, i]);
+    // Clear with #0000000000000000
+    //DTA.SetPosition(currentPos);
+    for j := 1 to 6 do DTA.WriteLongWord(0);
+
+    DTA.SetPosition(currentPos);
+
+    str := StringGrid2.Cells[2, i];
+    if CheckBox4.Checked then str := Trim(str);
+    DTA.WriteString(str);
+    DTA.ReadString(24 - Length(str));
+
+    ProgressBar2.Position := i;
+    Label9.Caption := Format('%.2f %%', [((i + 1)/ StringGrid2.RowCount) * 100]);
+
+    Application.ProcessMessages;
+  end;
 
   Hex.LoadFromStream(DTA.data);
   DTA.data.SaveToFile('d:\YExplorer\test\test2\Yodesk.dta');

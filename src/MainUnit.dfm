@@ -39,10 +39,10 @@ object MainForm: TMainForm
     Top = 0
     Width = 1245
     Height = 518
-    ActivePage = TabSheet6
+    ActivePage = TabSheet7
     Align = alClient
     MultiLine = True
-    TabIndex = 5
+    TabIndex = 6
     TabOrder = 1
     Visible = False
     object TabSheet1: TTabSheet
@@ -370,11 +370,11 @@ object MainForm: TMainForm
         Top = 0
         Width = 1237
         Height = 490
-        ActivePage = TabSheet13
+        ActivePage = TabSheet11
         Align = alClient
         MultiLine = True
         Style = tsFlatButtons
-        TabIndex = 2
+        TabIndex = 0
         TabOrder = 0
         object TabSheet11: TTabSheet
           Caption = 'General information'
@@ -494,8 +494,8 @@ object MainForm: TMainForm
           object MapsStringGrid: TStringGrid
             Left = 0
             Top = 0
-            Width = 971
-            Height = 345
+            Width = 1229
+            Height = 459
             Align = alClient
             ColCount = 18
             DefaultColWidth = 58
@@ -740,7 +740,7 @@ object MainForm: TMainForm
               FixedCols = 0
               ParentCtl3D = False
               TabOrder = 0
-              OnDrawCell = StringGrid1DrawCell
+              OnDrawCell = StringGrid4DrawCell
             end
           end
         end
@@ -762,6 +762,23 @@ object MainForm: TMainForm
         Width = 3
         Height = 13
       end
+      object Label4: TLabel
+        Left = 8
+        Top = 72
+        Width = 412
+        Height = 13
+        Caption = 
+          'WARNING!!! Characters don'#39't need to translate. Don'#39't waste your ' +
+          'time :)'
+        Color = clBtnFace
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clMaroon
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
       object Button10: TButton
         Left = 6
         Top = 32
@@ -775,27 +792,137 @@ object MainForm: TMainForm
     object TabSheet10: TTabSheet
       Caption = 'Names'
       ImageIndex = 9
-      object LabelNames: TLabel
-        Left = 8
-        Top = 8
-        Width = 66
-        Height = 13
-        Caption = 'Names count:'
-      end
-      object NamesLabel: TLabel
-        Left = 88
-        Top = 8
-        Width = 3
-        Height = 13
-      end
-      object Button11: TButton
-        Left = 6
-        Top = 32
-        Width = 123
-        Height = 25
-        Caption = 'Save names to files'
+      object PageControl3: TPageControl
+        Left = 0
+        Top = 0
+        Width = 1237
+        Height = 490
+        ActivePage = TabSheet17
+        Align = alClient
+        MultiLine = True
+        Style = tsFlatButtons
+        TabIndex = 1
         TabOrder = 0
-        OnClick = Button11Click
+        object TabSheet15: TTabSheet
+          Caption = 'General information'
+          object NamesLabel: TLabel
+            Left = 88
+            Top = 8
+            Width = 3
+            Height = 13
+          end
+          object LabelNames: TLabel
+            Left = 8
+            Top = 8
+            Width = 66
+            Height = 13
+            Caption = 'Names count:'
+          end
+          object Button11: TButton
+            Left = 6
+            Top = 32
+            Width = 123
+            Height = 25
+            Caption = 'Save names to files'
+            TabOrder = 0
+            OnClick = Button11Click
+          end
+        end
+        object TabSheet17: TTabSheet
+          Caption = 'Text translation'
+          ImageIndex = 2
+          object Panel6: TPanel
+            Left = 0
+            Top = 0
+            Width = 1229
+            Height = 41
+            Align = alTop
+            TabOrder = 0
+            object Label9: TLabel
+              Left = 558
+              Top = 23
+              Width = 153
+              Height = 13
+              Alignment = taCenter
+              AutoSize = False
+            end
+            object Button20: TButton
+              Left = 8
+              Top = 8
+              Width = 75
+              Height = 25
+              Caption = 'Get original'
+              TabOrder = 0
+              OnClick = Button20Click
+            end
+            object Button21: TButton
+              Left = 88
+              Top = 8
+              Width = 75
+              Height = 25
+              Caption = 'Get translated'
+              TabOrder = 1
+              OnClick = Button21Click
+            end
+            object Button22: TButton
+              Left = 192
+              Top = 8
+              Width = 129
+              Height = 25
+              Caption = 'Check phrases positions'
+              TabOrder = 2
+              OnClick = Button22Click
+            end
+            object Button23: TButton
+              Left = 368
+              Top = 8
+              Width = 75
+              Height = 25
+              Caption = 'Replace text'
+              TabOrder = 3
+              OnClick = Button23Click
+            end
+            object ProgressBar2: TProgressBar
+              Left = 560
+              Top = 5
+              Width = 150
+              Height = 17
+              Min = 0
+              Max = 100
+              Smooth = True
+              TabOrder = 4
+            end
+            object CheckBox4: TCheckBox
+              Left = 448
+              Top = 12
+              Width = 97
+              Height = 17
+              Caption = 'Trim spaces'
+              TabOrder = 5
+            end
+          end
+          object Panel7: TPanel
+            Left = 0
+            Top = 41
+            Width = 1229
+            Height = 418
+            Align = alClient
+            TabOrder = 1
+            object StringGrid2: TStringGrid
+              Left = 1
+              Top = 1
+              Width = 1227
+              Height = 416
+              Align = alClient
+              ColCount = 3
+              Ctl3D = False
+              DefaultRowHeight = 18
+              FixedCols = 0
+              ParentCtl3D = False
+              TabOrder = 0
+            end
+          end
+        end
       end
     end
   end
