@@ -39,10 +39,10 @@ object MainForm: TMainForm
     Top = 0
     Width = 1245
     Height = 518
-    ActivePage = TabSheet7
+    ActivePage = TabSheet5
     Align = alClient
     MultiLine = True
-    TabIndex = 6
+    TabIndex = 4
     TabOrder = 1
     Visible = False
     object TabSheet1: TTabSheet
@@ -110,8 +110,8 @@ object MainForm: TMainForm
         OnSelectCell = SectionsStringGridSelectCell
       end
       object Button2: TButton
-        Left = 80
-        Top = 292
+        Left = 96
+        Top = 348
         Width = 75
         Height = 25
         Caption = 'LoadBMP'
@@ -370,11 +370,11 @@ object MainForm: TMainForm
         Top = 0
         Width = 1237
         Height = 490
-        ActivePage = TabSheet11
+        ActivePage = TabSheet18
         Align = alClient
         MultiLine = True
         Style = tsFlatButtons
-        TabIndex = 0
+        TabIndex = 2
         TabOrder = 0
         object TabSheet11: TTabSheet
           Caption = 'General information'
@@ -404,6 +404,9 @@ object MainForm: TMainForm
             Top = 7
             Width = 288
             Height = 288
+            OnDragDrop = MapImageDragDrop
+            OnDragOver = MapImageDragOver
+            OnMouseUp = MapImageMouseUp
           end
           object MapProgressBar: TProgressBar
             Left = 16
@@ -477,7 +480,7 @@ object MainForm: TMainForm
           end
           object MapsListStringGrid: TStringGrid
             Left = 224
-            Top = 8
+            Top = 7
             Width = 89
             Height = 289
             ColCount = 1
@@ -503,6 +506,27 @@ object MainForm: TMainForm
             RowCount = 2
             TabOrder = 0
             OnSelectCell = MapsStringGridSelectCell
+          end
+        end
+        object TabSheet18: TTabSheet
+          Caption = 'Map editor'
+          ImageIndex = 3
+          OnHide = TabSheet18Hide
+          OnShow = TabSheet18Show
+          object RadioGroup1: TRadioGroup
+            Left = 224
+            Top = 0
+            Width = 273
+            Height = 33
+            Caption = ' Map planes '
+            Columns = 3
+            ItemIndex = 1
+            Items.Strings = (
+              'Bottom'
+              'Middle'
+              'Top')
+            TabOrder = 0
+            OnClick = RadioGroup1Click
           end
         end
         object TabSheet13: TTabSheet
@@ -1446,5 +1470,17 @@ object MainForm: TMainForm
     Filter = 'All files|*.*'
     Left = 912
     Top = 144
+  end
+  object MapPopupMenu: TPopupMenu
+    Left = 912
+    Top = 184
+    object Undo1: TMenuItem
+      Caption = 'Undo'
+      OnClick = Undo1Click
+    end
+    object Empty1: TMenuItem
+      Caption = 'Empty'
+      OnClick = Empty1Click
+    end
   end
 end

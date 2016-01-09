@@ -196,6 +196,11 @@ type
     LabelNames: TLabel;
     CheckBox4: TCheckBox;
     Label4: TLabel;
+    TabSheet18: TTabSheet;
+    RadioGroup1: TRadioGroup;
+    MapPopupMenu: TPopupMenu;
+    Undo1: TMenuItem;
+    Empty1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -244,14 +249,20 @@ type
     procedure Button17Click(Sender: TObject);
     procedure Button18Click(Sender: TObject);
     procedure Button19Click(Sender: TObject);
-    procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer;
-      Rect: TRect; State: TGridDrawState);
-    procedure StringGrid4DrawCell(Sender: TObject; ACol, ARow: Integer;
-      Rect: TRect; State: TGridDrawState);
+    procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+    procedure StringGrid4DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
     procedure Button20Click(Sender: TObject);
     procedure Button21Click(Sender: TObject);
     procedure Button22Click(Sender: TObject);
     procedure Button23Click(Sender: TObject);
+    procedure TabSheet18Show(Sender: TObject);
+    procedure TabSheet18Hide(Sender: TObject);
+    procedure MapImageDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+    procedure MapImageDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure MapImageMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure RadioGroup1Click(Sender: TObject);
+    procedure Undo1Click(Sender: TObject);
+    procedure Empty1Click(Sender: TObject);
   private
     texts: TStringList;
   public
@@ -294,6 +305,8 @@ type
     procedure Highlight(offset, size: Cardinal);
 
     procedure CheckPhasePositions(StringGrid: TStringGrid);
+
+    procedure SelectMapTile(X, Y: Integer; concrete: Boolean);
   end;
 
 var
@@ -306,6 +319,8 @@ var
   // Insert text
   ts, ts2: TStringList;
 
+  prevTile: Integer = -1;
+  prevTileX, prevTileY: Word;
   
 implementation
 
@@ -1065,7 +1080,6 @@ begin
   selectedCell := ACol + ARow * 16;
   if selectedCell < DTA.tilesCount then
   begin
-
     if Button = mbLeft then TilesDrawGrid.BeginDrag(false, 8) else
       begin
         TilesDrawGrid.Row := ARow;
@@ -1097,7 +1111,7 @@ begin
   r := Rect(0, 0, ClipboardImage.Width, ClipboardImage.Height);
   ClipboardImage.Canvas.Brush.Color := currentFillColor;
   ClipboardImage.Canvas.Brush.Style := bsSolid;
-  ClipboardImage.Canvas.FillRect(r);  
+  ClipboardImage.Canvas.FillRect(r);
 end;
 
 procedure TMainForm.ClipboardImageMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -2073,6 +2087,107 @@ begin
   DTA.data.SaveToFile('d:\YExplorer\test\test2\Yodesk.dta');
   showmessage('OK');
   ScanFileAndUpdate;
+end;
+
+procedure TMainForm.TabSheet18Show(Sender: TObject);
+begin
+  MapsListStringGrid.Parent := TabSheet18;
+  MapsListStringGrid.Left := 8;
+  TilesDrawGrid.Parent := TabSheet18;
+  TilesDrawGrid.Left := MapsListStringGrid.Left + MapsListStringGrid.Width + 8;
+  MapImage.Parent := TabSheet18;
+  MapImage.Left := TilesDrawGrid.Left + TilesDrawGrid.Width + 8;
+  MapsListStringGrid.Top := TilesDrawGrid.Top;
+  MapImage.Top := TilesDrawGrid.Top;
+end;
+
+procedure TMainForm.TabSheet18Hide(Sender: TObject);
+begin
+  MapsListStringGrid.Parent := TabSheet11;
+  MapsListStringGrid.Left := 224;
+  TilesDrawGrid.Parent := TabSheet4;
+  TilesDrawGrid.Left := 224;
+  MapImage.Parent := TabSheet11;
+  MapImage.Left := 320;
+  MapsListStringGrid.Top := 7;
+  MapImage.Top := 7;
+end;
+
+
+procedure TMainForm.MapImageDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+begin
+  Accept := (Source is TDrawGrid);
+end;
+
+procedure TMainForm.SelectMapTile(X, Y: Integer; concrete: Boolean);
+var left, top, w, h: Word;
+begin
+  left := x div 32;
+  top := y div 32;
+
+  DTA.SetPosition(TMap(DTA.maps.Objects[MapsListStringGrid.Row]).mapOffset);   // go to map data
+  DTA.ReadString(10);
+  w := DTA.ReadWord;                // width:word; //2 bytes: map width (W)
+  h := DTA.ReadWord;                // height:word; //2 bytes: map height (H)
+  DTA.ReadString(8);
+  DTA.MovePosition((top * w + left) * 6);
+  if concrete then DTA.MovePosition(RadioGroup1.ItemIndex * 2);
+end;
+
+
+procedure TMainForm.MapImageDragDrop(Sender, Source: TObject; X, Y: Integer);
+begin
+  prevTileX := x div 32;
+  prevTileY := y div 32;
+  SelectMapTile(x, y, true);
+  prevTile := DTA.ReadWord;
+  DTA.MovePosition(-2);
+  DTA.WriteWord(selectedCell);
+  ViewMap(MapsListStringGrid.Row);
+end;
+
+procedure TMainForm.MapImageMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var pnt: TPoint;
+  t1, t2, t3: Word;
+begin
+  SelectMapTile(x, y, false);
+  t1 := DTA.ReadWord;
+  t2 := DTA.ReadWord;
+  t3 := DTA.ReadWord;
+
+  StatusBar.Panels[0].Text := '$' + IntToHex(t1, 4) + ' $' + IntToHex(t2, 4) + ' $' + IntToHex(t3, 4) + ' (bottom, middle, top)';
+
+  if (Button = mbRight) and GetCursorPos(pnt) and TabSheet18.Visible then MapPopupMenu.Popup(pnt.X - 7, pnt.Y - 10);
+end;
+
+procedure TMainForm.RadioGroup1Click(Sender: TObject);
+begin
+  prevTile := -1;
+end;
+
+procedure TMainForm.Undo1Click(Sender: TObject);
+begin
+  if prevTile <> -1 then
+  begin
+    SelectMapTile(prevTileX, prevTileY, true);
+    DTA.WriteWord(prevTile);
+    prevTile := -1;
+    ViewMap(MapsListStringGrid.Row);
+  end;
+end;
+
+procedure TMainForm.Empty1Click(Sender: TObject);
+var
+  pt : tPoint;
+begin
+  pt := ScreenToClient(Mouse.CursorPos);
+  prevTileX := pt.x div 32;
+  prevTileY := pt.y div 32;
+  SelectMapTile(prevTileX, prevTileY, true);
+  prevTile := DTA.ReadWord;
+  DTA.MovePosition(-2);
+  DTA.WriteWord($FFFF);
+  ViewMap(MapsListStringGrid.Row);
 end;
 
 end.
